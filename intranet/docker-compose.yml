@@ -1,0 +1,15 @@
+
+# This is the base configuration. 
+version: '3.2'
+
+services:
+
+  # -------------------------------------------------------------
+  # Crawl log viewer
+  # -------------------------------------------------------------
+  crawl-log-viewer:
+    image: ukwa/crawl-log-viewer:streamer
+    ports:
+     - "8000:8000"
+    volumes:
+      - ./crawl-log-topics.json:/usr/src/app/topics.json
