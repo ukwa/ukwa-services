@@ -7,7 +7,7 @@ services:
     image: ukwa/ukwa-pywb:1.0.9
     environment:
       WEBHDFS_USER: "access"
-      UKWA_INDEX: "xmlquery+http://cdx.api.wa.cl.uk/data-heritrix"
+      UKWA_INDEX: "xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       UKWA_ARCHIVE: "webhdfs://hdfs.api.wa.bl.uk"
       SCRIPT_NAME: "/act/wayback"
     volumes:
@@ -62,7 +62,7 @@ services:
       - "PII_URI=${PII_URL}"
       - "ACCESS_RESOLVER_URI=https://www.webarchive.org.uk/access/resolve/"
       - "ENABLE_EVOLUTIONS=true"
-      - "APPLY_EVOLUTIONS=false" # This is generally safe to enable, but should only be done when migrations are expected.
+      - "APPLY_EVOLUTIONS=true" # This is generally safe to enable, but should only be done when migrations are expected.
       - "APPLY_DOWN_EVOLUTIONS=false" # WARNING DOWNS ARE POTENTIALLY DESTRUCTIVE
     volumes:
       - "${DDHAPT_SIPS_SUBMITTED_DIR}:/opt/data/dls_sips_copy"

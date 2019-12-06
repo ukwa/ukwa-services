@@ -1,2 +1,28 @@
 # ukwa-services
 Deployment configuration for all UKWA services stacks.
+
+These [Docker Stack]() configurations and related scripts are used to launch and manage our main services.  No internal or sensitive data is kept here -- that is stored in internal `ukwa-services-env` repository and pulled in when needed.
+
+## Deployment Process
+
+First, individual components should be developed and tested on developers' own machines/VMs, using the [Docker Compose]() files within each tool's repository. e.g.
+
+- [w3act](https://github.com/ukwa/w3act/blob/master/docker-compose.yml)
+- [crawl-log-viewer](https://github.com/ukwa/crawl-log-viewer#local-development-setup)
+
+These are are intended to be self-contained. i.e. if possible should not depend on external services, but use dummy ones populated with test data.
+
+Once a new version of a component is close to completion, we will want to run then against internal APIs for integration testing and/or user acceptance testing, and that's what the files in this repository are for. A copy of this repository is available on the shared storage of the DEV Swarm, and that's where new builds of versions of containers should be tested.
+
+Once we're happy with the set of Swarm stacks, we can tag the whole configuration set for release through BETA and then to PROD.
+
+Whoever is performing the roll-out will then review the tagged `ukwa-services` configuration:
+
+- check they understand what has been changed
+- review setup, especially the prod/beta/dev-specific configurations, and check they are up to date and sensible
+- check no sensitive data or secrets have crept into this repository (rather than `ukwa-services-env`)
+- check all containers specify a tagged version to deploy
+- check the right API endpoints are in us
+
+
+
