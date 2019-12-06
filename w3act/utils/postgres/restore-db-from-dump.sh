@@ -1,7 +1,13 @@
 #!/bin/sh
 
-source /etc/sysconfig/w3act-beta
+# Password:
+source /mnt/nfs/config/gitlab/ukwa-services-env/w3act/dev/w3act.env
 
+# Data folder:
+export DATA_FOLDER=/mnt/nfs/data/w3act
+export W3ACT_PSQL_DIR=$DATA_FOLDER/postgresql
+
+# Dump folder:
 export W3ACT_DUMPS_DIR=$PWD
 
 PASS_COMMAND="docker-compose exec postgres"
