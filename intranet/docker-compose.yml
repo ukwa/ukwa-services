@@ -8,7 +8,7 @@ services:
   # Crawl log viewer
   # -------------------------------------------------------------
   crawl-log-viewer:
-    image: ukwa/crawl-log-viewer:streamer
+    image: ukwa/crawl-log-viewer
     ports:
      - "8000:8000"
     volumes:
