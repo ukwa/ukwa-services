@@ -1,0 +1,23 @@
+INDEX:   &INDEX ${UKWA_INDEX}
+ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
+
+collections:
+    # open access (with access controls) under /archive/
+    archive:
+        index_paths: *INDEX
+        archive_paths: *ARCHIVE
+
+# redirect to exact url behavior
+redirect_to_exact: true
+
+# enable memento
+enable_memento: true
+
+# enable experimental Memento Prefer
+enable_prefer: true
+
+locales_root_dir: ./i18n/translations/
+locales:
+  - en
+  - cy
+
