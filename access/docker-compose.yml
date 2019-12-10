@@ -19,7 +19,7 @@ services:
       - "KAFKA_LAUNCH_BROKER=192.168.45.15:9094"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
       - "HTTPS_PROXY=http://194.66.232.92:3127/"
-      - "SERVER_NAME=beta.webarchive.org.uk"
+      - "SERVER_NAME=dev.webarchive.org.uk"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
     ports:
      - "8000:8000"
@@ -37,14 +37,14 @@ services:
   pywb-nobanner:
     image: ukwa/ukwa-pywb:latest
     ports:
-      - "8090:8080"
+      - "9090:8080"
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://192.168.45.13:14000"
     volumes:
       - ./pywb/config-nobanner.yaml:/webarchive/config.yaml
-      - /root/wayback-config/acl/:/ukwa_pywb/acl/
+      - open-access-acl:/ukwa_pywb/acl/
       - ./pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
     networks:
       - default
@@ -73,8 +73,8 @@ services:
   pywb:
     image: ukwa/ukwa-pywb:2.4.0-beta-5
     ports:
-      - "8080:8080"
-      - "8081:8081"
+      - "9080:8080"
+      - "9081:8081"
     environment:
       - "DEBUG=True"
       - "WEBHDFS_USER=access"
@@ -86,7 +86,7 @@ services:
         gelf-address: "udp://logs.wa.bl.uk:12201"
     volumes:
       - ./pywb/config.yaml:/webarchive/config.yaml
-      - /root/wayback-config/acl/:/ukwa_pywb/acl/
+      - open-access-acl:/ukwa_pywb/acl/
 
 
   # -------------------------------------------------------------
@@ -124,7 +124,7 @@ services:
     image: solr:6.3
     volumes:
     # n.b container solr userid (8983) should have write permission on host solr dir
-       - "/data/solr/ukwa_collections/server:/opt/solr/server" 
+       - solr-ukwa-collections:/opt/solr/server
     ports:
        - "9020:8983"
 
@@ -170,11 +170,14 @@ services:
   shinedb:
     image: postgres:9.6.2
     volumes:
-      - "/data/shine/postgresql/data:/var/lib/postgresql/data"   
+      - shine-postgres-data:/var/lib/postgresql/data
       
       
 volumes:
   analysis-volume:
+  solr-ukwa-collections:
+  shine-postgres-data:
+  open-access-acl:
 
 networks:
   default:
