@@ -1,0 +1,14 @@
+server {
+  listen  80;
+  server_name ${SERVER_NAME}
+  charset utf-8;
+
+  location /intranet/ {
+    root  /usr/share/nginx/html;
+  }
+
+  location /intranet/logs {
+    proxy_pass  http://crawl-log-viewer:8000/;
+    proxy_set_header  Host $http_host;
+  }
+}

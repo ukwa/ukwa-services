@@ -9,7 +9,20 @@ services:
   # -------------------------------------------------------------
   crawl-log-viewer:
     image: ukwa/crawl-log-viewer
-    ports:
-     - "8000:8000"
+    environment:
+      - "SCRIPT_NAME=/intranet/logs"
     volumes:
       - ./crawl-log-topics.json:/usr/src/app/topics.json
+
+  # -------------------------------------------------------------
+  # NGINX that proxies connections to the intranet components
+  # -------------------------------------------------------------
+    web:
+    image: nginx
+    volumes:
+    - ./intranet.nginx.template:/etc/nginx/conf.d/nginx.template
+    ports:
+    - "90:80"
+    environment:
+    - SERVER_NAME=${INTRANET_HOST}
+    command: /bin/bash -c "envsubst < /etc/nginx/conf.d/nginx.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
