@@ -11,37 +11,33 @@ services:
     image: ukwa/ukwa-access-api
     environment:
       - "CDX_SERVER=http://cdx.api.wa.bl.uk/data-heritrix"
-      - "WEBHDFS_PREFIX=http://192.168.45.13:14000/webhdfs/v1"
-      - "KAFKA_BOOTSTRAP_SERVERS=192.168.45.15:9094"
+      - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
+      - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
       - "KAFKA_SEEK_TO_BEGINNING=False"
       - "API_LABEL=ACCESS API PROTOTYPE"
-      - "KAFKA_LAUNCH_BROKER=192.168.45.15:9094"
+      - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
       - "HTTPS_PROXY=http://194.66.232.92:3127/"
-      - "SERVER_NAME=dev.webarchive.org.uk"
+      - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
-    ports:
-     - "8000:8000"
     volumes:
       - analysis-volume:/analysis
 
   # Analyses recent crawl behaviour by processing the crawled data stream:
   analyse:
     image: ukwa/crawl-streams
-    command: "analyse -k 192.168.45.15:9094 -u 2 -o /analysis/fc.crawled.json"
+    command: "analyse -k ${KAFKA_BROKER} -u 2 -o /analysis/fc.crawled.json"
     volumes:
       - analysis-volume:/analysis
 
   # An embedded, bannerless OA Wayback to render:
   pywb-nobanner:
     image: ukwa/ukwa-pywb:latest
-    ports:
-      - "9090:8080"
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
-      - "UKWA_ARCHIVE=webhdfs://192.168.45.13:14000"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
     volumes:
       - ./pywb/config-nobanner.yaml:/webarchive/config.yaml
       - open-access-acl:/ukwa_pywb/acl/
@@ -63,8 +59,6 @@ services:
       - /tmp/webrender:/tmp/webrender
     deploy:
       replicas: 1
-    ports:
-     - "8010:8010"
 
 
   # -------------------------------------------------------------
@@ -72,18 +66,11 @@ services:
   # -------------------------------------------------------------
   pywb:
     image: ukwa/ukwa-pywb:2.4.0-beta-5
-    ports:
-      - "9080:8080"
-      - "9081:8081"
     environment:
       - "DEBUG=True"
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
-      - "UKWA_ARCHIVE=webhdfs://192.168.45.13:14000"
-    logging:
-      driver: gelf
-      options:
-        gelf-address: "udp://logs.wa.bl.uk:12201"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
     volumes:
       - ./pywb/config.yaml:/webarchive/config.yaml
       - open-access-acl:/ukwa_pywb/acl/
@@ -95,14 +82,12 @@ services:
   ukwa-ui:
     image: ukwa/ukwa-ui:latest
     command: java -Djava.security.egd=file:/dev/./urandom -jar /ukwa-ui.war --spring.config.location=file:/application.properties
-    ports:
-     - "8080:8080"
     environment:
-     - "SET_PROTOCOL_TO_HTTPS=true"
-     - "OFF_SITE_URL=https://beta.webarchive.org.uk/wayback/archive/"
+     - "SET_PROTOCOL_TO_HTTPS=${USE_HTTPS}"
+     - "OFF_SITE_URL=https://${SERVER_NAME}/wayback/archive/"
      - "SOLR_COLLECTION_SEARCH_PATH=http://ukwa_collections:8983"
      - "SOLR_COLLECTION_SEARCH_REQUEST_HANDLER=/solr/collections/select"
-     - "SOLR_FULL_TEXT_SEARCH_PATH=http://192.168.45.33:8983"
+     - "SOLR_FULL_TEXT_SEARCH_PATH=http://solr.api.wa.bl.uk"
      - "SOLR_FULL_TEXT_SEARCH_REQUEST_HANDLER=/solr/all/select"
      - "SOLR_READ_TIMEOUT=600000"
      - "SOLR_CONNECTION_TIMEOUT=60000"
@@ -112,10 +97,6 @@ services:
      - "BL_SMTP_SERVER_HOST=juno.bl.uk"
      - "BL_SMTP_USERNAME="
      - "BL_SMTP_PASSWORD="
-    logging:
-      driver: gelf
-      options:
-        gelf-address: "udp://logs.wa.bl.uk:12201"
     volumes:
       - ./ukwa-ui/ukwa-ui.properties:/application.properties:ro   
 
@@ -134,22 +115,16 @@ services:
   mementos:
     image: ukwa/mementoweb-webclient
     command: "/mementos/bin/mementos-webclient -Dhttp.proxyHost=194.66.232.92 -Dhttp.proxyPort=3127 -Dconfig.file=/mementos/conf/application.conf -Dpidfile.path=/dev/null"
-    ports:
-      - "9000:9000"
     environment:
-      - "JAVA_OPTS=-Xmx1g -Dhttp.proxyHost=explorer -Dhttp.proxyPort=3127"
+      - "JAVA_OPTS=-Xmx1g -Dhttp.proxyHost=194.66.232.92 -Dhttp.proxyPort=3127"
 
-  # Rate limiter for Mementos:
+  # Web proxy setup including rate limiting for Mementos
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
-    logging:
-      driver: gelf
-      options:
-        gelf-address: "udp://logs.wa.bl.uk:12201"
     volumes:
-      - ./mementos/nginx.conf:/etc/nginx/conf.d/default.conf:ro   
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro   
 
   # -------------------------------------------------------------
   # Shine service and database
@@ -158,8 +133,6 @@ services:
   # Shine
   shine:
    image: ukwa/shine
-   ports:
-     - "9001:9000"
    environment:
      - "SOLR_URL=http://192.168.45.70:8983/solr/jisc"
      - "JAVA_OPTS=-Xmx2g -XX:+ExitOnOutOfMemoryError"
@@ -186,3 +159,9 @@ networks:
   attach:
     driver: overlay
     attachable: true
+
+#logging:
+#  driver: gelf
+#  options:
+#    gelf-address: "udp://logs.wa.bl.uk:12201"
+
