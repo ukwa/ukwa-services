@@ -23,9 +23,9 @@ server {
     # Otherwise, no rewrite needed, just pass to pywb
     location / {
         include uwsgi_params;
-        uwsgi_param UWSGI_SCHEME https;
+        uwsgi_param UWSGI_SCHEME ${SERVER_SCHEME};
         uwsgi_param SCRIPT_NAME /act/wayback;
-        uwsgi_param HTTP_HOST dev.webarchive.org.uk;
+        uwsgi_param HTTP_HOST ${SERVER_NAME};
 
         uwsgi_pass pywb:8081;
 
