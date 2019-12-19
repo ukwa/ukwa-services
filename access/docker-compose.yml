@@ -15,7 +15,7 @@ services:
       - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
       - "KAFKA_SEEK_TO_BEGINNING=False"
-      - "API_LABEL=ACCESS API PROTOTYPE"
+      - "API_LABEL=ACCESS API"
       - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
       - "HTTPS_PROXY=http://194.66.232.92:3127/"
