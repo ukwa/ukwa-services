@@ -10,15 +10,15 @@ services:
   ukwa-access-api:
     image: ukwa/ukwa-access-api
     environment:
-      - "CDX_SERVER=http://cdx.api.wa.bl.uk/data-heritrix"
-      - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
+      - "CDX_SERVER=${CDX_SERVER}"
+      - "WEBHDFS_PREFIX=${WEBHDFS_PREFIX}"
       - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
       - "KAFKA_SEEK_TO_BEGINNING=False"
       - "API_LABEL=ACCESS API"
       - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
-      - "HTTPS_PROXY=http://194.66.232.92:3127/"
+      - "HTTPS_PROXY=${HTTPS_PROXY}""
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
     volumes:
@@ -36,8 +36,8 @@ services:
     image: ukwa/ukwa-pywb:latest
     environment:
       - "WEBHDFS_USER=access"
-      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
-      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "UKWA_INDEX=${UKWA_INDEX}"
+      - "UKWA_ARCHIVE=${UKWA_ARCHIVE}"
     volumes:
       - ./pywb/config-nobanner.yaml:/webarchive/config.yaml
       - open-access-acl:/ukwa_pywb/acl/
@@ -69,8 +69,8 @@ services:
     environment:
       - "DEBUG=True"
       - "WEBHDFS_USER=access"
-      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
-      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "UKWA_INDEX=${UKWA_INDEX}"
+      - "UKWA_ARCHIVE=${UKWA_ARCHIVE}"
     volumes:
       - ./pywb/config.yaml:/webarchive/config.yaml
       - open-access-acl:/ukwa_pywb/acl/
@@ -87,7 +87,7 @@ services:
      - "OFF_SITE_URL=https://${SERVER_NAME}/wayback/archive/"
      - "SOLR_COLLECTION_SEARCH_PATH=http://ukwa_collections:8983"
      - "SOLR_COLLECTION_SEARCH_REQUEST_HANDLER=/solr/collections/select"
-     - "SOLR_FULL_TEXT_SEARCH_PATH=http://solr.api.wa.bl.uk"
+     - "SOLR_FULL_TEXT_SEARCH_PATH=${SOLR_FULL_TEXT_SEARCH_PATH}"
      - "SOLR_FULL_TEXT_SEARCH_REQUEST_HANDLER=/solr/all/select"
      - "SOLR_READ_TIMEOUT=600000"
      - "SOLR_CONNECTION_TIMEOUT=60000"
@@ -114,9 +114,9 @@ services:
   # -------------------------------------------------------------
   mementos:
     image: ukwa/mementoweb-webclient
-    command: "/mementos/bin/mementos-webclient -Dhttp.proxyHost=194.66.232.92 -Dhttp.proxyPort=3127 -Dconfig.file=/mementos/conf/application.conf -Dpidfile.path=/dev/null"
+    command: "/mementos/bin/mementos-webclient -Dhttp.proxyHost=${PROXYHOST} -Dhttp.proxyPort=${PROXYPORT} -Dconfig.file=/mementos/conf/application.conf -Dpidfile.path=/dev/null"
     environment:
-      - "JAVA_OPTS=-Xmx1g -Dhttp.proxyHost=194.66.232.92 -Dhttp.proxyPort=3127"
+      - "JAVA_OPTS=-Xmx1g -Dhttp.proxyHost=${PROXYHOST} -Dhttp.proxyPort=${PROXYPORT}"
 
   # Web proxy setup including rate limiting for Mementos
   nginx:
@@ -134,7 +134,7 @@ services:
   shine:
    image: ukwa/shine
    environment:
-     - "SOLR_URL=http://192.168.45.70:8983/solr/jisc"
+     - "SOLR_URL=${SHINE_SOLR}"
      - "JAVA_OPTS=-Xmx2g -XX:+ExitOnOutOfMemoryError"
    depends_on:
      - shinedb
