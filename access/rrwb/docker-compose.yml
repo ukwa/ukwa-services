@@ -1,0 +1,50 @@
+
+# This is the base configuration. 
+version: '3.2'
+
+services:
+
+  # -------------------------------------------------------------
+  # Reading Room Wayback configuration per LDL:
+  # -------------------------------------------------------------
+  pywb-bl:
+    image: ukwa/ukwa-pywb:2.4.0-beta-5
+    environment:
+      - "DEBUG=True"
+      - "WEBHDFS_USER=access"
+      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "REDIS_URL=redis://redis:6379/0"
+    volumes:
+      - ./pywb/config.yaml:/webarchive/config.yaml
+      - rr-access-acl:/ukwa_pywb/acl/
+    depends_on:
+      - redis
+
+  # Redis service to hold locks
+  redis:
+    image: redis:3.2.4
+
+  # Add some setup via NGINX
+  nginx:
+    image: nginx:1.13-alpine
+
+    volumes:
+      - ./nginx/pywb.conf:/etc/nginx/conf.d/pywb.conf:ro
+
+    ports:
+      - "8100:8100"
+
+    depends_on:
+      - pywb
+
+
+volumes:
+  # Where the access block list is held:
+  rr-access-acl:
+
+#logging:
+#  driver: gelf
+#  options:
+#    gelf-address: "udp://logs.wa.bl.uk:12201"
+

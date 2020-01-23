@@ -1,0 +1,32 @@
+INDEX:   &INDEX ${UKWA_INDEX}
+ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
+
+collections:
+    # NPLD access under /archive/
+    archive:
+        index_paths: *INDEX
+        archive_paths: *ARCHIVE
+
+        acl_paths:
+            - ./acl/blocks.aclj
+
+        default_access: block
+
+        # up the query limit:
+        query_limit: 100000
+
+# redirect to exact url behavior
+redirect_to_exact: true
+
+# enable memento
+enable_memento: true
+
+# enable experimental Memento Prefer
+enable_prefer: true
+
+# Locale setup
+locales_root_dir: ./i18n/translations/
+locales:
+  - en
+  - cy
+

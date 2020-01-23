@@ -3,6 +3,16 @@ Deployment configuration for all UKWA services stacks.
 
 These [Docker Stack]() configurations and related scripts are used to launch and manage our main services.  No internal or sensitive data is kept here -- that is stored in internal `ukwa-services-env` repository and pulled in when needed.
 
+See the [change log](./CHANGELOG.md) for information on how this setup has changed over time.
+
+## Structure
+
+Service stacks are grouped by broad service area, e.g. `access/website` is the service stack that provides the public website part of our access system.
+
+Within each stack folder, we should have a single `docker-compose.yml` file which should be used for all deployment contexts (`dev`,`beta` and `prod`). Any necessary variations should be defined via environment variables.
+
+These variables, any other context-specific configuration, should be held in `dev`,`beta` and `prod` subdirectories. For example, if `access/website/docker-compose.yml` is the main stack definition file, any addtional services needed only on `dev` might be declared in `access/website/dev/docker-compose.yml` and would be deployed separately.
+
 ## Deployment Process
 
 First, individual components should be developed and tested on developers' own machines/VMs, using the [Docker Compose]() files within each tool's repository. e.g.
@@ -18,11 +28,9 @@ Once we're happy with the set of Swarm stacks, we can tag the whole configuratio
 
 Whoever is performing the roll-out will then review the tagged `ukwa-services` configuration:
 
-- check they understand what has been changed
+- check they understand what has been changed, which should be indicated in the [change log](./CHANGELOG.md)
 - review setup, especially the prod/beta/dev-specific configurations, and check they are up to date and sensible
 - check no sensitive data or secrets have crept into this repository (rather than `ukwa-services-env`)
 - check all containers specify a tagged version to deploy
 - check the right API endpoints are in us
-
-
 
