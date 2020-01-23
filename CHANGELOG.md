@@ -15,6 +15,7 @@ Headings are [Added, Changed, Deprecated, Removed, Fixed, Security](https://keep
 
 * Re-arranged content into service areas (ingest/access/etc.) Structure is now `area/stack` for each deployable service stack.
 * Updated the README to refer to this CHANGELOG.
+* Setting up the website service stack to deploy the beta version as-is.
 
 ### Removed
 

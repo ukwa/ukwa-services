@@ -21,4 +21,4 @@ mkdir ${STORAGE_PATH}/ukwa-collections-solr
 mkdir /tmp/webrender
 
 # Launch the common configuration with these environment variable:
-docker stack deploy -c ../docker-compose.yml access
+docker stack deploy -c ../docker-compose.yml website

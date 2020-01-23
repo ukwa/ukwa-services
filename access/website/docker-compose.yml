@@ -28,7 +28,7 @@ services:
      - "BL_SMTP_USERNAME="
      - "BL_SMTP_PASSWORD="
     volumes:
-      - ./ukwa-ui/ukwa-ui.properties:/application.properties:ro   
+      - ./config/ukwa-ui/ukwa-ui.properties:/application.properties:ro   
 
   # -------------------------------------------------------------
   # Collections index for Topics & Themes of the UKWA UI
@@ -54,7 +54,7 @@ services:
       - "UKWA_INDEX=cdx+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
     volumes:
-      - ./pywb/config.yaml:/webarchive/config.yaml
+      - ./config/pywb/config.yaml:/webarchive/config.yaml
       # Used to store the access control lists used by the pywb services.
       - "${STORAGE_PATH}/open-access-acl:/ukwa_pywb/acl/"
 
@@ -74,7 +74,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro   
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro   
 
   # -------------------------------------------------------------
   # Shine service and database
@@ -132,20 +132,17 @@ services:
         - "UKWA_INDEX=cdx+http://cdx.api.wa.bl.uk/data-heritrix"
         - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       volumes:
-        - ./pywb/config-nobanner.yaml:/webarchive/config.yaml
-        - ./pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
+        - ./config/pywb/config-nobanner.yaml:/webarchive/config.yaml
+        - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
         # Used to store the access control lists used by the pywb services.
         - "${STORAGE_PATH}/open-access-acl:/ukwa_pywb/acl/"
-      networks:
-        - default
-        - attach
   
     # Web page rendering post-crawl:
     webrender:
       image: ukwa/webrender-api:1.0.10
       environment:
         - "HTTP_PROXY=http://pywb-nobanner:8080"
-        - "DOCKER_NETWORK=access_attach"
+        - "DOCKER_NETWORK=website_default"
         - "LC_ALL=en_US.utf8"
         - "WEB_RENDER_TMP=/tmp/webrender"
       volumes:
@@ -165,8 +162,9 @@ volumes:
   analysis-volume:
 
 networks:
-  # This attachable network is needed so the screenshotter can spin up containers and talk to them over HTTP:
-  attach:
+  # This attachable network is needed so the screenshotter can spin up containers and talk to them over HTTP.
+  # It also makes it simpler to connect to the PostgreSQL instance for maintenance.
+  default:
     driver: overlay
     attachable: true
 

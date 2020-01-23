@@ -1,7 +1,7 @@
 # ukwa-services
 Deployment configuration for all UKWA services stacks.
 
-These [Docker Stack]() configurations and related scripts are used to launch and manage our main services.  No internal or sensitive data is kept here -- that is stored in internal `ukwa-services-env` repository and pulled in when needed.
+These [Docker Stack](https://docs.docker.com/engine/reference/commandline/stack/) configurations and related scripts are used to launch and manage our main services.  No internal or sensitive data is kept here -- that is stored in internal `ukwa-services-env` repository and pulled in when needed.
 
 See the [change log](./CHANGELOG.md) for information on how this setup has changed over time.
 
@@ -15,7 +15,7 @@ These variables, any other context-specific configuration, should be held in `de
 
 ## Deployment Process
 
-First, individual components should be developed and tested on developers' own machines/VMs, using the [Docker Compose]() files within each tool's repository. e.g.
+First, individual components should be developed and tested on developers' own machines/VMs, using the [Docker Compose](https://docs.docker.com/compose/compose-file/) files within each tool's repository. e.g.
 
 - [w3act](https://github.com/ukwa/w3act/blob/master/docker-compose.yml)
 - [crawl-log-viewer](https://github.com/ukwa/crawl-log-viewer#local-development-setup)
