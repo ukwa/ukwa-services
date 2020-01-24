@@ -8,10 +8,14 @@ https://www.webarchive.org.uk/
 See the comments in [the stack definition](./docker-compose.yml) for details.
 
 
-Deployment Procedure
---------------------
+Deployment Procedures
+--------------------=
 
-Where possible, deployment setup is handled in the launch script (e.g. [./dev/deploy-access-dev.sh](./dev/deploy-access-dev.sh)). However, Shine requires a PostgreSQL database, so additional setup is required using the scripts in [./scripts/postgres](./scripts/postgres).
+Where possible, deployment setup is handled in the launch script (e.g. [./dev/deploy-access-dev.sh](./dev/deploy-access-dev.sh)). However, some setup cannot be done this way.
+
+### Shine Database
+
+Shine requires a PostgreSQL database, so additional setup is required using the scripts in [./scripts/postgres](./scripts/postgres).
 
 If starting from a new deployment, and having deployed the stack, you first need to stop Shine itself from running, as otherwise it will attempt to start up and will insert and empty database into PostgreSQL and this will interfere with the restore process. So, use
 
@@ -23,3 +27,19 @@ To do a restore, use `download-shine-db-dump.sh` to grab a database dump from HD
 
 Re-deploy the whole service stack, and Shine will restart using the restored database.
 
+### Setting up api endpoints
+
+Once running, the entire system should be exposed properly via the API gateway.  e.g. accessing the dev system:
+
+- For the actual website, we want `website.dapi.wa.bl.uk` to point to `dev-swarm-members:80`.  
+- For the Topics & Themes Solr instance we should route `solr-collections.dapi.wa.bl.uk` to `dev-swarm-members:9020`.
+
+### Setting up X.webarchive.org.uk
+
+The website is designed to be run behind a boundary web proxy that handles SSL etc.  To make use of this stack of services, the server that provides e.g. dev.webarchive.org.uk will need to be configured to point to the right API endpoint.
+
+Having set this up, if we visit e.g. `dev.webarchive.org.uk` the traffic should show up under `website.dapi.wa.bl.uk` and so forth.
+
+## Testing
+
+TBA

@@ -1,67 +1,64 @@
+version: "3.2"
+
 # -------------------------------------------------------------
 # This service configuration defines additional, experimental services
 # -------------------------------------------------------------
-
-version: '3.2'
-
 services:
-
   # -------------------------------------------------------------
   # The Python service that provides some basic APIs
   # -------------------------------------------------------------
-    ukwa-access-api:
-      image: ukwa/ukwa-access-api
-      environment:
-        - "CDX_SERVER=http://cdx.api.wa.bl.uk/data-heritrix"
-        - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
-        - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
-        - "KAFKA_CRAWLED_TOPIC=fc.crawled"
-        - "KAFKA_SEEK_TO_BEGINNING=False"
-        - "API_LABEL=ACCESS API"
-        - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
-        - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
-        - "HTTPS_PROXY=http://194.66.232.92:3127/"
-        - "SERVER_NAME=${SERVER_NAME}"
-        - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
-      volumes:
-        - analysis-volume:/analysis
-  
-    # Analyses recent crawl behaviour by processing the crawled data stream:
-    analyse:
-      image: ukwa/crawl-streams
-      command: "analyse -k ${KAFKA_BROKER} -u 2 -o /analysis/fc.crawled.json"
-      volumes:
-        - analysis-volume:/analysis
-  
-    # An embedded, bannerless OA Wayback to render:
-    pywb-nobanner:
-      image: ukwa/ukwa-pywb:latest
-      environment:
-        - "WEBHDFS_USER=access"
-        - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
-        - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
-      volumes:
-        - ./pywb/config-nobanner.yaml:/webarchive/config.yaml
-        - open-access-acl:/ukwa_pywb/acl/
-        - ./pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
-      networks:
-        - default
-        - attach
-  
-    # Web page rendering post-crawl:
-    webrender:
-      image: ukwa/webrender-api:1.0.10
-      environment:
-        - "HTTP_PROXY=http://pywb-nobanner:8080"
-        - "DOCKER_NETWORK=access_attach"
-        - "LC_ALL=en_US.utf8"
-        - "WEB_RENDER_TMP=/tmp/webrender"
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-        - /tmp/webrender:/tmp/webrender
-      deploy:
-        replicas: 1
-  
+  ukwa-access-api:
+    image: ukwa/ukwa-access-api
+    environment:
+      - "CDX_SERVER=http://cdx.api.wa.bl.uk/data-heritrix"
+      - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
+      - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
+      - "KAFKA_CRAWLED_TOPIC=fc.crawled"
+      - "KAFKA_SEEK_TO_BEGINNING=False"
+      - "API_LABEL=ACCESS API"
+      - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
+      - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
+      - "HTTPS_PROXY=http://194.66.232.92:3127/"
+      - "SERVER_NAME=${SERVER_NAME}"
+      - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
+    volumes:
+      - analysis-volume:/analysis
+
+  # Analyses recent crawl behaviour by processing the crawled data stream:
+  analyse:
+    image: ukwa/crawl-streams
+    command: "analyse -k ${KAFKA_BROKER} -u 2 -o /analysis/fc.crawled.json"
+    volumes:
+      - analysis-volume:/analysis
+
+  # An embedded, bannerless OA Wayback to render:
+  pywb-nobanner:
+    image: ukwa/ukwa-pywb:latest
+    environment:
+      - "WEBHDFS_USER=access"
+      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+    volumes:
+      - ./pywb/config-nobanner.yaml:/webarchive/config.yaml
+      - open-access-acl:/ukwa_pywb/acl/
+      - ./pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
+    networks:
+      - default
+      - attach
+
+  # Web page rendering post-crawl:
+  webrender:
+    image: ukwa/webrender-api:1.0.10
+    environment:
+      - "HTTP_PROXY=http://pywb-nobanner:8080"
+      - "DOCKER_NETWORK=access_attach"
+      - "LC_ALL=en_US.utf8"
+      - "WEB_RENDER_TMP=/tmp/webrender"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/webrender:/tmp/webrender
+    deploy:
+      replicas: 1
 
 # -----------------------------------------
 # Volumes and networks supporting the above
@@ -70,7 +67,6 @@ services:
 volumes:
   # Used to store analysis generated from Kafka, so it can be made available via the API component:
   analysis-volume:
-
 # -----------------------------------------
 # Logging configuration
 # -----------------------------------------
