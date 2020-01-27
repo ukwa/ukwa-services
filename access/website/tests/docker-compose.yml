@@ -1,9 +1,9 @@
-version: '2'
+version: '3.2'
 
 services:
 
 # -----------------------------------------------------------
-# Automated test engine
+# Automated test engine - tests the website from 'outside'
 # -----------------------------------------------------------
 
   test:
@@ -16,7 +16,6 @@ services:
       - ./robot/make_profile.py:/tmp/make_profile.py
       - ../proxy-certs:/tmp/proxy-certs
     depends_on:
-      - pywb
       - firefox
       - chrome
       - hub

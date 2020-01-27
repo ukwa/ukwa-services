@@ -10,13 +10,11 @@ Library           RequestsLibrary
 
 *** Variables ***
 ${SELENIUM}          http://hub:4444/wd/hub
-${HOST}              http://pywb:8080
+${HOST}              https://dev.webarchive.org.uk/
 ${BROWSER}           Firefox
 ${DELAY}             0
 ${VALID USER}        demo
 ${VALID PASSWORD}    mode
-${ERROR URL}         ${HOST}/error.html
-${CA_CERTS}          /tmp/proxy-certs/pywb-ca.pem
 
 *** Keywords ***
 
@@ -30,7 +28,7 @@ Reset Browsers
 # Open Browsers
 Open Browser To Collection Page
     [Arguments]    ${coll}=test    ${browser}=firefox
-    Open Browser    ${HOST}/${coll}/    browser=${browser}    remote_url=${SELENIUM}
+    Open Browser    ${HOST}/wayback/${coll}/    browser=${browser}    remote_url=${SELENIUM}
     Set Selenium Speed    ${DELAY}
 
 Open Browser To Home Page

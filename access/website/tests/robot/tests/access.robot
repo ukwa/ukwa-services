@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Verify different access settings in reading-room, open-access and qa-access collections
-Resource          resource.robot
+Resource          _resource.robot
 Suite setup       Run Keywords    Reset Browsers
 Suite teardown    Run Keywords    Close All Browsers
 
