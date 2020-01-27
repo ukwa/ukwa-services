@@ -7,47 +7,45 @@ Documentation     A resource file with reusable keywords and variables.
 Library           SeleniumLibrary
 Library           /tmp/make_profile.py
 Library           RequestsLibrary
+Library           OperatingSystem
 
 *** Variables ***
 ${SELENIUM}          http://hub:4444/wd/hub
-${HOST}              https://dev.webarchive.org.uk/
-${BROWSER}           Firefox
-${DELAY}             0
-${VALID USER}        demo
-${VALID PASSWORD}    mode
+${BROWSER}           Chrome
+${DELAY}             0.5s
+
 
 *** Keywords ***
 
 # Browser Reset for each Test Suite
 Reset Browsers
-    Log To Console    Waiting for 20s for browser startup
-    Sleep     20s     Wait for browser startup
+    Set Selenium Speed    ${DELAY}
+    Log To Console  Running tests on host: %{HOST}
+    Log To Console    Waiting for for browser startup
+    Sleep     10s     Wait for browser startup
     Close All Browsers
 
 
 # Open Browsers
 Open Browser To Collection Page
     [Arguments]    ${coll}=test    ${browser}=firefox
-    Open Browser    ${HOST}/wayback/${coll}/    browser=${browser}    remote_url=${SELENIUM}
-    Set Selenium Speed    ${DELAY}
+    Open Browser    %{HOST}/wayback/${coll}/    browser=${browser}    remote_url=${SELENIUM}
 
 Open Browser To Home Page
-    Open Browser    ${HOST}/    browser=${BROWSER}    remote_url=${SELENIUM}
-    Maximize Browser Window
-    Set Selenium Speed    ${DELAY}
+    Log To Console  Going to %{HOST}
+    Open Browser    %{HOST}/    browser=${BROWSER}    remote_url=${SELENIUM}
 
 Open Browser With Proxy
     [Arguments]    ${coll}=test    ${browser}=firefox
     ${profile}=    make_profile
-    Open Browser    ${HOST}/    browser=${BROWSER}    remote_url=${SELENIUM}    ff_profile_dir=${profile}
-    Set Selenium Speed    ${DELAY}
+    Open Browser    %{HOST}/    browser=${BROWSER}    remote_url=${SELENIUM}    ff_profile_dir=${profile}
 
 
 # Access Checks
 Check Excluded
     [Arguments]    ${url}
     Go To   ${url}
-    Page Should Contain    URL Not Found
+    Page Should Contain    Url Not Found
 
 Check Blocked
     [Arguments]    ${url}
@@ -64,7 +62,7 @@ Check Allowed
 
 # Prefer Checks
 Check Response Is Raw
-    [Arguments]    ${resp}    ${path}     ${host}=${HOST}
+    [Arguments]    ${resp}    ${path}     ${host}=%{HOST}
     Should Be Equal As Strings    ${resp.status_code}    200
     Should Be Equal As Strings    ${resp.url}    ${host}${path}
     Should Be Equal As Strings    ${resp.headers['Preference-Applied']}    raw
@@ -72,7 +70,7 @@ Check Response Is Raw
     Should Not Contain    ${resp.text}    wombat.js
 
 Check Response Is Banner Only
-    [Arguments]    ${resp}    ${path}    ${host}=${HOST}
+    [Arguments]    ${resp}    ${path}    ${host}=%{HOST}
     Should Be Equal As Strings    ${resp.status_code}    200
     Should Be Equal As Strings    ${resp.url}    ${host}${path}
     Should Be Equal As Strings    ${resp.headers['Preference-Applied']}    banner-only
@@ -80,7 +78,7 @@ Check Response Is Banner Only
     Should Not Contain    ${resp.text}    wombat.js
 
 Check Response is Rewritten
-    [Arguments]    ${resp}    ${path}    ${host}=${HOST}
+    [Arguments]    ${resp}    ${path}    ${host}=%{HOST}
     Should Be Equal As Strings    ${resp.status_code}    200
     Should Be Equal As Strings    ${resp.url}    ${host}${path}
     Should be Equal As Strings    ${resp.headers['Preference-Applied']}    rewritten

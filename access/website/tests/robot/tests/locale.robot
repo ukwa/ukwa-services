@@ -1,6 +1,6 @@
 *** Settings ***
 Documentation     Verify locale-specific routes and localized strings
-Resource          resource.robot
+Resource          _resource.robot
 Suite setup       Run Keywords    Reset Browsers
 Suite teardown    Run Keywords    Close All Browsers
 
@@ -9,21 +9,21 @@ Suite teardown    Run Keywords    Close All Browsers
 Open Browser
     Open Browser To Home Page
 
-Check EN Home Page
-    Go To    ${HOST}/en
+Check Wayback EN Home Page
+    Go To    %{HOST}/wayback/en
     Page Should Contain    UK Web Archive Access System
 
-Check CY Home Page
-    Go To    ${HOST}/cy
+Check Wayback CY Home Page
+    Go To    %{HOST}/wayback/cy
     Page Should Contain    System fynediad Archif We y DG
 
-Check EN Replay Acid Test
-    Go To    ${HOST}/en/qa-access/2018/http://acid.matkelly.com/
+Check Wayback EN Replay Page
+    Go To    %{HOST}/wayback/en/archive/2018/https://www.bl.uk/
     Wait Until Page Contains    Language:    timeout=10s
     Page Should Contain    Back to Calendar
 
-Check CY Replay Acid Test
-    Go To    ${HOST}/cy/qa-access/2018/http://acid.matkelly.com/
+Check Wayback CY Replay Page
+    Go To    %{HOST}/wayback/cy/archive/2018/https://www.bl.uk
     Wait Until Page Contains    Iaith:    timeout=10s
     Page Should Contain    Dychwelyd i'r Calendr
 
