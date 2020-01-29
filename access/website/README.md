@@ -1,12 +1,21 @@
-The Access Stack
+The Access Stack <!-- omit in toc -->
 ================
+
+- [Introduction](#introduction)
+- [Deployment Procedures](#deployment-procedures)
+  - [Shine Database](#shine-database)
+  - [Setting up api endpoints](#setting-up-api-endpoints)
+  - [Setting up X.webarchive.org.uk](#setting-up-xwebarchiveorguk)
+- [Testing](#testing)
+
+Introduction
+------------
 
 This stack contains the components used for general, public access to our web archives. i.e.
 
 https://www.webarchive.org.uk/
 
 See the comments in [the stack definition](./docker-compose.yml) for details.
-
 
 Deployment Procedures
 ---------------------
