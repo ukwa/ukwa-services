@@ -42,6 +42,39 @@ Having set this up, if we visit e.g. `dev.webarchive.org.uk` the traffic should 
 
 ## Testing
 
+A series of tests for the website are held under the `tests` folder.  These are defined as [Robot Framework](https://robotframework.org/) acceptance tests. In the [`tests/robot/tests`](./tests/robot/tests) we have a set of `.robot` files that define tests for each major web site feature (e.g. [Wayback](./tests/robot/tests/wayback.robot)). The tests are written in an pseudo-natural-language format, relying heavily on [web testing automation keywords](https://robotframework.org/SeleniumLibrary/SeleniumLibrary.html) provided by the [Robot Framework Selenium Library](https://github.com/robotframework/SeleniumLibrary).
 
+Here's an example of a simple test sequence...
 
-When developing tests, take care to ensure that Open Browser is called once per test file. It tends to hang if it's called multiple times.
+```
+Open Browser
+    Open Browser To Home Page
+
+Check Wayback EN Home Page
+    [Tags]  wayback locale en
+    Go To    %{HOST}/wayback/en
+    Page Should Contain    UK Web Archive Access System
+```
+
+The first test (`Open Browser`) uses the `Open Browser To Home Page` keyword, which we've defined in the shared [`_resource.robot`](./tests/robot/tests/_resource.robot) file. This sets up the right test browser with the right configuration for the tests in this file (when developing tests, take care to ensure that `Open Browser` is _only_ called once per test file. It tends to hang if it's called multiple times). The next test (`Check Wayback EN Home Page`) loads the Wayback homepage and checks the page contains a particular text string (n.b. matching is case-sensitive).
+
+This provides a simple language for describing the expected behaviour of the site, and makes it easy to add further tests.  But putting the host name in an environment variable (referenced as `%{HOST}`), we can run the same test sequence across `HOST=https://www.webarchive.org.uk`, `HOST=https://beta.webarchive.org.uk` or even `HOST=https://username:password@dev.webarchive.org.uk`.
+
+To run the test suite, you need to use the supplied [Docker Compose](https://docs.docker.com/compose/) file to set up the [Selenium service](https://github.com/SeleniumHQ/docker-selenium#selenium-docker) and build and run the test system.  First, set the `HOST` environment variable. e.g.
+
+    export HOST=https://www.webarchive.org.uk
+
+Then build a Robot Framework container that includes the Selenium library:
+
+    docker-compose build robot
+
+Now to run the test suite, you can run:
+
+    docker-compose run robot
+
+The system will spin up the necessary Selenium containers (with the [Selenium Hub](https://www.guru99.com/introduction-to-selenium-grid.html) exposed on port 4444 in case you want to take a look), and then run the tests.  The results will be visible in summary in the console, and in detail via the `results/report.html` report file.  If you hit errors, the system should automatically take screenshots so you can see what the browser looked like at the point the error occured.
+
+Sometimes, the Selenium system can get a bit confused and requests start to 'hang'. In this case shutting down all the containers before the next run:
+
+    docker-compose down
+
