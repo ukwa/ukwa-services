@@ -9,7 +9,7 @@ See the comments in [the stack definition](./docker-compose.yml) for details.
 
 
 Deployment Procedures
---------------------=
+---------------------
 
 Where possible, deployment setup is handled in the launch script (e.g. [./dev/deploy-access-dev.sh](./dev/deploy-access-dev.sh)). However, some setup cannot be done this way.
 
