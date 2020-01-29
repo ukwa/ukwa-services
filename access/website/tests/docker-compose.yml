@@ -7,10 +7,14 @@ services:
 # -----------------------------------------------------------
 
   robot:
-    build: robot
+    build:
+      context: robot
+      args:
+        - "https_proxy=${HTTPS_PROXY}"
     command: --outputdir /results /tests
     environment: 
       - "HOST=${HOST}"
+      - "https_proxy=${HTTPS_PROXY}"
     volumes:
       - ./robot/tests:/tests:ro
       - ./results:/results:rw
