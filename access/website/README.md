@@ -51,7 +51,7 @@ Having set this up, if we visit e.g. `dev.webarchive.org.uk` the traffic should 
 
 ## Testing
 
-A series of tests for the website are held under the `tests` folder.  These are defined as [Robot Framework](https://robotframework.org/) acceptance tests. In the [`tests/robot/tests`](./tests/robot/tests) we have a set of `.robot` files that define tests for each major web site feature (e.g. [Wayback](./tests/robot/tests/wayback.robot)). The tests are written in an pseudo-natural-language format, relying heavily on [web testing automation keywords](https://robotframework.org/SeleniumLibrary/SeleniumLibrary.html) provided by the [Robot Framework Selenium Library](https://github.com/robotframework/SeleniumLibrary).
+A series of tests for the website are held under the `tests` folder.  These are defined as [Robot Framework](https://robotframework.org/) acceptance tests. In the [`tests/robot/tests`](./tests/robot/tests) we have a set of `.robot` files that define tests for each major web site feature (e.g. [Wayback](./tests/robot/tests/wayback.robot)). The tests are written in an [pseudo-natural-language tabular format](https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#test-case-syntax), relying heavily on [web testing automation keywords](https://robotframework.org/SeleniumLibrary/SeleniumLibrary.html) provided by the [Robot Framework Selenium Library](https://github.com/robotframework/SeleniumLibrary).
 
 Here's an example of a simple test sequence...
 
@@ -69,11 +69,15 @@ The first test (`Open Browser`) uses the `Open Browser To Home Page` keyword, wh
 
 This provides a simple language for describing the expected behaviour of the site, and makes it easy to add further tests.  By putting the host name in an environment variable (referenced as `%{HOST}`), we can run the same test sequence across `HOST=https://www.webarchive.org.uk`, `HOST=https://beta.webarchive.org.uk` or even `HOST=https://username:password@dev.webarchive.org.uk`.
 
-To run the test suite, you need to use the supplied [Docker Compose](https://docs.docker.com/compose/) file to set up the [Selenium service](https://github.com/SeleniumHQ/docker-selenium#selenium-docker) and build and run the test system.  First, set the `HOST` environment variable. e.g.
+To run the test suite, you need to use the supplied [Docker Compose](https://docs.docker.com/compose/) file to set up the [Selenium service](https://github.com/SeleniumHQ/docker-selenium#selenium-docker) and build and run the test system.  First, go into the test suite folder
+
+    cd tests
+
+and set the `HOST` environment variable. e.g.
 
     export HOST=https://www.webarchive.org.uk
 
-Then build a Robot Framework container that includes the Selenium library:
+Then build the Robot Framework container that includes the Selenium library:
 
     docker-compose build robot
 
