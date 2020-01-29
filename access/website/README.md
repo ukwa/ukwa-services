@@ -42,4 +42,6 @@ Having set this up, if we visit e.g. `dev.webarchive.org.uk` the traffic should 
 
 ## Testing
 
-TBA
+
+
+When developing tests, take care to ensure that Open Browser is called once per test file. It tends to hang if it's called multiple times.

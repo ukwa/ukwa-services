@@ -8,13 +8,12 @@ services:
 
   robot:
     build: robot
-    #command: -v BROWSER:ff --outputdir /out /tests
-    command: --outputdir /out /tests
+    command: --outputdir /results /tests
     environment: 
       - "HOST=${HOST}"
     volumes:
       - ./robot/tests:/tests:ro
-      - ./results:/out:rw
+      - ./results:/results:rw
       - ./robot/make_profile.py:/tmp/make_profile.py
     depends_on:
       - firefox
