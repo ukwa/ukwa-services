@@ -1,4 +1,11 @@
-# ukwa-services
+# ukwa-services <!-- omit in toc -->
+
+- [Introduction](#introduction)
+- [Structure](#structure)
+- [Deployment Process](#deployment-process)
+
+## Introduction
+
 Deployment configuration for all UKWA services stacks.
 
 These [Docker Stack](https://docs.docker.com/engine/reference/commandline/stack/) configurations and related scripts are used to launch and manage our main services.  No internal or sensitive data is kept here -- that is stored in internal `ukwa-services-env` repository and pulled in when needed.
@@ -33,4 +40,5 @@ Whoever is performing the roll-out will then review the tagged `ukwa-services` c
 - check no sensitive data or secrets have crept into this repository (rather than `ukwa-services-env`)
 - check all containers specify a tagged version to deploy
 - check the right API endpoints are in us
+- run any tests supplied for the component
 
