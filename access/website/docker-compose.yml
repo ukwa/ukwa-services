@@ -122,6 +122,7 @@ services:
       - "HTTPS_PROXY=http://194.66.232.92:3127/"
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
+      - "SCRIPT_NAME=/api" # Deploy the API under this prefix
     volumes:
       - "analysis-volume:/analysis"
 
