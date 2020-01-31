@@ -16,6 +16,8 @@ Headings are [Added, Changed, Deprecated, Removed, Fixed, Security](https://keep
 * Re-arranged content into service areas (ingest/access/etc.) Structure is now `area/stack` for each deployable service stack.
 * Updated the README to refer to this CHANGELOG.
 * Setting up the website service stack to deploy the beta version as-is.
+* Added initial cross-deployment automated test suite based on Robot Framework.
+* Added example proxy config to ensure we can build and use images at work.
 
 ### Removed
 
