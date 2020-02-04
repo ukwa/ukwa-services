@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation     Verify locale-specific routes and localized strings
+Documentation     Verify behaviour of the Wayback archival website playback service.
 Resource          _resource.robot
 Suite setup       Run Keywords    Reset Browsers
 Suite teardown    Run Keywords    Close All Browsers

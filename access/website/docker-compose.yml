@@ -46,15 +46,18 @@ services:
   # Collections index for Topics & Themes of the UKWA UI
   # -------------------------------------------------------------
   ukwa_collections:
-    image: solr:8.4
+    image: solr:6
     user: "${SOLR_UID}"
     command:
       - "solr-precreate"
       - "collections"
+      - "/config/solr/collections"
     volumes:
+        - "./config/solr:/config/solr"
     # Used to store the Solr index used to provide the Topic & Themes part of the main UI. Populated by an external task.
     # n.b container solr userid (8983) should have write permission on host solr dir
-        - "${STORAGE_PATH}/ukwa-collections-solr:/var/solr"
+        - "${STORAGE_PATH}/ukwa-collections-solr/mycores:/opt/solr/server/solr/mycores"
+        - "${STORAGE_PATH}/ukwa-collections-solr/logs:/opt/solr/server/logs"
     ports:
         - "9020:8983" # Exposed port so external clients can read/populate
 
@@ -116,13 +119,14 @@ services:
       - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
       - "KAFKA_SEEK_TO_BEGINNING=False"
-      - "API_LABEL=ACCESS API"
+      - "API_LABEL=UKWA ACCESS API"
       - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
       - "HTTPS_PROXY=http://194.66.232.92:3127/"
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
       - "SCRIPT_NAME=/api" # Deploy the API under this prefix
+      - "HTTP_X_FORWARDED_PROTO=https"
     volumes:
       - "analysis-volume:/analysis"
 
