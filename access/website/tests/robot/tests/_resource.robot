@@ -26,7 +26,6 @@ Reset Browsers
 
 
 # Open Browsers
-
 Open Browser To Home Page
     [Tags]  homepage
     Log To Console  Going to %{HOST}
@@ -43,7 +42,7 @@ Open Browser With Proxy
 Check Excluded
     [Arguments]    ${url}
     Go To   ${url}
-    Page Should Contain    URL Not Found
+    Page Should Contain    Not Found
 
 Check Blocked
     [Arguments]    ${url}
