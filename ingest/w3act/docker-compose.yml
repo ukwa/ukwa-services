@@ -58,7 +58,7 @@ services:
       - "ENABLE_DDHAPT=true"
       - "SMTP_SERVER=juno.bl.uk"
       - "WAYBACK_URL=http://nginx:8100/"
-      - "CDXSERVER_ENDPOINT=http://192.168.45.21:8080/data-heritrix"
+      - "CDXSERVER_ENDPOINT=http://cdx.api.wa.bl.uk/data-heritrix"
       - "MONITRIX_URI=http://monitrix:5601/app/kibana"
       - "PDFTOHTMLEX_URI=http://pdf2htmlex:5000/convert?url="
       - "AMQP_HOST=amqp"
