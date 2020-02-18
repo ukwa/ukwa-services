@@ -1,7 +1,7 @@
 W3ACT
 =====
 
-This stack deploys our curatorial service W3ACT and the sub-components it depends upon.
+This stack deploys our curatorial service W3ACT and the sub-components it depends upon:
 
 - W3ACT
 - W3ACT's PostgreSQL DB
@@ -19,9 +19,11 @@ However, the database needs to be set up correctly, along with a couple of manag
 
 ## Migrating the database an existing service
 
-When moving to a new deployment, we need to populate the database, using the scripts in the `scripts/postgres` folder. And old service should be shut down and a database backup should be taken. 
+When moving to a new deployment, we need to populate the database, using the scripts in the `scripts/postgres` folder. And old service should be shut down and a database backup should be taken. The correct command is of the form:
 
-TBA General command format for this...
+    pg_dump -U w3act -d w3act -h database-host -p 5432 --format=c --file=w3act_dump.sql
+
+although the details will depend on the deployment details.
 
 Alternatively, if timed appropriately, a backup from HDFS can be used, as shown in the [download-db-dump.sh](scripts/postgres/download-db-dump.sh) script.
 
@@ -36,6 +38,8 @@ To test it, you can run
 To start the database, then
 
     ./connect.sh
+
+_NOTE_ that if database changes are needed when updating versions, this is a good moment to implement them. See, for example `2020-02-reset-collection-areas.sh`.
 
 which should drop you in the `psql` console where you can inspect the database.  When done, exit and then run:
 
@@ -53,7 +57,7 @@ The container version and banner color (once logged in) should be set appropriat
 
 ## The database backup task
 
-Every day, the W3ACT database should be backed-up to HDFS, and the service deployment cannot be considered complete unless this is in place.
+Every day, the W3ACT database should be backed-up to HDFS, and the service deployment cannot be considered complete unless this is in place. See [`ukwa-services/management/tasks`](../../management/tasks/) for details.
 
 ## The service validation task
 
@@ -61,11 +65,13 @@ _In the future, we will have a suite of Robot Framework acceptance tests that wi
 
 ## Monitoring
 
-The monitoring framework should check that W3ACT is up.
+The monitoring framework should:
+
+- Check that W3ACT is up.
 
 TBC:
 
-- Check results of database back task?
+- Check results of database backup task?
 - Check results of service validation task?
 
 
