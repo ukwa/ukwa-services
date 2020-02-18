@@ -13,9 +13,9 @@ These services are passive, in that they only consume UKWA APIs for playback, an
 Deployment
 ==========
 
-The services are simple to deploy, using the scripts provided for each deployment context (see `dev`/`beta`/`prod` folders).
+The services are deployed using the scripts provided for each deployment context (see `dev`/`beta`/`prod` folders).  The scripts should be reviewed to make sure the configuration is correct, particularly the parts that specify the persistent storage locations and connections to external services.
 
-However, the database needs to be set up correctly, along with a couple of management tasks.
+As well as being able to run the services, the database needs to be set up correctly, and a couple of management tasks need to be in place...
 
 ## Migrating the database an existing service
 
@@ -27,9 +27,15 @@ although the details will depend on the deployment details.
 
 Alternatively, if timed appropriately, a backup from HDFS can be used, as shown in the [download-db-dump.sh](scripts/postgres/download-db-dump.sh) script.
 
-Before populating the new service, we need to make sure that the database is running, but not W3ACT itself, as in some cases components like W3ACT will attempt to set up the database on start up. To make this simpler, a separate [`docker-compose.yml`](scripts/postgres/docker-compose.yml) file is provided for spinning up the database on it's own and populating it. 
+Before populating the new service, we need to make sure that the database is running, but not W3ACT itself, as in some cases components like W3ACT will attempt to set up the database on start up. To make this simpler, we used `docker-compose` to spin up the database alone, rather than running the whole stack.
 
 So, before running the main stack, place the W3ACT dump into the `scripts/postgres` folder (as `w3act_dump.sql`) and use the [restore-db-from-dump.sh](scripts/postgres/restore-db-from-dump.sh) to populate the database.
+
+These scripts need to have the `W3ACT_PSQL_PASSWORD`, `W3ACT_PSQL_DIR` and `W3ACT_DUMPS_DIR` PostgreSQL environment variables set up, or else they will complain:
+
+    The W3ACT_PSQL_PASSWORD, W3ACT_PSQL_DIR and W3ACT_DUMPS_DIR environment variables should be set!
+
+The necessary values come from `ukwa-services-env` (for the password) and the `dev/beta/prod` deployment scripts (for the file locations).
 
 To test it, you can run
 
