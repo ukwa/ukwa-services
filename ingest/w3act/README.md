@@ -53,6 +53,10 @@ which should drop you in the `psql` console where you can inspect the database. 
 
 to shut down the temporary PostgreSQL service.
 
+## Integration with BL services
+
+PII/eBooks etc. TBA
+
 ## Launching the stack
 
 Given the database already exists, or has been populated as above, you should now be able to run the deployment script, e.g. `beta/deploy-w3act-beta.sh` for https://beta.webarchive.org.uk/act
