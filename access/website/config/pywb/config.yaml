@@ -1,0 +1,43 @@
+INDEX:   &INDEX ${UKWA_INDEX}
+ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
+
+collections:
+    # open access (with access controls) under /archive/
+    archive:
+        index_paths: *INDEX
+        archive_paths: *ARCHIVE
+
+        acl_paths:
+            - ./acl/blocks.aclj
+            - ./acl/allows.aclj
+
+        default_access: block
+
+        # up the query limit:
+        query_limit: 100000
+
+proxy:
+    # collection for proxy mode
+    coll: archive
+    ca_name: UKWA pywb HTTPS Proxy CA
+    ca_file_cache: /mnt/nfs/config/gitlab/ukwa-services-env/access/pywb/pywb-ca.pem
+    use_banner: false
+    enable_banner: false # More recent syntax for upcoming versions
+    enable_content_rewrite: false
+
+
+# redirect to exact url behavior
+redirect_to_exact: false
+
+# enable memento
+enable_memento: true
+
+# enable experimental Memento Prefer
+enable_prefer: true
+
+# Locale setup
+locales_root_dir: ./i18n/translations/
+locales:
+  - en
+  - cy
+

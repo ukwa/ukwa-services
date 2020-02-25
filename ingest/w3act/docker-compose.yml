@@ -1,0 +1,97 @@
+version: '3.2'
+
+services:
+
+  # PyWB for QA
+  pywb:
+    image: ukwa/ukwa-pywb:1.0.9
+    environment:
+      WEBHDFS_USER: "access"
+      UKWA_INDEX: "xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      UKWA_ARCHIVE: "webhdfs://hdfs.api.wa.bl.uk"
+      SCRIPT_NAME: "/act/wayback"
+    volumes:
+      - ./pywb-config.yaml:/webarchive/config.yaml
+
+  # NGINX for PYWB
+  # To ensure pywb gets proxied behind the right location, we use
+  # this NGINX instance to set the deployment scheme, hostname and path
+  # (unfortunately there does not seem to be a way to tell pywb this directly)
+  nginx:
+    image: nginx
+    environment:
+      - SERVER_NAME=${SERVER_NAME}
+      - SERVER_SCHEME=${SERVER_SCHEME}
+    command: /bin/bash -c "envsubst '$$SERVER_NAME $$SERVER_SCHEME' < /etc/nginx/conf.d/nginx.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+    volumes:
+      - ./nginx.template:/etc/nginx/conf.d/nginx.template:ro
+    # Accessible port only needed for debugging:
+    #ports:
+    #  - "8100:8100"
+    depends_on:
+      - pywb
+
+  # PDF to HTML service
+  pdf2htmlex:
+    image: ukwa/pdf2htmlex:1.0.1
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: '2G'
+    depends_on:
+      - nginx
+      - pywb
+
+  # W3ACT
+  w3act:
+    image: min2ha/w3act-fork:latest
+    command: /w3act/bin/w3act -J-Xmx6g -J-XX:+ExitOnOutOfMemoryError -Dconfig.file=/w3act/conf/docker.conf -Dpidfile.path=/dev/null -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1898 -Dcom.sun.management.jmxremote.rmi.port=1898 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=${JMX_HOSTNAME}
+    environment:
+      - "APPLICATION_NAVBAR_COLOR=${APPLICATION_NAVBAR_COLOR}"
+      - "APPLICATION_SECRET=${APPLICATION_SECRET}"
+      - "SECRET_SERVER_USER=${SECRET_SERVER_USER}"
+      - "SECRET_SERVER_PASSWORD=${SECRET_SERVER_PASSWORD}"
+      - "DB_DRIVER=org.postgresql.Driver"
+      - "DB_URI=postgres://w3act:${W3ACT_PSQL_PASSWORD}@postgres/w3act"
+      - "USE_TEST_DATA=false"
+      - "ENABLE_DDHAPT=true"
+      - "SMTP_SERVER=juno.bl.uk"
+      - "WAYBACK_URL=http://nginx:8100/"
+      - "CDXSERVER_ENDPOINT=http://cdx.api.wa.bl.uk/data-heritrix"
+      - "MONITRIX_URI=http://monitrix:5601/app/kibana"
+      - "PDFTOHTMLEX_URI=http://pdf2htmlex:5000/convert?url="
+      - "AMQP_HOST=amqp"
+      - "SERVER_NAME=${W3ACT_SERVER_NAME}"
+      - "PII_URI=${PII_URL}"
+      - "ACCESS_RESOLVER_URI=https://www.webarchive.org.uk/access/resolve/"
+      - "ENABLE_EVOLUTIONS=true"
+      - "APPLY_EVOLUTIONS=true" # This is generally safe to enable, but should only be done when migrations are expected.
+      - "APPLY_DOWN_EVOLUTIONS=false" # WARNING DOWNS ARE POTENTIALLY DESTRUCTIVE
+    volumes:
+      - "${DDHAPT_SIPS_SUBMITTED_DIR}:/opt/data/dls_sips_copy"
+      - "${DDHAPT_EBOOKS_SUBMISSION_DIR}:/opt/data/w3act/ebooks:shared"
+      - "${DDHAPT_EJOURNALS_SUBMISSION_DIR}:/opt/data/w3act/ejournals:shared"
+    ports:
+      - "9000:9000"
+      - "1898:1898"
+    depends_on:
+      - nginx
+      - pywb
+      - pdf2htmlex
+
+  # PostgreSQL
+  postgres:
+    image: postgres:9.6.2
+    environment:
+      - "POSTGRES_USER=w3act"
+      - "POSTGRES_PASSWORD=${W3ACT_PSQL_PASSWORD}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - "${W3ACT_PSQL_DIR}:/var/lib/postgresql/data"
+      - "${W3ACT_DUMPS_DIR}:/var/lib/postgresql/backups"
+
+
+
+
