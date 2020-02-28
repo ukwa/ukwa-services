@@ -1,6 +1,5 @@
 W3ACT
 =====
-
 This stack deploys our curatorial service W3ACT and the sub-components it depends upon:
 
 - W3ACT
@@ -10,14 +9,23 @@ This stack deploys our curatorial service W3ACT and the sub-components it depend
 
 These services are passive, in that they only consume UKWA APIs for playback, and data feeds are generated from them. They don't initiate the crawling processes or other regular tasks.
 
-Deployment
-==========
+## Deployment
+It is hoped this general dev - beta - prod deployment approach will simplify and streamline the roll-out process for our services. Consequently, the main deployment practice should be that of redeployment. That is, updating an existing service.
+
+### Updating an existing service
+This updating process should be mostly the same for all services, so the significant differences are highlighted below.
 
 The services are deployed using the scripts provided for each deployment context (see `dev`/`beta`/`prod` folders).  The scripts should be reviewed to make sure the configuration is correct, particularly the parts that specify the persistent storage locations and connections to external services.
 
-As well as being able to run the services, the database needs to be set up correctly, and a couple of management tasks need to be in place...
 
-## Migrating the database an existing service
+
+### Setting up a new service
+This section details the steps to set up this stack for the first time. The important detail in the W3ACT stack is the inclusion of the database, i.e., a service that holds information through the life of the stack. When updating an existing W3ACT stack, the deployment scripts should include any necessary changes to the database. However, when setting up the W3ACT stack for the first time, the database needs to be populated with data prior to the W3ACT service start-up, which logically means the database needs creating before it is populated with data.
+
+### Gather the database data
+Assuming the W3ACT service has run before, the Postgres database data should exist somewhere, perhaps on a different host. This data needs to be copied to the deployment environment in preparation of populating the database. 
+
+## Migrating the database from an existing service
 
 When moving to a new deployment, we need to populate the database, using the scripts in the `scripts/postgres` folder. And old service should be shut down and a database backup should be taken. The correct command is of the form:
 
@@ -25,9 +33,9 @@ When moving to a new deployment, we need to populate the database, using the scr
 
 although the details will depend on the deployment details.
 
-Alternatively, if timed appropriately, a backup from HDFS can be used, as shown in the [download-db-dump.sh](scripts/postgres/download-db-dump.sh) script.
+Alternatively, if timed appropriately, a backup from HDFS can be gained, as performed in the [download-db-dump.sh](scripts/postgres/download-db-dump.sh) script. Note that this script will need amending, to request the correct datestamped w3act.pgdump file.
 
-Before populating the new service, we need to make sure that the database is running, but not W3ACT itself, as in some cases components like W3ACT will attempt to set up the database on start up. To make this simpler, we used `docker-compose` to spin up the database alone, rather than running the whole stack.
+Before populating the new service, we need to make sure that the database is running, but not W3ACT itself, as in some cases components like W3ACT will attempt to set up the database on start up. To make this simpler, we use `docker-compose` to spin up the database alone, rather than running the whole stack.
 
 So, before running the main stack, place the W3ACT dump into the `scripts/postgres` folder (as `w3act_dump.sql`) and use the [restore-db-from-dump.sh](scripts/postgres/restore-db-from-dump.sh) to populate the database.
 
