@@ -10,63 +10,67 @@ This stack deploys our curatorial service W3ACT and the sub-components it depend
 These services are passive, in that they only consume UKWA APIs for playback, and data feeds are generated from them. They don't initiate the crawling processes or other regular tasks.
 
 ## Deployment
-It is hoped this general dev - beta - prod deployment approach will simplify and streamline the roll-out process for our services. Consequently, the main deployment practice should be that of redeployment. That is, updating an existing service.
+It is expected this general dev > beta > prod deployment approach will simplify and streamline the roll-out process for our services. Consequently, the main deployment practice should be that of redeployment. That is, updating an existing service.
 
 ### Updating an existing service
 This updating process should be mostly the same for all services, so the significant differences are highlighted below.
 
 The services are deployed using the scripts provided for each deployment context (see `dev`/`beta`/`prod` folders).  The scripts should be reviewed to make sure the configuration is correct, particularly the parts that specify the persistent storage locations and connections to external services.
 
+The significant difference for the W3ACT stack is managing the Postgres database. Any changes necessary for Postgres should be included via the W3ACT .sql scripts. If the changes to Postgres are more impactful then the database processes defined in the 'Setting up a new service' section below should be followed.
 
 
 ### Setting up a new service
-This section details the steps to set up this stack for the first time. The important detail in the W3ACT stack is the inclusion of the database, i.e., a service that holds information through the life of the stack. When updating an existing W3ACT stack, the deployment scripts should include any necessary changes to the database. However, when setting up the W3ACT stack for the first time, the database needs to be populated with data prior to the W3ACT service start-up, which logically means the database needs creating before it is populated with data.
+This section details the steps to set up this stack for the first time. The important detail in the W3ACT stack is the inclusion of the database, i.e., a service that holds information through the life of the stack. When updating an existing W3ACT stack, the deployment scripts should include any necessary changes to the database. However, when setting up the W3ACT stack for the first time, the database needs to be populated with data prior to the W3ACT service start-up, which logically means the database needs creating before it is populated with data. (If the W3ACT service has never been run before, this database population can be skipped - the W3ACT service will be used to enter the data.)
+
+### Start Postgres
+Before populating the new service, we need to make sure that the database is running, but not W3ACT itself, as in some cases components like W3ACT will attempt to set up the database on start up. To make this simpler, we use `docker-compose` to spin up the database alone, rather than running the whole stack.
+
+And before starting the database, the following environment variables need to be set, inside gitlab 'ukwa-services-env' repo and the deployment directory settings file.
+- W3ACT_PSQL_DIR
+- W3ACT_PSQL_PASSWORD
+- W3ACT_DUMPS_DIR
+
+So, before running the main stack, place the W3ACT dump into the `scripts/postgres` folder (as `w3act_dump.sql`) and use the [restore-db-from-dump.sh](scripts/postgres/restore-db-from-dump.sh) to populate the database.
+
+
+
 
 ### Gather the database data
 Assuming the W3ACT service has run before, the Postgres database data should exist somewhere, perhaps on a different host. This data needs to be copied to the deployment environment in preparation of populating the database. 
 
-## Migrating the database from an existing service
+First, create a backup of the existing Postgres database data on the existing host, e.g.,:
+    pg_dump -U w3act -d w3act -h <postgres host> -p 5432 --format=c --file=w3act_dump.sql
 
-When moving to a new deployment, we need to populate the database, using the scripts in the `scripts/postgres` folder. And old service should be shut down and a database backup should be taken. The correct command is of the form:
+Copy the output dump file to the deployment platform. At UKWA we regularly back up our Postgres database onto our Hadoop storage platform, so this can be downloaded via the script [download-db-dump.sh](scripts/postgres/download-db-dump.sh) (this needs amending to the correct date before executing).
 
-    pg_dump -U w3act -d w3act -h database-host -p 5432 --format=c --file=w3act_dump.sql
 
-although the details will depend on the deployment details.
 
-Alternatively, if timed appropriately, a backup from HDFS can be gained, as performed in the [download-db-dump.sh](scripts/postgres/download-db-dump.sh) script. Note that this script will need amending, to request the correct datestamped w3act.pgdump file.
 
-Before populating the new service, we need to make sure that the database is running, but not W3ACT itself, as in some cases components like W3ACT will attempt to set up the database on start up. To make this simpler, we use `docker-compose` to spin up the database alone, rather than running the whole stack.
 
-So, before running the main stack, place the W3ACT dump into the `scripts/postgres` folder (as `w3act_dump.sql`) and use the [restore-db-from-dump.sh](scripts/postgres/restore-db-from-dump.sh) to populate the database.
 
 These scripts need to have the `W3ACT_PSQL_PASSWORD`, `W3ACT_PSQL_DIR` and `W3ACT_DUMPS_DIR` PostgreSQL environment variables set up, or else they will complain:
-
     The W3ACT_PSQL_PASSWORD, W3ACT_PSQL_DIR and W3ACT_DUMPS_DIR environment variables should be set!
 
 The necessary values come from `ukwa-services-env` (for the password) and the `dev/beta/prod` deployment scripts (for the file locations).
 
 To test it, you can run
-
     ./start.sh
 
 To start the database, then
-
     ./connect.sh
 
 _NOTE_ that if database changes are needed when updating versions, this is a good moment to implement them. See, for example `2020-02-reset-collection-areas.sh`.
 
 which should drop you in the `psql` console where you can inspect the database.  When done, exit and then run:
-
     docker-compose down
 
 to shut down the temporary PostgreSQL service.
 
 ## Integration with BL services
-
 PII/eBooks etc. TBA
 
 ## Launching the stack
-
 Given the database already exists, or has been populated as above, you should now be able to run the deployment script, e.g. `beta/deploy-w3act-beta.sh` for https://beta.webarchive.org.uk/act
 
 The final step for launching the services is to ensure that the public name (e.g. `beta.webarchive.org.uk`) is pointing to the right Swarm endpoint.
@@ -74,22 +78,15 @@ The final step for launching the services is to ensure that the public name (e.g
 The container version and banner color (once logged in) should be set appropriately and consistently with what's defined in this repository.
 
 ## The database backup task
-
 Every day, the W3ACT database should be backed-up to HDFS, and the service deployment cannot be considered complete unless this is in place. See [`ukwa-services/management/tasks`](../../management/tasks/) for details.
 
 ## The service validation task
-
 _In the future, we will have a suite of Robot Framework acceptance tests that will run daily (overnight) and report whether the services are running as expected._
 
 ## Monitoring
-
 The monitoring framework should:
-
 - Check that W3ACT is up.
 
 TBC:
-
 - Check results of database backup task?
 - Check results of service validation task?
-
-
