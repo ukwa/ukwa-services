@@ -113,9 +113,10 @@ services:
   backstage:
     image: ukwa/ukwa-backstage
     environment:
-     - "SOLR_URL=http://192.168.45.21:8983/solr/tracking"
+     - "CATALOG_SOLR_URL=http://192.168.45.21:8983/solr/tracking"
      - "TRACKDB_SOLR_URL=http://192.168.45.21:8983/solr/tracking"
-     - "RAILS_RELATIVE_URL_ROOT=/intranet"
+     - "DEPLOY_RELATIVE_URL_ROOT=/intranet"
+     - "RAILS_SERVE_STATIC_FILES=true"
     ports:
      - 3001:3000
 
