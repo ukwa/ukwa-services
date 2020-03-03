@@ -4,6 +4,10 @@ server {
   charset utf-8;
   root  /usr/share/nginx/html;
 
+  location = /index.html {
+    rewrite ^ /intranet/ redirect;
+  }
+
   location /intranet/logs {
     proxy_pass  http://crawl-log-viewer:8000/intranet/logs;
     proxy_redirect     off;
@@ -56,10 +60,6 @@ server {
     proxy_set_header   X-Real-IP            $remote_addr;
     proxy_set_header   X-Forwarded-For      $proxy_add_x_forwarded_for;
     proxy_set_header   X-Forwarded-Proto    $scheme;
-  }
-
-  location /intranet {
-    alias /usr/share/nginx/html;
   }
 
 }

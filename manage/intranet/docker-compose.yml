@@ -8,30 +8,15 @@ services:
   # NGINX that proxies connections to the intranet components
   # -------------------------------------------------------------
   web:
-    image: nginx
+    # To be updated via an external cron job running docker swarm update...
+    image: ukwa/ukwa-intranet
     volumes:
-      - /mnt/nfs/data/ukwa-reports-html:/usr/share/nginx/html:ro
       - ./config/nginx.template:/etc/nginx/conf.d/nginx.template
     ports:
       - "90:90"
     environment:
       - SERVER_NAME=${SERVER_NAME}
     command: /bin/bash -c "envsubst '$$SERVER_NAME' < /etc/nginx/conf.d/nginx.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
-
-
-  # -------------------------------------------------------------
-  # Static-site (re)generator
-  # -------------------------------------------------------------
-  hugo:
-    image: jojomi/hugo:latest
-    volumes:
-      - /mnt/nfs/data/ukwa-reports/:/src
-      - /mnt/nfs/data/ukwa-reports-html:/output
-    environment:
-      - HUGO_REFRESH_TIME=3600
-      - HUGO_THEME=minimal
-      - HUGO_BASEURL=http://192.168.45.91:90/intranet
-    restart: always
 
   # -------------------------------------------------------------
   # Internal API
