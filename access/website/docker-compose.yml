@@ -8,7 +8,7 @@ services:
 
   # -------------------------------------------------------------
   # Web proxy setup
-  # ---------------------------------------------------------------
+  # -------------------------------------------------------------
   # All routing to sub-components goes through here.
   # All complex setup relating to the public website is here.
   nginx:
@@ -29,7 +29,7 @@ services:
      - "OFF_SITE_URL=https://${SERVER_NAME}/wayback/archive/"
      - "SOLR_COLLECTION_SEARCH_PATH=http://ukwa_collections:8983"
      - "SOLR_COLLECTION_SEARCH_REQUEST_HANDLER=/solr/collections/select"
-     - "SOLR_FULL_TEXT_SEARCH_PATH=http://solr.api.wa.bl.uk"
+     - "SOLR_FULL_TEXT_SEARCH_PATH=${SOLR_FULL_TEXT_SEARCH_PATH}"
      - "SOLR_FULL_TEXT_SEARCH_REQUEST_HANDLER=/solr/all/select"
      - "SOLR_READ_TIMEOUT=600000"
      - "SOLR_CONNECTION_TIMEOUT=60000"
@@ -83,19 +83,18 @@ services:
   # -------------------------------------------------------------
   mementos:
     image: ukwa/mementoweb-webclient
-    command: "/mementos/bin/mementos-webclient -Dhttp.proxyHost=194.66.232.92 -Dhttp.proxyPort=3127 -Dconfig.file=/mementos/conf/application.conf -Dpidfile.path=/dev/null"
+    command: "/mementos/bin/mementos-webclient -Dhttp.proxyHost=${PROXYHOST} -Dhttp.proxyPort=${PROXYPORT} -Dconfig.file=/mementos/conf/application.conf -Dpidfile.path=/dev/null"
     environment:
-      - "JAVA_OPTS=-Xmx1g -Dhttp.proxyHost=194.66.232.92 -Dhttp.proxyPort=3127"
+      - "JAVA_OPTS=-Xmx1g -Dhttp.proxyHost=${PROXYHOST} -Dhttp.proxyPort=${PROXYPORT}"
 
   # -------------------------------------------------------------
   # Shine service and database
   # -------------------------------------------------------------
-
   # Shine
   shine:
    image: ukwa/shine
    environment:
-     - "SOLR_URL=http://192.168.45.70:8983/solr/jisc"
+     - "SOLR_URL=${SHINE_SOLR}"
      - "JAVA_OPTS=-Xmx2g -XX:+ExitOnOutOfMemoryError"
    depends_on:
      - shinedb
@@ -168,7 +167,6 @@ services:
 # -----------------------------------------
 # Volumes and networks supporting the above
 # -----------------------------------------
-
 volumes:
   # Used to store analysis generated from Kafka, so it can be made available via the API component.
   # Only transient storage so can be managed entirely by Docker.
