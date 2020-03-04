@@ -1,7 +1,6 @@
 version: '3.2'
 
 services:
-
   # PyWB for QA
   pywb:
     image: ukwa/ukwa-pywb:1.0.9
@@ -64,7 +63,7 @@ services:
       - "AMQP_HOST=amqp"
       - "SERVER_NAME=${W3ACT_SERVER_NAME}"
       - "PII_URI=${PII_URL}"
-      - "ACCESS_RESOLVER_URI=https://www.webarchive.org.uk/access/resolve/"
+      - "ACCESS_RESOLVER_URI=${W3ACT_SERVER_NAME}/access/resolve/"
       - "ENABLE_EVOLUTIONS=true"
       - "APPLY_EVOLUTIONS=true" # This is generally safe to enable, but should only be done when migrations are expected.
       - "APPLY_DOWN_EVOLUTIONS=false" # WARNING DOWNS ARE POTENTIALLY DESTRUCTIVE
@@ -87,11 +86,7 @@ services:
       - "POSTGRES_USER=w3act"
       - "POSTGRES_PASSWORD=${W3ACT_PSQL_PASSWORD}"
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - "${W3ACT_PSQL_DIR}:/var/lib/postgresql/data"
-      - "${W3ACT_DUMPS_DIR}:/var/lib/postgresql/backups"
-
-
-
-
+      - "${W3ACT_DUMPS_DIR}:/tmp"
