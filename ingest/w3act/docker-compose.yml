@@ -44,7 +44,7 @@ services:
 
   # W3ACT
   w3act:
-    image: min2ha/w3act-fork:latest
+    image: ${W3ACT_IMAGE}
     command: /w3act/bin/w3act -J-Xmx6g -J-XX:+ExitOnOutOfMemoryError -Dconfig.file=/w3act/conf/docker.conf -Dpidfile.path=/dev/null -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1898 -Dcom.sun.management.jmxremote.rmi.port=1898 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=${JMX_HOSTNAME}
     environment:
       - "APPLICATION_NAVBAR_COLOR=${APPLICATION_NAVBAR_COLOR}"
