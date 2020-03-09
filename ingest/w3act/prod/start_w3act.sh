@@ -18,4 +18,4 @@ fi
 
 
 # Deploy
-docker stack deploy -c ../docker-compose.yml ife_prod
+docker stack deploy -c ../docker-compose.yml w3act

@@ -1,7 +1,5 @@
 #!/bin/sh
 
-export W3ACT_IMAGE=min2ha/w3act-fork:latest
-
 # Pull in sensitive environment variables:
 source /mnt/nfs/config/gitlab/ukwa-services-env/w3act/dev/w3act.env
 
