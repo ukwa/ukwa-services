@@ -2,6 +2,7 @@
 
 ###########################
 DEBUG=
+DBPAUSE=60
 ###########################
 SLEEP=5
 
@@ -28,11 +29,10 @@ sleep ${SLEEP}
 echo "Upping docker-compose.yml postgres container ---------------------------"
 $DOCKER_COMMAND up -d postgres
 
-PAUSE=60
-echo "Pausing ${PAUSE} seconds for postgres to fully start -------------------"
-while [[ ${PAUSE} -gt 0 ]]; do
-	echo -n "${PAUSE} "
-	PAUSE=$((PAUSE-1))
+echo "Pausing ${DBPAUSE} seconds for postgres to fully start -------------------"
+while [[ ${DBPAUSE} -gt 0 ]]; do
+	echo -n "${DBPAUSE} "
+	DBPAUSE=$((DBPAUSE-1))
 	sleep 1
 done
 echo 
