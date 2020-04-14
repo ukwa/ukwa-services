@@ -4,9 +4,8 @@
 source /mnt/nfs/config/gitlab/ukwa-services-env/w3act/dev/w3act.env
 
 # Set up the dev.webarchive.org.uk hostname - unfortunately this needs a different nginx config for pywb
-export SERVER_NAME=192.168.45.91:9000
+export SERVER_NAME=dev.webarchive.org.uk
 export SERVER_SCHEME=http
-
 
 # Make DEV visually distinct (any CSS colour name will work)
 export APPLICATION_NAVBAR_COLOR=purple
