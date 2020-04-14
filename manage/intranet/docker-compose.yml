@@ -9,9 +9,10 @@ services:
   # -------------------------------------------------------------
   web:
     # To be updated via an external cron job running docker swarm update...
-    image: ukwa/ukwa-intranet
+    image: nginx
     volumes:
       - ./config/nginx.template:/etc/nginx/conf.d/nginx.template
+      - /mnt/nfs/data/ukwa-reports-html:/usr/share/nginx/html/intranet
     ports:
       - "90:90"
     environment:
@@ -57,7 +58,7 @@ services:
       - ./config/pywb/config-nobanner.yaml:/webarchive/config.yaml
       - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
       # Used to store the access control lists used by the pywb services.
-      - "${STORAGE_PATH}/open-access-acl:/ukwa_pywb/acl/"
+      - "/mnt/nfs/data/website/open-access-acl:/ukwa_pywb/acl/"
 
   # Web page rendering post-crawl:
   webrender:
