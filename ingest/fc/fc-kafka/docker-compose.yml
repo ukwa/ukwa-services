@@ -1,0 +1,69 @@
+version: "3.2"
+
+services:
+
+  # Kafka used as main mechanism for CrawlURI routing and logging
+  # Needs a Zookeeper too
+  # ----
+  zookeeper:
+    image: zookeeper:3.4
+    ports:
+      - 2181:2181
+    volumes:
+      - "${STORAGE_PATH}/zookeeper/data:/data"
+      - "${STORAGE_PATH}/zookeeper/datalog:/datalog"
+
+  kafka:
+    image: wurstmeister/kafka:2.12-2.1.0
+    ports:
+      - target: 9094
+        published: 9094
+        protocol: tcp
+        mode: host
+      - target: 7071
+        published: 7071
+        protocol: tcp
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: ${CRAWL_HOST_LAN_IP}
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://${CRAWL_HOST_LAN_IP}:9094
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      LOG_RETENTION_HOURS: -1
+      LOG_RETENTION_BYTES: -1
+      NUM_PARTITIONS: 32
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      #KAFKA_CREATE_TOPICS: "fc.tocrawl.npld:16:1,fc.tocrawl.bypm:16:1,fc.crawled:16:1"
+      # Integrate with Prometheus - note that this interferes with the create-topics script so may need to be disabled when first creating the topics:
+      KAFKA_JMX_OPTS: "-javaagent:/prom-jmx/jmx_prometheus_javaagent-0.10.jar=7071:/prom-jmx/prom-jmx-agent-config-kafka.yml"
+      # persistent files are in consistent locations, each server supplies a /kafka folder.
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG_DIRS: /kafka/kafka-logs/kafka-logs-broker-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${STORAGE_PATH}/kafka:/kafka
+      - ./prom-jmx/:/prom-jmx
+    depends_on:
+      - zookeeper
+    #deploy:
+    #  mode: global
+
+
+  # Kafka UI
+  ui:
+    image: ukwa/docker-trifecta
+    ports:
+      - "9000:9000"
+    environment:
+      - "ZK_HOST=zookeeper:2181"
+    depends_on:
+      - zookeeper
+      - kafka
+
+networks:
+  # Allow attachment of transient containers, external monitoring:
+  default:
+    driver: overlay
+    attachable: true
+

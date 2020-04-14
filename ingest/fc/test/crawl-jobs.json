@@ -1,0 +1,9 @@
+[
+  {
+    "id": "frequent-test",
+    "job_name": "frequent",
+    "deployment": "frequent-test",
+    "function": "ingest",
+    "dns_sd_name": "heritrix-worker"
+  }
+]
