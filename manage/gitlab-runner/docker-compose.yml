@@ -1,0 +1,11 @@
+version: '3.5'
+
+services:
+
+  runner:
+    image: gitlab/gitlab-runner:alpine
+    restart: unless-stopped
+    volumes:
+      - /mnt/nfs/data/gitlab-runner:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+
