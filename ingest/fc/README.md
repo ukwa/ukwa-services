@@ -7,12 +7,14 @@ The production crawler setup is split into multiple stacks.
 - `fc-crawl` runs the crawls (requires `fc-kafka` to be running).
 - `fc-wb` runs a (optional) Wayback access point to look at the crawl results.
 
+It can be run on different servers, and a `prod/prod-env-HOSTNAME.sh` script should be setup and linked as `prod/prod-env.sh` before running the helper scripts.
+
 
     $ docker swarm init --advertise-addr 192.168.45.15
 
 The crawler needs to be in public DNS, so lookups get back to us.
 
-The crawler needs a few firewall ports opening up.
+The crawler needs a few firewall ports opening up (TBC)
 
 
 
