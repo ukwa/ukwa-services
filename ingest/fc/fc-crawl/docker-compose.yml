@@ -19,7 +19,7 @@ services:
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
     volumes:
       - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
-      - "/var/heritrix/npld/state:/heritrix/state"
+      - "${TMP_STORAGE_PATH}/heritrix/npld/state:/heritrix/state"
       - "${STORAGE_PATH}/surts/npld:/shared" # Shared configuration - surts file held here.
     deploy:
       replicas: 1
@@ -48,7 +48,7 @@ services:
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
     volumes:
       - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
-      - "/var/heritrix/bypm/state:/heritrix/state"
+      - "${TMP_STORAGE_PATH}/heritrix/bypm/state:/heritrix/state"
       - "${STORAGE_PATH}/surts/bypm:/shared" # Shared configuration - surts file held here.
     deploy:
       replicas: 1
