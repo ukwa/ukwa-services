@@ -8,7 +8,7 @@ services:
 
   # -------------------------------------------------------------
   # Web proxy setup
-  # ---------------------------------------------------------------
+  # -------------------------------------------------------------
   # All routing to sub-components goes through here.
   # All complex setup relating to the public website is here.
   nginx:
@@ -29,7 +29,7 @@ services:
      - "OFF_SITE_URL=https://${SERVER_NAME}/wayback/archive/"
      - "SOLR_COLLECTION_SEARCH_PATH=http://ukwa_collections:8983"
      - "SOLR_COLLECTION_SEARCH_REQUEST_HANDLER=/solr/collections/select"
-     - "SOLR_FULL_TEXT_SEARCH_PATH=http://solr.api.wa.bl.uk"
+     - "SOLR_FULL_TEXT_SEARCH_PATH=${SOLR_FULL_TEXT_SEARCH_PATH}"
      - "SOLR_FULL_TEXT_SEARCH_REQUEST_HANDLER=/solr/all/select"
      - "SOLR_READ_TIMEOUT=600000"
      - "SOLR_CONNECTION_TIMEOUT=60000"
@@ -46,15 +46,18 @@ services:
   # Collections index for Topics & Themes of the UKWA UI
   # -------------------------------------------------------------
   ukwa_collections:
-    image: solr:8.4
+    image: solr:6
     user: "${SOLR_UID}"
     command:
       - "solr-precreate"
       - "collections"
+      - "/config/solr/collections"
     volumes:
+        - "./config/solr:/config/solr"
     # Used to store the Solr index used to provide the Topic & Themes part of the main UI. Populated by an external task.
     # n.b container solr userid (8983) should have write permission on host solr dir
-        - "${STORAGE_PATH}/ukwa-collections-solr:/var/solr"
+        - "${STORAGE_PATH}/ukwa-collections-solr/mycores:/opt/solr/server/solr/mycores"
+        - "${STORAGE_PATH}/ukwa-collections-solr/logs:/opt/solr/server/logs"
     ports:
         - "9020:8983" # Exposed port so external clients can read/populate
 
@@ -80,19 +83,18 @@ services:
   # -------------------------------------------------------------
   mementos:
     image: ukwa/mementoweb-webclient
-    command: "/mementos/bin/mementos-webclient -Dhttp.proxyHost=194.66.232.92 -Dhttp.proxyPort=3127 -Dconfig.file=/mementos/conf/application.conf -Dpidfile.path=/dev/null"
+    command: "/mementos/bin/mementos-webclient -Dhttp.proxyHost=${PROXYHOST} -Dhttp.proxyPort=${PROXYPORT} -Dconfig.file=/mementos/conf/application.conf -Dpidfile.path=/dev/null"
     environment:
-      - "JAVA_OPTS=-Xmx1g -Dhttp.proxyHost=194.66.232.92 -Dhttp.proxyPort=3127"
+      - "JAVA_OPTS=-Xmx1g -Dhttp.proxyHost=${PROXYHOST} -Dhttp.proxyPort=${PROXYPORT}"
 
   # -------------------------------------------------------------
   # Shine service and database
   # -------------------------------------------------------------
-
   # Shine
   shine:
    image: ukwa/shine
    environment:
-     - "SOLR_URL=http://192.168.45.70:8983/solr/jisc"
+     - "SOLR_URL=${SHINE_SOLR}"
      - "JAVA_OPTS=-Xmx2g -XX:+ExitOnOutOfMemoryError"
    depends_on:
      - shinedb
@@ -116,12 +118,14 @@ services:
       - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
       - "KAFKA_SEEK_TO_BEGINNING=False"
-      - "API_LABEL=ACCESS API"
+      - "API_LABEL=UK Web Archive API"
       - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
       - "HTTPS_PROXY=http://194.66.232.92:3127/"
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
+      - "SCRIPT_NAME=/api" # Deploy the API under this prefix
+      - "HTTP_X_FORWARDED_PROTO=https"
     volumes:
       - "analysis-volume:/analysis"
 
@@ -163,7 +167,6 @@ services:
 # -----------------------------------------
 # Volumes and networks supporting the above
 # -----------------------------------------
-
 volumes:
   # Used to store analysis generated from Kafka, so it can be made available via the API component.
   # Only transient storage so can be managed entirely by Docker.

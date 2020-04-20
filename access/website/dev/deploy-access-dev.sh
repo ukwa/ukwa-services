@@ -15,7 +15,8 @@ export SOLR_UID=$UID
 # Set up folders needed by different components
 mkdir -p ${STORAGE_PATH}/open-access-acl
 mkdir -p ${STORAGE_PATH}/shine-postgres-data
-mkdir -p ${STORAGE_PATH}/ukwa-collections-solr
+mkdir -p ${STORAGE_PATH}/ukwa-collections-solr/mycores
+mkdir -p ${STORAGE_PATH}/ukwa-collections-solr/logs
 #chgrp -R $SOLR_GROUP ${STORAGE_PATH}/ukwa-collections-solr
 #chmod -R g+rwx ${STORAGE_PATH}/ukwa-collections-solr
 
