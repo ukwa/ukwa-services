@@ -1,0 +1,28 @@
+global:
+  scrape_interval:     1m
+  evaluation_interval: 1m
+
+scrape_configs:
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka:7071']
+
+  - job_name: 'npld-heritrix-workers'
+    dns_sd_configs:
+    - names:
+      - 'tasks.npld-heritrix-worker'
+      type: 'A'
+      port: 9118
+
+  - job_name: 'bypm-heritrix-workers'
+    dns_sd_configs:
+    - names:
+      - 'tasks.bypm-heritrix-worker'
+      type: 'A'
+      port: 9118
+

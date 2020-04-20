@@ -1,5 +1,5 @@
 *** Settings ***
-Documentation     Verify locale-specific routes and localized strings
+Documentation     Verify behaviour of the Wayback archival website playback service.
 Resource          _resource.robot
 Suite setup       Run Keywords    Reset Browsers
 Suite teardown    Run Keywords    Close All Browsers
@@ -34,7 +34,7 @@ Check Wayback CY Replay Page
 Check Wayback Open Access
     [Tags]   wayback 200
     # Choosing a test page that does not have long-running JavaScript (which slows down testing).
-    Check Allowed    %{HOST}/wayback/archive/19950418155600/http://portico.bl.uk   text=Library
+    Check Allowed    %{HOST}/wayback/archive/19950418155600/http://portico.bl.uk   text=Portico
 
 Check Wayback Blocked (451)
     [Tags]  wayback 451

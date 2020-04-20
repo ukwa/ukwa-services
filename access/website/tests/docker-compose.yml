@@ -30,7 +30,10 @@ services:
     depends_on:
       - hub
     environment:
-      HUB_HOST: hub
+      - "http_proxy=${http_proxy}"
+      - "https_proxy=${https_proxy}"
+      - "no_proxy=hub"
+      - "HUB_HOST=hub"
 
   chrome:
     image: selenium/node-chrome:3.141.59-zinc
@@ -39,7 +42,10 @@ services:
     depends_on:
       - hub
     environment:
-      HUB_HOST: hub
+      - "http_proxy=${http_proxy}"
+      - "https_proxy=${https_proxy}"
+      - "no_proxy=hub"
+      - "HUB_HOST=hub"
 
   hub:
     image: selenium/hub:3.141.59-zinc
