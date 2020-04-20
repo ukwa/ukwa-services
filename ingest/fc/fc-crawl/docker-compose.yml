@@ -1,0 +1,151 @@
+version: "3.2"
+
+services:
+
+  # UKWA Heritrix for NPLD
+  npld-heritrix-worker:
+    image: ukwa/heritrix-worker:${HERITRIX_VERSION}
+    hostname: "npld-heritrix3-worker-{{.Task.Slot}}"
+    ports:
+      - 8443:8443
+    env_file: heritrix-shared-settings.env
+    environment:
+      - "KAFKA_TOCRAWL_TOPIC=fc.tocrawl.npld"
+      - "KAFKA_INSCOPE_TOPIC=fc.inscope.npld"
+      - "KAFKA_CANDIDATES_TOPIC=fc.tocrawl.npld"
+      - "CRAWL_NAME=frequent-npld"
+      - "WARC_PREFIX=BL-NPLD"
+      - "WEBRENDER_WARC_PREFIX=BL-NPLD-WEBRENDER"
+      - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
+    volumes:
+      - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
+      - "${TMP_STORAGE_PATH}/heritrix/npld/state:/heritrix/state"
+      - "${STORAGE_PATH}/surts/npld:/shared" # Shared configuration - surts file held here.
+    deploy:
+      replicas: 1
+    stop_grace_period: 10m # Give the H3 instances some time to shut down neatly following SIGTERM
+    depends_on:
+      - clamd
+      - webrender
+    networks:
+      - default
+      - kafka
+
+  # UKWA Heritrix for NPLD
+  bypm-heritrix-worker:
+    image: ukwa/heritrix-worker:${HERITRIX_VERSION}
+    hostname: "bypm-heritrix3-worker-{{.Task.Slot}}"
+    ports:
+      - 9443:8443
+    env_file: heritrix-shared-settings.env
+    environment:
+      - "KAFKA_TOCRAWL_TOPIC=fc.tocrawl.bypm"
+      - "KAFKA_INSCOPE_TOPIC=fc.inscope.bypm"
+      - "KAFKA_CANDIDATES_TOPIC=fc.tocrawl.bypm"
+      - "CRAWL_NAME=frequent-bypm"
+      - "WARC_PREFIX=BL-BYPM"
+      - "WEBRENDER_WARC_PREFIX=BL-BYPM-WEBRENDER"
+      - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
+    volumes:
+      - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
+      - "${TMP_STORAGE_PATH}/heritrix/bypm/state:/heritrix/state"
+      - "${STORAGE_PATH}/surts/bypm:/shared" # Shared configuration - surts file held here.
+    deploy:
+      replicas: 1
+    stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
+    depends_on:
+      - clamd
+      - webrender
+    networks:
+      - default
+      - kafka
+
+
+  # Clamd virus scanning Service
+  clamd:
+    image: ukwa/clamd
+    deploy:
+      replicas: 4
+
+  # ----------------------------------------------
+  # WARC Proxy
+  # ----------------------------------------------
+
+  # The WARChiving proxy itself
+  warcprox:
+    image: ukwa/warcprox:2.3.1
+    command: "warcprox -b 0.0.0.0 -d /output/warcs --base32 --gzip --rollover-idle-time 600 --dedup-db-file /dev/null --stats-db-file /dev/null --quiet --plugin warcprox-plugins.listeners.UpdateOutbackCDX --plugin warcprox-plugins.listeners.KafkaCaptureFeed"
+    environment:
+      - "KAFKA_BOOTSTRAP_SERVERS=kafka:9092"
+      - "KAFKA_CRAWLED_TOPIC=fc.crawled"
+      - "KAFKA_ACKS=1"
+      - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
+    volumes:
+      - "${STORAGE_PATH}/heritrix/wren:/output/warcs"
+    deploy:
+      replicas: 1
+    networks:
+      - default
+      - kafka
+
+
+  # ----------------------------------------------
+  # Web Render Farm
+  # ----------------------------------------------
+
+  # PhantomJS web page rendering service
+  webrender:
+    image: ukwa/webrender-api:1.0.11
+    #ports:
+    #  - 8010:8010
+    environment:
+      - "WARCPROX=warcprox:8000"
+      - "LC_ALL=en_US.utf8"
+      - "WEB_RENDER_TMP=/tmp/webrender"
+      - "DOCKER_NETWORK=fc_crawl_default"
+      - "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.3"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # For launching containerised renderers
+      - /tmp/webrender:/tmp/webrender
+      - "./webrender-gunicorn.ini:/webrender/gunicorn.ini" # Override render server configuration
+    deploy:
+      replicas: 1
+      endpoint_mode: dnsrr # Use this to avoid the Ingress network, as it appears to forcibly reset long-running connections.
+    depends_on:
+      - warcprox
+
+
+  # ----------------------------------------------
+  # Monitoring
+  # ----------------------------------------------
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9191:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - "${STORAGE_PATH}/prometheus-data:/prometheus"
+    user: root
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=1000d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.external-url=http://${CRAWL_HOST_LAN_IP}:9191/'
+      - '--web.enable-admin-api'
+      - '--web.enable-lifecycle'
+    networks:
+      - default
+      - kafka
+
+networks:
+  # Allow attachment of transient web-render containers, external monitoring:
+  default:
+    driver: overlay
+    attachable: true
+  kafka:
+    external:
+      name: fc_kafka_default
+
