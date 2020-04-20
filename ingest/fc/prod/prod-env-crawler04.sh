@@ -1,6 +1,7 @@
 export CRAWL_HOST_LAN_IP=crawler04.n45.bl.uk
 export CRAWL_HOST_WAN_IP=crawler04.bl.uk
-export STORAGE_PATH=/mnt/local/fc
+export STORAGE_PATH=/mnt/lr10/fc
+export TMP_STORAGE_PATH=/mnt/lr10/fc-tmp
 # CrawlDB FC (OutbackCDX)
 # Oddly slow...
 #export CDXSERVER_ENDPOINT=http://crawldb-fc.api.wa.bl.uk/fc

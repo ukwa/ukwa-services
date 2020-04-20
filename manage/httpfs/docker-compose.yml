@@ -1,0 +1,66 @@
+
+version: "3.2"
+
+services:
+
+  # Our slightly-modified version of HttpFS:
+  worker:
+    image: ukwa/httpfs:cdh3u5
+    user: tomcat
+    volumes:
+      - ./etc/hadoop:/etc/hadoop
+    environment:
+      - "SERVICE_PORTS=14000" # This is required so the dockercloud/haproxy knows what port to use
+      - "CATALINA_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9090 -Dcom.sun.management.jmxremote.rmi.port=9090 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false" # Needs? -Djava.rmi.server.hostname=192.168.99.100 ???
+    ports:
+      - "19090:9090"
+    networks:
+      - httpfsnet
+    extra_hosts:
+      - "namenode:192.168.1.103"
+    deploy:
+      replicas: 3
+
+  # HAProxy load balancer
+  lb:
+    image: dockercloud/haproxy
+    ports:
+      - "14000:80"
+      - "1937:1936" # For monitoring/stats
+    environment:
+      - "BALANCE=roundrobin"
+      - "TIMEOUT=connect 30s, client 10m, server 10m"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - httpfsnet
+    deploy: # There needs to be just one of these, located on a manager node so it can talk to Docker:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+  # Expose HAProxy stats in a form suitable for Prometheus:
+  metrics:
+    image: quay.io/prometheus/haproxy-exporter
+    ports:
+      - '19101:9101'
+    command:
+      - "--haproxy.scrape-uri=http://stats:stats@lb:1936/;csv"
+    networks:
+      - httpfsnet
+
+  # Also export HDFS stats scraped from the front page:
+  hdfs-exporter:
+    image: ukwa/hdfs-exporter
+    ports: 
+     - 9117:9118
+    environment:
+     - "HDFS_HEALTH_PAGE=http://hdfs.api.wa.bl.uk/dfshealth.jsp"
+
+
+# The auto-configuring HAProxy system appears to require that each proxied service runs in a dedicated virtual network
+networks:
+  httpfsnet:
+    driver: overlay
+
