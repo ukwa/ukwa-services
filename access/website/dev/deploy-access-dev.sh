@@ -9,6 +9,7 @@ export USE_HTTPS=true
 export KAFKA_BROKER=192.168.45.15:9094
 export DEPLOYMENT_TAG=dev
 export STORAGE_PATH=/mnt/nfs/data/website
+export SOLR_FULL_TEXT_SEARCH_PATH='http://solr.api.wa.bl.uk'
 export SOLR_UID=$UID
 #export LOG_SERVER="udp://logs.wa.bl.uk:12201"
 
