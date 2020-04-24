@@ -5,38 +5,34 @@ version: '3.2'
 services:
 
   # -------------------------------------------------------------
-  # Reading Room Wayback configuration per LDL:
+  # Reading Room Wayback configuration per LDL: British Library
   # -------------------------------------------------------------
-  pywb-bl:
+  bl:
     image: ukwa/ukwa-pywb:2.4.0-beta-5
+    ports:
+      - "11080:8080"
+    env_file: common.env
     environment:
-      - "DEBUG=True"
-      - "WEBHDFS_USER=access"
-      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
-      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
-      - "REDIS_URL=redis://redis:6379/0"
+      - "REDIS_URL=redis://bl_redis:6379/0"
     volumes:
       - ./pywb/config.yaml:/webarchive/config.yaml
       - rr-access-acl:/ukwa_pywb/acl/
     depends_on:
-      - redis
+      - redis-bl
 
   # Redis service to hold locks
-  redis:
+  bl_redis:
     image: redis:3.2.4
 
-  # Add some setup via NGINX
-  nginx:
-    image: nginx:1.13-alpine
-
-    volumes:
-      - ./nginx/pywb.conf:/etc/nginx/conf.d/pywb.conf:ro
-
+  # Separate service for staff access, no locks.
+  bl_staff:
+    image: ukwa/ukwa-pywb:2.4.0-beta-5
     ports:
-      - "8100:8100"
-
-    depends_on:
-      - pywb
+      - "11090:8080"
+    env_file: common.env
+    volumes:
+      - ./pywb/config-staff.yaml:/webarchive/config.yaml
+      - rr-access-acl:/ukwa_pywb/acl/
 
 
 volumes:

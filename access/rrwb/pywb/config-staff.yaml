@@ -7,7 +7,6 @@ collections:
         index_paths: *INDEX
         archive_paths: *ARCHIVE
 
-        single-use-lock: true
         acl_paths:
             - ./acl/blocks.aclj
 
