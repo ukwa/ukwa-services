@@ -11,6 +11,7 @@ source ${DIR}/task.env.sh
 export STREAM="frequent"
 export YEAR="2020"
 
+# Ensure we only run one copy of this script at a time:
 LOCKFILE="/var/tmp/`basename $0`.lock"
 touch $LOCKFILE
 unset lockfd

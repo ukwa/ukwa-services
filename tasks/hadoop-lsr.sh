@@ -16,12 +16,15 @@ source ${DIR}/task.env.sh
 # Specify which path to list:
 export HADOOP_PATH=$1
 
+# Ensure we only run one copy of this script at a time:
 LOCKFILE="/var/tmp/`basename $0`.lock"
 touch $LOCKFILE
 unset lockfd
 (
     # Check lock and exit if locked:
     flock -n $lockfd || { echo `basename $0` "is already running!"; exit 1; }
+
+    echo "TODO: Should check the output file exists and is up to date before running..."
 
     # Run the Hadoop recursive list command and collect the result:
     echo "Running 'hadoop fs -lsr" $HADOOP_PATH "'..."
