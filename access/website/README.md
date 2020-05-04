@@ -105,3 +105,14 @@ Sometimes, the Selenium system can get a bit confused and requests start to 'han
 
     docker-compose down
 
+
+
+## Tasks
+
+The following tasks should be running regularly (details TBA):
+
+- Update `allows.aclj` (at least daily).
+- Update the Collection Solr (at least daily).
+- Run the [test suite](#testing) (daily after the above updates?) and raise an alert if the website is misbehaving.
+- Back-up the Shine DB (daily).
+- Verification that these tasks are running (Task Event data submitted to Prometheus and with appropriate alerts set up).
