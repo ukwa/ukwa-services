@@ -1,5 +1,5 @@
 # Define which container image to use:
-export TASK_IMG="anjackson/ukwa-manage:trackdb-lib"
+export TASK_IMG="ukwa/ukwa-manage:latest"
 
 # Specify IP addresses of the NameNode and JobTracker:
 export NN_IP=192.168.1.103
