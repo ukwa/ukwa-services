@@ -24,7 +24,7 @@ unset lockfd
     # Check lock and exit if locked:
     flock -n $lockfd || { echo `basename $0` "is already running!"; exit 1; }
 
-    echo "TODO: Should check the output file exists and is up to date before running..."
+    echo "TODO: Should we check if this has already run today? Or just re-run?"
 
     # Run the Hadoop recursive list command and collect the result:
     echo "Running 'hadoop fs -lsr" $HADOOP_PATH "'..."

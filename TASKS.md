@@ -7,16 +7,23 @@ We use bash flock to ensure only one copy of a script runs at once. We use Track
 
 We update TrackDB with tasks completed. Verification that all important tasks are running by submitting Task Event data to Solr, and exporting that to Prometheus, with appropriate alerts set up.
 
+Task scripts are kept with the service stack they support, but linked from here.
+
+Scripts usually expect two environment variables to be set.
+
+- `DEPLOY_ENV_VARS` which is a file path pointing to a file that declares the environment variables that define the DEV/BETA/PROD environment. See e.g. [dev.env.sh](./dev.env.sh).
+- `SECRET_ENV_VARS` which is a file path pointing to a file that declares environment variables that have secret values.
+
 ## Ingest
 
-- Update crawl job specs (daily)
-- Launch crawls (hourly)
+- Update crawl job specifications, based on W3ACT data (daily)
+- Launch crawls, based on crawl job specifications (hourly)
 - Move WARCs and crawl logs to HDFS (hourly)
 - Get latest data from third-party sources: 
     - Nominet (monthly)
         - _Currently a Luigi task: []()_
 - Back-up W3ACT PostgreSQL database to HDFS (daily)
-    - `<./w3act-csv-to-hdfs.sh>`
+    - As CSV [`./w3act-csv-to-hdfs.sh`](./ingest/w3act/scripts/w3act-csv-to-hdfs.sh)
 
 ## Management
 
