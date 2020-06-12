@@ -39,10 +39,10 @@ Scripts usually expect two environment variables to be set.
 - Update TrackDB from HDFS:
   - See [`update-trackdb-from-hdfs.sh`](./manage/trackdb/scripts/update-trackdb-from-hdfs.sh) 
   - Update with whole-of-HDFS file listing (daily):
-    - `update-trackdb-from-hdfs.sh /`
+    - `update-trackdb-from-hdfs.sh $TRACKDB_URL /`
   - _TBA_ Update TrackDB with partial file listing (hourly)
-    - `update-trackdb-from-hdfs.sh /heritrix/output/frequent-npld`
-    - `update-trackdb-from-hdfs.sh /heritrix/output/frequent-bypm`
+    - `update-trackdb-from-hdfs.sh $TRACKDB_URL /heritrix/output/frequent-npld`
+    - `update-trackdb-from-hdfs.sh $TRACKDB_URL /heritrix/output/frequent-bypm`
 - _TBA_ Recently Crawled data export (currently a Kafka client demon).
 - _TBA_ Reports (GenerateHDFSReports, dead seeds, etc.)
 - _TBA_ Metrics (generate metrics from TrackDB and push to the Prometheus push gateway)

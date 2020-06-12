@@ -1,6 +1,19 @@
 TrackDB
 =======
 
+## Updating TrackDB with information from HDFS
+
+To update TrackDB, we need to generate a file listing from HDFS and then import it. The [update-trackdb-from-hdfs.sh](./scripts/update-trackdb-from-hdfs.sh) script can update TrackDB based on a complete file listing:
+
+    update-trackdb-from-hdfs.sh http://trackdb.dapi.wa.bl.uk/solr/tracking /
+
+Or on just a subset of the files:
+
+    update-trackdb-from-hdfs.sh http://trackdb.dapi.wa.bl.uk/solr/tracking /heritrix/output/frequent-npld
+
+Which is much quicker and allows us to keep track of new items as they come in.
+
+Note that the HDFS listing process needs the the `NAMENODE_IP` environment variable to be set.  See `~/gitlab/ukwa-services-env/hadoop.env` for an example.
 
 ## Migrating data between TrackDB instances
 
