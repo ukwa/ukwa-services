@@ -60,7 +60,7 @@ unset lockfd
     flock -n ${lockfd}|| { echo "ERROR: $(basename $0) is already running!"; exit 1; }
 
     echo "Solr indexing WARCs from ${TRACKDB_URL} for ${STREAM} ${YEAR} and using ${TASK_IMG}, into ${SOLR_ZKS}/${SOLR_COLLECTION}..."
-#    docker run -i ${TASK_IMG} -v ${SHARED}:/shared windex solr-index \
+#    docker run -i -v ${SHARED}:/shared ${TASK_IMG} windex solr-index \
 #        --trackdb-url ${TRACKDB_URL} \
 #        --stream ${STREAM} \
 #        --year ${YEAR} \
