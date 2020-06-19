@@ -53,6 +53,7 @@ esac
 # Prepare lock file for file descriptor:
 LOCKFILE="/var/tmp/`basename $0`.lock"
 touch $LOCKFILE
+chmod a+rw $LOCKFILE # cope if different users use the same lockfile
 unset lockfd
 
 (

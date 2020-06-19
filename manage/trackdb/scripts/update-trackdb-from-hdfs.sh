@@ -28,6 +28,7 @@ fi
 # Ensure we only run one copy of this script at a time:
 LOCKFILE="/var/tmp/`basename $0`.lock"
 touch $LOCKFILE
+chmod a+rw $LOCKFILE # cope if different users use the same lockfile
 unset lockfd
 (
     # Check lock and exit if locked:

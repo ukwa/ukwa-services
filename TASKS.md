@@ -25,8 +25,8 @@ Scripts usually expect two environment variables to be set.
     - _currently not handled here_
 - Get latest data from third-party sources: 
     - Nominet (monthly)
-        - _Currently a Luigi task: [NominetDomainListToHDFS]()_
-        - _script to be added_
+        - Implemented as part of the `store` command.
+        - Run as `store nominet` on a server that can SFTP and see hdfs.api.wa.bl.uk (e.g. a crawler.)
 - Back-up W3ACT PostgreSQL database to HDFS (daily)
     - As CSV [`./w3act-csv-to-hdfs.sh`](./ingest/w3act/scripts/w3act-csv-to-hdfs.sh)
     - As `pgdump`, _script to be added, currently Luigi: BackupProductionW3ACTPostgres_
