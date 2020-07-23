@@ -1,0 +1,36 @@
+global:
+  scrape_interval:     1m
+  evaluation_interval: 1m
+  scrape_timeout:      30s
+
+# Specify the location of rules we want prometheus to load
+rule_files:
+  - 'alert.rules.yml'
+
+
+# prometheus has a dependency on alertmanager, as defined in docker_compose.yml
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets:
+      - "monitor.wa.bl.uk:9093"
+
+scrape_configs:
+
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['prometheus:9090']
+
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka-1:7071', 'kafka-2:7071']
+
+  - job_name: 'npld-dc-heritrix-workers'
+    dns_sd_configs:
+    - names:
+      - 'tasks.npld-dc-heritrix-worker'
+      type: 'A'
+      port: 9118
+
+

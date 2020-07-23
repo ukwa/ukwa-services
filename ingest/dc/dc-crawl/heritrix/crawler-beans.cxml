@@ -1,0 +1,931 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	HERITRIX 3 CRAWL JOB CONFIGURATION FILE
+	
+	This is a relatively minimal configuration suitable for many crawls.
+	
+	Commented-out beans and properties are provided as an example; values
+	shown in comments reflect the actual defaults which are in effect
+	without specification. (To change from the default behavior, 
+	uncomment AND alter the shown values.)   
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xi="http://www.w3.org/2003/XInclude"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+	<context:annotation-config/>
+   
+	<!-- CRAWL METADATA: including identification of crawler/operator -->
+	<bean id="metadata" class="org.archive.modules.CrawlMetadata" autowire="byName">
+		<property name="operatorContactUrl" value="http://www.bl.uk/aboutus/legaldeposit/websites/websites/faqswebmaster/index.html"/>
+		<property name="jobName" value="#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}"/>
+		<property name="description" value="[see override above]"/>
+		<!-- <property name="operator" value=""/> -->
+		<!-- <property name="operatorFrom" value=""/> -->
+		<property name="organization" value="The British Library"/>
+		<!-- <property name="audience" value=""/> -->
+		<property name="userAgentTemplate" value="#{systemEnvironment['USER_AGENT_PREFIX'] ?: 'bl.uk_ldfc_bot'}/@VERSION@ (+@OPERATOR_CONTACT_URL@)"/>
+		<property name="robotsPolicyName" value="classic" />
+		<!-- <property name="robotsPolicyName" value="obey"/> -->
+		<!--
+  			<property name="robotsPolicyName"> <ref bean="ignoreForTransclusionsRobotsPolicy"/> </property>
+		-->
+	</bean>
+ 	<!-- ROBOTS.TXT ALTERNATIVE APPROACH: Ignore robots.txt for embeds and other transcluded resources.
+  	<bean id="ignoreForTransclusionsRobotsPolicy" class="uk.bl.wap.crawler.h3.modules.net.ObeyRobotsExceptTranscludedPolicy">
+  	</bean>
+  	-->	
+	
+	<!-- SEEDS FILE: Disabled in this case, as we control seeding with Kafka (below_ -->
+	<bean id="seeds" class="uk.bl.wap.crawler.modules.seeds.NoOpSeedsModule">
+		<property name="sourceTagSeeds" value="true" />
+	</bean>
+   
+    <!-- a 'top-level' bean that listens for URLs from Kafka -->
+    <bean id="kafkaUrlReceiver" class="uk.bl.wap.crawler.frontier.KafkaUrlReceiver">
+      <property name="bootstrapServers" value="#{systemEnvironment['KAFKA_BOOTSTRAP_SERVERS'] ?: 'kafka:9092'}" />
+      <property name="groupId" value="#{systemEnvironment['KAFKA_GROUP_ID'] ?: 'crawlers'}" />
+      <property name="topic" value="#{systemEnvironment['KAFKA_TOCRAWL_TOPIC'] ?: 'uris.tocrawl'}" />
+      <property name="consumerId" value="#{systemEnvironment['KAFKA_CONSUMER_ID'] ?: 1}"/>
+      <property name="consumerGroupSize" value="#{systemEnvironment['KAFKA_CONSUMER_GROUP_SIZE'] ?: 1}"/>
+      <property name="seekToBeginning" value="#{systemEnvironment['KAFKA_SEEK_TO_BEGINNING'] ?: false}"/>
+      <property name="maxPollRecords" value="#{systemEnvironment['KAFKA_MAX_POLL_RECORDS'] ?: 500}"/>
+      <property name="numMessageHandlerThreads" value="#{systemEnvironment['KAFKA_NUM_MESSAGE_THREADS'] ?: 16}"/>
+      <property name="discardedUriFeedEnabled" value="#{systemEnvironment['KAFKA_DISCARDED_FEED_ENABLED'] ?: false}"/>
+      <property name="retireQueues" value="#{systemEnvironment['RETIRE_QUEUES'] ?: false}"/>
+    </bean>
+    <!-- This allows the collection of a separate crawl-log of the out-of-scope URIs. It is called from kafkaUrlReceiver -->
+    <bean id="discardedUriFeed" class="uk.bl.wap.crawler.postprocessor.KafkaKeyedDiscardedFeed">
+        <property name="topic" value="#{systemEnvironment['KAFKA_DISCARDED_TOPIC'] ?: 'uris.discarded'}" />
+        <property name="brokerList" value="#{systemEnvironment['KAFKA_BOOTSTRAP_SERVERS'] ?: 'kafka:9092'}" />
+    </bean>
+    
+	
+	<!-- SCOPE: rules for which discovered URIs to crawl; order is very 
+		 important because last decision returned other than 'NONE' wins. -->
+	<bean id="scope" class="uk.bl.wap.modules.deciderules.AccountableDecideRuleSequence">
+        <property name="recordDecidingRule" value="#{systemEnvironment['RECORD_DECIDING_RULE'] ?: false}" />
+        <property name="logToFile" value="#{systemEnvironment['SCOPE_LOG_ENABLED'] ?: false}" />
+		<property name="rules">
+			<list>
+				<!-- Begin by REJECTing all... -->
+				<bean class="org.archive.modules.deciderules.RejectDecideRule">
+				</bean>
+            
+                <!-- LIST MAIN ACCEPTANCE CRITERIA -->
+                
+				<!-- ...then ACCEPT those with appropriate SURT prefixes... -->
+                <ref bean="surtPrefixSeedScope" />
+				<!-- ...and ACCEPT extensions likely to be associated/helper files... -->
+				<bean class="org.archive.modules.deciderules.MatchesRegexDecideRule">
+					<property name="regex" value="^https?://[^/]+/.+(?i)(\.(js|css|bmp|gif|jpe?g|[pm]ng|svg|tiff?|ico|web[pm]|aac|aiff?|m3u|m4[av]|midi?|mp[1234acu]|og[agm]|ra?m?|cda|alac|ac3|flac|wav|wm[av]|as[fx]|avi|flv|mov|mpe?g|qt|smil|swf|woff|eot|ttf))\b.*$"/>
+					<property name="decision" value="ACCEPT" />
+				</bean>
+                <!-- always chase down Embeds and Redirects... -->
+				<bean class="org.archive.modules.deciderules.HopsPathMatchesRegexDecideRule">
+					<property name="decision" value="ACCEPT" />
+					<property name="regex" value="^.*[ER]+$" />
+				</bean>
+				<!-- ...  ACCEPT those on the same Domain (disabled by default)... -->
+				<ref bean="onDomainAccept" />            
+                <!-- ...always ACCEPT content hosted on servers that appear to be located in the UK... -->
+                <!-- This only makes sense in the broad/domain crawl (disabled by default)-->
+                <bean id="externalGeoLookupRule" class="uk.bl.wap.modules.deciderules.ExternalGeoLocationDecideRule">
+                  <property name="lookup">
+                    <ref bean="externalGeoLookup"/>
+                  </property>
+                  <property name="countryCodes">
+                    <list>
+                      <value>GB</value>
+                    </list>
+                  </property>
+                  <!-- if false, we will only run this rule if it could change the current decision, 
+                  i.e. if it could ACCEPT a URI that is not already ACCEPTED. GeoIP lookup is expensive 
+                  so lets skip it but note that this means .uk URIs will not be tagged with a geo-location. -->
+                  <property name="lookupEveryUri" value="#{systemEnvironment['GEOIP_LOOKUP_EVERY_URI'] ?: false}"/>
+                  <property name="enabled" value="#{systemEnvironment['GEOIP_GB_ENABLED'] ?: false}" />
+                </bean>
+                <!-- ...ACCEPT known URL-shortening services -->
+                <bean class="org.archive.modules.deciderules.surt.SurtPrefixedDecideRule">
+                   <property name="decision" value="ACCEPT" />
+                   <property name="seedsAsSurtPrefixes" value="false" />
+                   <property name="surtsDumpFile" value="url.shorteners.dump" />
+                   <property name="surtsSourceFile" value="url.shorteners.txt" />
+                </bean>
+
+                <!-- LIST REJECTION/BAD-URI CRITERIA -->
+            
+				<!-- ...but REJECT those more than a configured link-hop-count from start... -->
+				<ref bean="hopsCountReject" />
+                <!-- ...and REJECT those with 5 or more consecutive redirects... -->
+                <bean class="org.archive.modules.deciderules.HopsPathMatchesRegexDecideRule">
+                  <property name="decision" value="REJECT"/>
+                  <property name="regex" value=".*RRRRR$"/>
+                </bean>
+				<!-- ...and REJECT those from a configurable (initially empty) set of URI regexes... -->
+				<ref bean="listRegexFilterOut" />
+				<!-- ...and REJECT those with suspicious repeating path-segments... -->
+				<bean class="org.archive.modules.deciderules.PathologicalPathDecideRule">
+					<property name="maxRepetitions" value="3" />
+				</bean>
+				<!-- ...and REJECT those with more than threshold number of path-segments... -->
+				<bean class="org.archive.modules.deciderules.TooManyPathSegmentsDecideRule">
+					<property name="maxPathDepth" value="15" />
+				</bean>
+            
+                <!-- ...and REJECT highly compressible URIs... -->
+                <!-- 
+                <bean class="uk.bl.wap.modules.deciderules.CompressibilityDecideRule">
+                    <property name="min" value="0.28"/>
+                    <property name="max" value="1.6"/>
+                </bean>
+                 -->
+                 
+				<!-- ...but REJECT those from a configurable set of REJECT SURTs... -->
+                <ref bean="surtPrefixScopeExclusion" />
+            
+                <!-- ...and REJECT those that we've crawled recently enough... -->
+                <ref bean="recentlySeen"/>
+            
+				<!-- ...but always ACCEPT those marked as prerequisitee for another URI... -->
+				<bean class="org.archive.modules.deciderules.PrerequisiteAcceptDecideRule">
+				</bean>
+			</list>
+		</property>
+	</bean>
+    <!-- Top-level bean for managing SURT scope (alsoCheckVia enabled via sheet) -->
+    <bean id="surtPrefixSeedScope" class="uk.bl.wap.modules.deciderules.WatchedFileSurtPrefixedDecideRule">
+         <property name="seedsAsSurtPrefixes" value="true" />
+         <property name="alsoCheckVia" value="false" />
+         <property name="surtsSourceFile" value="#{systemEnvironment['SURTS_SOURCE_FILE'] ?: 'surts.txt'}" />
+         <property name="surtsDumpFile" value="surts.dump" />
+         <!-- How often to re-read the scope file (seconds) -->
+         <property name="sourceCheckInterval" value="#{systemEnvironment['SCOPE_FILE_RELOAD_INTERVAL'] ?: 5}"/>
+    </bean>
+    <!-- Top-level bean for managing SURT excludes/REJECT -->
+    <bean id="surtPrefixScopeExclusion" class="uk.bl.wap.modules.deciderules.WatchedFileSurtPrefixedDecideRule">
+         <property name="decision" value="REJECT" />
+         <property name="seedsAsSurtPrefixes" value="false" />
+         <property name="alsoCheckVia" value="false" />
+         <property name="surtsSourceFile" value="#{systemEnvironment['SURTS_EXCLUDE_SOURCE_FILE'] ?: 'exclude.txt'}" />
+         <property name="surtsDumpFile" value="exclude.dump" />
+         <!-- How often to re-read the scope file (seconds) -->
+         <property name="sourceCheckInterval" value="#{systemEnvironment['SCOPE_FILE_RELOAD_INTERVAL'] ?: 5}"/>
+    </bean>
+    <!-- ... ACCEPT those on the same Domain (enabled via sheet)... -->
+    <bean id="onDomainAccept" class="org.archive.modules.deciderules.surt.OnDomainsDecideRule">
+        <property name="decision" value="ACCEPT" />
+        <property name="enabled" value="false" />
+    </bean>
+    <!-- ...but REJECT those more than a configured link-hop-count from start (modifiable via sheet)... -->
+	<bean id="hopsCountReject" class="org.archive.modules.deciderules.TooManyHopsDecideRule">
+		<property name="maxHops" value="#{systemEnvironment['MAX_HOPS_DEFAULT'] ?: 20}" />
+	</bean>
+	<!-- ...and REJECT those from a configurable (initially empty) set of URI regexes... -->
+	<bean id="listRegexFilterOut" class="org.archive.modules.deciderules.MatchesListRegexDecideRule">
+		<property name="decision" value="REJECT" />
+		<property name="listLogicalOr" value="true" />
+        <property name="regexList" ref="scopeExcludesList"/>
+    </bean>
+    <import resource="excludes.xml"/>
+    
+	<!-- GEO-LOOKUP: specifying location of external database. -->
+    <bean id="externalGeoLookup" class="uk.bl.wap.modules.deciderules.ExternalGeoLookup">
+        <property name="database" value="#{ systemEnvironment['GEOLITE2_CITY_MMDB_LOCATION'] ?: '' }/GeoLite2-City.mmdb"/>
+    </bean>
+    
+   <!-- RECENTLY SEEN: Used to de-scope already-crawled URIs --> 
+   <bean id="recentlySeen" class="uk.bl.wap.modules.deciderules.OutbackCDXRecentlySeenDecideRule">
+       <!--  If recently seen, REJECT -->
+       <property name="decision" value="REJECT" />
+       <!-- Time to elapse before re-crawling a URI is allowed (in seconds, defaults to 365 days): -->
+       <property name="recrawlInterval" value="31536000"/>
+       <!-- reference to shared OutbackCDX configuration: -->
+       <property name="outbackCDXClient" ref="outbackCDXClient"/>
+       <!-- if false, we will only run this rule if it could change the current decision, 
+         i.e. if it could REJECT a URI that is not already REJECTED. CDX lookup is expensive 
+         so lets skip it. Note that this will prevent de-duplication of otherwise out-of-scope pre-requisites (if there are any). -->
+       <property name="lookupEveryUri" value="#{systemEnvironment['RECENTLY_SEEN_LOOKUP_EVERY_URI'] ?: false}"/>       
+   </bean>
+ 
+	<!-- 
+		PROCESSING CHAINS
+		Much of the crawler's work is specified by the sequential 
+		application of swappable Processor modules. These Processors
+		are collected into three 'chains. The CandidateChain is applied 
+		to URIs being considered for inclusion, before a URI is enqueued
+		for collection. The FetchChain is applied to URIs when their 
+		turn for collection comes up. The DispositionChain is applied 
+		after a URI is fetched and analyzed/link-extracted.
+		-->
+		
+	<!-- CANDIDATE CHAIN --> 
+	<!-- processors declared as named beans -->
+	<bean id="candidateScoper" class="org.archive.crawler.prefetch.CandidateScoper">
+		<property name="scope">
+			<ref bean="scope" />
+		</property>
+	</bean>
+	<bean id="preparer" class="org.archive.crawler.prefetch.FrontierPreparer">
+		<property name="preferenceDepthHops" value="-1" />
+		<property name="preferenceEmbedHops" value="1" />
+		<property name="canonicalizationPolicy"> 
+			<ref bean="canonicalizationPolicy" />
+		</property>
+		<property name="queueAssignmentPolicy"> 
+			<ref bean="queueAssignmentPolicy" />
+		</property>
+		<property name="uriPrecedencePolicy"> 
+			<ref bean="uriPrecedencePolicy" />
+		</property>
+		<property name="costAssignmentPolicy"> 
+			<ref bean="costAssignmentPolicy" />
+		</property>
+		<property name="scope">
+			<ref bean="scope" />
+		</property>
+	</bean>
+     <!-- This copies the stream of discovered, in-scope URIs to a Kafka topic (as a check/disaster-recovery mechanism) -->
+     <bean id="inScopeUriFeed" class="uk.bl.wap.crawler.postprocessor.KafkaKeyedToCrawlFeed">
+       <property name="enabled" value="#{systemEnvironment['KAFKA_INSCOPE_LOG_ENABLED'] ?: true}" />
+       <property name="emitOutlinks" value="false" /> <!-- this module should at on the CrawlURI in the chain, not it's outlinks -->
+       <property name="topic" value="#{systemEnvironment['KAFKA_INSCOPE_TOPIC'] ?: 'uris.inscope'}" />
+       <property name="brokerList" value="#{systemEnvironment['KAFKA_BOOTSTRAP_SERVERS'] ?: 'kafka:9092'}" />
+       <property name="extraFields">
+           <map>
+             <entry key="CRAWL_NAME" value="#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}"/>
+           </map>
+       </property>
+       <property name="discardedUriFeedEnabled" value="#{systemEnvironment['KAFKA_DISCARDED_FEED_ENABLED'] ?: false}"/>
+     </bean>
+	<!-- assembled into ordered CandidateChain bean.
+         NOTE that seeds are prepared and scheduled via a SeedListener and don't run through the candidate chain. -->
+	<bean id="candidateProcessors" class="org.archive.modules.CandidateChain">
+		<property name="processors">
+			<list>
+				<!-- apply scoping rules to each individual candidate URI... -->
+				<ref bean="candidateScoper"/>
+				<ref bean="preparer"/>
+                <!-- also emit log of URIs determined to be in-scope, and enqueued in the frontier -->
+                <ref bean="inScopeUriFeed"/>
+			</list>
+		</property>
+	</bean>
+		
+	<!-- FETCH CHAIN --> 
+	<!-- processors declared as named beans -->
+   
+    <!-- This resets the quotas if we this URL has been annotated to indicate we are re-launching this URL -->
+    <bean id="quotaResetter" class="uk.bl.wap.crawler.prefetch.QuotaResetProcessor">
+    </bean>
+    <bean id="quotaEnforcer" class="org.archive.crawler.prefetch.QuotaEnforcer">
+        <!-- Default quota of 500MiB per hostname (can be overridden in sheets too, use -1 for no quota): -->
+        <property name="hostMaxSuccessKb" value="#{systemEnvironment['DEFAULT_HOST_MAX_SUCCESS_KB_QUOTA'] ?: -1}" />
+        <!-- Default quota of 500MiB per server (hostname+port, can be overridden in sheets too, use -1 for no quota): -->
+        <property name="serverMaxSuccessKb" value="#{systemEnvironment['DEFAULT_SERVER_MAX_SUCCESS_KB_QUOTA'] ?: 524288}" />
+        <!-- This will log all out-of-quota URLs rather than just retiring the queue. -->
+        <property name="forceRetire" value="#{systemEnvironment['RETIRE_QUEUES'] ?: false}"/>
+        <!-- Modify behaviour so prerequisites are never blocked by quotas (e.g. robots.txt) -->
+        <property name="shouldProcessRule">
+            <bean class="org.archive.modules.deciderules.DecideRuleSequence">
+                <property name="rules">
+                    <list>
+                        <!-- Begin by ACCEPTing all... -->
+                        <bean class="org.archive.modules.deciderules.AcceptDecideRule"/>
+                        <!-- ...but REJECT (DO NOT apply quotas for) critical pre-requisites... -->
+                        <bean class="org.archive.modules.deciderules.HopsPathMatchesRegexDecideRule">
+                           <property name="decision" value="REJECT" />
+                           <property name="regex" value="^PR*$" />
+                        </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+	<bean id="preselector" class="org.archive.crawler.prefetch.Preselector">
+		<property name="recheckScope" value="true" />
+		<property name="blockAll" value="false" />
+		<property name="blockByRegex" value="" />
+		<property name="allowByRegex" value="" />
+		<property name="scope">
+			<ref bean="scope" />
+		</property>
+	</bean>
+	<bean id="preconditions" class="org.archive.crawler.prefetch.PreconditionEnforcer">
+		<property name="ipValidityDurationSeconds" value="21600" />
+		<property name="robotsValidityDurationSeconds" value="86400" /> <!-- 24 hr -->
+		<property name="calculateRobotsOnly" value="false" />
+	</bean>
+	<bean id="fetchDns" class="org.archive.modules.fetcher.FetchDNS">
+		<!-- The following is only invoked if DNS lookup fails. 
+         See https://github.com/internetarchive/heritrix3/blob/master/modules/src/main/java/org/archive/modules/fetcher/FetchDNS.java#L74-L78
+             http://www.dnsjava.org/doc/org/xbill/DNS/ResolverConfig.html 
+         (i.e. /etc/hosts does not override domain names for H3 -->
+		<property name="acceptNonDnsResolves" value="false" />
+		<property name="digestContent" value="true" />
+		<property name="digestAlgorithm" value="sha1" />
+        <!-- AFAICT /etc/resolv.conf is only read once at startup. -->
+	</bean>
+	<bean id="wrenderHttp" class="uk.bl.wap.crawler.processor.WrenderProcessor">
+        <property name="enabled" value="#{systemEnvironment['WEBRENDER_ENABLED'] ?: false}"/>
+        <property name="connectTimeout" value="#{systemEnvironment['WEBRENDER_CONNECT_TIMEOUT_MS'] ?: 3600000 }" />
+        <property name="readTimeout" value="#{systemEnvironment['WEBRENDER_READ_TIMEOUT_MS'] ?: 3600000 }" />
+        <property name="maxTries" value="#{systemEnvironment['WEBRENDER_MAX_TRIES'] ?: 1 }" />
+		<property name="WrenderEndpoint" value="#{systemEnvironment['WEBRENDER_ENDPOINT'] ?: 'http://localhost:5000/wrender'}" />
+        <property name="warcFilePrefix" value="#{systemEnvironment['WEBRENDER_WARC_PREFIX'] ?: 'WEBRENDER'}"/>
+        <property name="shouldProcessRule">
+            <bean class="org.archive.modules.deciderules.DecideRuleSequence">
+                <property name="rules">
+                    <list>
+                        <!-- Begin by REJECTing all... -->
+                        <bean class="org.archive.modules.deciderules.RejectDecideRule"/>
+                        <!-- ...then ACCEPT seeds... -->
+                        <bean class="org.archive.modules.deciderules.SeedAcceptDecideRule"/>
+  					  <!-- ...then ACCEPT those with an annotation that requests rendering... -->
+  					  <bean class="uk.bl.wap.modules.deciderules.AnnotationMatchesListRegexDecideRule">
+  						<property name="decision" value="ACCEPT"/>
+  						<property name="regexList">
+  							<list>
+  								<value>^WebRenderThis$</value>
+  							</list>
+  						</property>
+  					  </bean>
+                    </list>
+                </property>
+            </bean>
+        </property>
+	</bean>
+	<bean id="fetchHttp" class="org.archive.modules.fetcher.FetchHTTP">
+		<property name="maxLengthBytes" value="0" />
+		<property name="timeoutSeconds" value="1200" />
+		<property name="maxFetchKBSec" value="0" />
+		<property name="defaultEncoding" value="ISO-8859-1" />
+		<property name="shouldFetchBodyRule"> 
+			<bean class="org.archive.modules.deciderules.AcceptDecideRule"/>
+		</property>
+		<property name="soTimeoutMs" value="20000" />
+		<property name="sendIfModifiedSince" value="false" />
+		<property name="sendIfNoneMatch" value="false" />
+		<property name="sendConnectionClose" value="true" />
+		<property name="sendReferer" value="true" />
+		<property name="sendRange" value="false" />
+		<property name="ignoreCookies" value="false" />
+		<property name="sslTrustLevel" value="OPEN" />
+		<property name="acceptHeaders"> 
+			<list>
+				<value>Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</value>
+			</list>
+		</property>
+		<property name="httpBindAddress" value="" />
+		<property name="httpProxyHost" value="" />
+		<property name="httpProxyPort" value="0" />
+		<property name="digestContent" value="true" />
+		<property name="digestAlgorithm" value="sha1" />
+	</bean>
+	<bean id="extractorHttp" class="org.archive.modules.extractor.ExtractorHTTP">
+		<property name="inferRootPage" value="true" />
+	</bean>
+        <!--
+	<bean id="trapSuppressExtractor" class="org.archive.modules.extractor.TrapSuppressExtractor">
+	</bean>
+        -->
+	<bean id="extractorHtml" class="org.archive.modules.extractor.ExtractorHTML">
+		<property name="extractJavascript" value="false" />
+		<property name="extractValueAttributes" value="true" />
+		<property name="ignoreFormActionUrls" value="false" />
+		<property name="extractOnlyFormGets" value="true" />
+		<property name="treatFramesAsEmbedLinks" value="true" />
+		<property name="ignoreUnexpectedHtml" value="true" />
+		<property name="maxElementLength" value="1024" />
+		<property name="maxAttributeNameLength" value="1024" />
+		<property name="maxAttributeValLength" value="16384" />
+	</bean>
+	<bean id="extractorCss" class="org.archive.modules.extractor.ExtractorCSS">
+	</bean> 
+	<bean id="extractorSwf" class="org.archive.modules.extractor.ExtractorSWF">
+	</bean>
+	<bean id="extractorJson" class="uk.bl.wap.modules.extractor.ExtractorJson">
+	</bean>
+	<bean id="extractorSitemap" class="uk.bl.wap.modules.extractor.RobotsTxtSitemapExtractor">
+	</bean>
+    <bean id="extractorSitemapXml" class="uk.bl.wap.modules.extractor.SitemapExtractor">
+    </bean>
+    <bean id="extractorXml" class="org.archive.modules.extractor.ExtractorXML">
+    </bean> 
+	<bean id="extractorJs" class="org.archive.modules.extractor.ExtractorJS">
+	</bean>
+    <!-- a processor that scans content for viruses -->
+    <bean id="viralContent" class="uk.bl.wap.crawler.postprocessor.ViralContentProcessor">
+        <property name="enabled" value="#{systemEnvironment['CLAMD_ENABLED'] ?: false}"/>
+		<property name="clamdHost" value="#{systemEnvironment['CLAMD_HOST'] ?: localhost}" />
+   		<property name="clamdPort" value="3310" />
+   		<property name="clamdTimeout" value="60000" />
+		<property name="streamMaxLength" value="94371840"/>
+	</bean>
+	<!-- Configure persistent URI history storage -->
+	<bean id="persistStoreProcessor" class="uk.bl.wap.modules.recrawl.OutbackCDXPersistStoreProcessor">
+       <property name="outbackCDXClient" ref="outbackCDXClient"/>
+	</bean>
+	<bean id="fetchHistoryProcessor" class="org.archive.modules.recrawl.FetchHistoryProcessor">
+		<property name="historyLength" value="2" />
+	</bean>
+	<!-- Configure persistent URI history loading for subsequent crawls -->
+	<bean id="persistLoadProcessor" class="uk.bl.wap.modules.recrawl.OutbackCDXPersistLoadProcessor">
+       <property name="outbackCDXClient" ref="outbackCDXClient"/>
+	</bean>
+	<!-- assembled into ordered FetchChain bean -->
+	<bean id="fetchProcessors" class="org.archive.modules.FetchChain">
+		<property name="processors">
+			<list>
+				<!-- reset quotas if requested... -->
+                <ref bean="quotaResetter"/>
+                <!-- enforce per-host quotas... -->
+                <ref bean="quotaEnforcer"/>
+				<!-- recheck scope, if so enabled... -->
+				<ref bean="preselector"/>
+				<!-- ...then verify or trigger prerequisite URIs fetched, allow crawling... -->
+				<ref bean="preconditions"/>
+                <!-- ...load hash of earlier download for de-duplication. -->
+                <!-- NOT required as the recentlySeen filter does this
+				<ref bean="persistLoadProcessor"/>
+                 -->
+				<!-- ...fetch if DNS URI... -->
+				<ref bean="fetchDns"/>
+				<!-- ...use web browser rendering service for some URIs - skips the rest of the chain if it works -->
+				<ref bean="wrenderHttp"/>
+				<!-- ...fetch if HTTP URI... -->
+				<ref bean="fetchHttp"/>
+				<ref bean="fetchHistoryProcessor" />
+				<!-- ...extract oulinks from HTTP headers... -->
+				<ref bean="extractorHttp"/>
+				<!-- ...suppress likely crawler traps... -->
+				<!--ref bean="trapSuppressExtractor" /-->
+				<!-- ...extract outlinks from JSON... -->
+				<!--
+				<ref bean="extractorJson" />
+				-->
+				<!-- ...extract sitemaps from robots.txt... -->
+				<ref bean="extractorSitemap"/>
+               <!-- ...extract links from Sitemaps (specific logic)... -->
+               <ref bean="extractorSitemapXml"/>
+               <!-- ...extract links from XML (like sitemaps!?)... -->
+               <ref bean="extractorXml"/>
+				<!-- ...extract outlinks from HTML content... -->
+				<ref bean="extractorHtml"/>
+				<!-- ...extract outlinks from CSS content... -->
+				<ref bean="extractorCss"/>
+				<!-- ...extract outlinks from JS content... -->
+				<!--
+				<ref bean="extractorJs"/>
+				-->
+				<!-- ...extract outlinks from Flash content... -->
+				<ref bean="extractorSwf"/>
+                <!-- ...infer GOV.UK Content API URL for the GOV.UK site... -->
+                <bean id="extractorGovUKContentApi" class="uk.bl.wap.modules.extractor.GovUkContentAPIExtractor">
+                </bean>
+				<!-- ...add IPs to crawl.log... -->
+				<bean id="ipAnnotator" class="uk.bl.wap.crawler.processor.IpAnnotator">
+				</bean>
+				<!-- ...add country-codes to crawl.log... -->
+				<bean id="countryCodeAnnotator" class="uk.bl.wap.crawler.processor.CountryCodeAnnotator">
+		        </bean>
+				<!-- ...scan for viruses... -->
+				<ref bean="viralContent" />
+			</list>
+		</property>
+	</bean>
+	<!-- DISPOSITION CHAIN -->
+	<!-- processors declared as named beans -->
+    <bean id="skipDispositionChain" class="uk.bl.wap.crawler.postprocessor.SkipDispositionChainProcessor">
+    </bean>
+      <!-- property name="pauseThresholdMiB" value="1048576" / --> <!-- 1TiB -->
+   	<bean id="diskSpaceMonitor" class="org.archive.crawler.monitor.DiskSpaceMonitor">
+		<property name="pauseThresholdMiB" value="1024" />   <!-- 1GiB -->
+		<property name="monitorConfigPaths" value="false" />
+		<property name="monitorPaths">
+			<list>
+				<value>/heritrix/output</value>
+				<value>/heritrix/state</value>
+			</list>
+		</property>
+	</bean>
+   <!-- This appeared to cause problems when checking a specific file (uri-errors.log) on Gluster,
+   so I'm taking it out for now. 
+	<bean id="rootDiskSpaceMonitor" class="org.archive.crawler.monitor.DiskSpaceMonitor">
+		<property name="pauseThresholdMiB" value="2048" />
+		<property name="monitorConfigPaths" value="true" />
+		<property name="monitorPaths">
+			<list>
+				<value>/</value>
+			</list>
+		</property>
+	</bean>
+   -->
+	<bean id="warcWriterViral" class="uk.bl.wap.modules.writer.WARCViralWriterProcessor">
+		<property name="shouldProcessRule">
+			<bean class="org.archive.modules.deciderules.DecideRuleSequence">
+				<property name="rules">
+					<list>
+						<!-- Begin by REJECTing all... -->
+						<bean class="org.archive.modules.deciderules.RejectDecideRule"/>
+						<!-- ...then ACCEPT those with viral annotations... -->
+						<bean class="uk.bl.wap.modules.deciderules.AnnotationMatchesListRegexDecideRule">
+							<property name="decision" value="ACCEPT"/>
+							<property name="regexList">
+								<list>
+									<value>^.*stream:.+FOUND.*$</value>
+								</list>
+							</property>
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="compress" value="true" />
+		<property name="prefix" value="#{systemEnvironment['WARC_PREFIX'] ?: 'BL'}-VIRAL" />
+		<property name="maxFileSizeBytes" value="1006632959" />
+		<property name="poolMaxActive" value="#{systemEnvironment['WARC_VIRAL_WRITER_POOL_SIZE'] ?: 5}" />
+		<property name="skipIdenticalDigests" value="false" />
+		<property name="maxTotalBytesToWrite" value="0" />
+		<property name="directory" value="." />
+		<property name="storePaths">
+			<list>
+				<value>/heritrix/output/#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}/${launchId}/viral/</value>
+			</list>
+		</property>
+		<property name="writeRequests" value="true" />
+		<property name="writeMetadata" value="true" />
+		<property name="writeRevisitForIdenticalDigests" value="false" />
+		<property name="writeRevisitForNotModified" value="false" />
+	</bean>
+	<bean id="warcWriterDefault" class="uk.bl.wap.modules.writer.ExtendedWARCWriterProcessor">
+		<property name="shouldProcessRule">
+			<bean class="org.archive.modules.deciderules.DecideRuleSequence">
+				<property name="rules">
+					<list>
+						<!-- Begin by ACCEPTing all... -->
+						<bean class="org.archive.modules.deciderules.AcceptDecideRule"/>
+						<!-- ...then ACCEPT those with viral annotations... -->
+						<bean class="uk.bl.wap.modules.deciderules.AnnotationMatchesListRegexDecideRule">
+							<property name="decision" value="REJECT"/>
+							<property name="regexList">
+								<list>
+									<value>^.*stream:.+FOUND.*$</value>
+								</list>
+							</property>
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="compress" value="true" />
+		<property name="prefix" value="#{systemEnvironment['WARC_PREFIX'] ?: 'BL'}" />
+		<property name="maxFileSizeBytes" value="1006632959" />
+		<property name="poolMaxActive" value="#{systemEnvironment['WARC_WRITER_POOL_SIZE'] ?: 10}" />
+		<property name="skipIdenticalDigests" value="false" />
+		<property name="maxTotalBytesToWrite" value="0" />
+		<property name="directory" value="." />
+		<property name="storePaths">
+			<list>
+				<value>/heritrix/output/#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}/${launchId}/warcs/</value>
+			</list>
+		</property>
+		<property name="writeRequests" value="true" />
+		<property name="writeMetadata" value="true" />
+		<property name="writeRevisitForIdenticalDigests" value="true" />
+		<property name="writeRevisitForNotModified" value="false" />
+	</bean>
+    <!-- This provides a crawl log feed to a queue - note that you'll need to set up a binding that matches these parameters to a queue -->
+    <bean id="crawlLogFeed" class="uk.bl.wap.crawler.postprocessor.KafkaKeyedCrawlLogFeed">
+      <property name="enabled" value="#{systemEnvironment['KAFKA_CRAWL_LOG_ENABLED'] ?: true}" />
+      <property name="topic" value="#{systemEnvironment['KAFKA_CRAWLED_TOPIC'] ?: 'uris.crawled'}" />
+      <property name="brokerList" value="#{systemEnvironment['KAFKA_BOOTSTRAP_SERVERS'] ?: 'kafka:9092'}" />
+      <property name="extraFields">
+          <map>
+            <entry key="crawl_name" value="#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}"/>
+          </map>
+      </property>
+    </bean>
+  
+  <!-- This spots documents (e.g. PDFs) in the crawl log feed and posts them to a dedicated queue.
+  <bean id="crawlLogDocumentFeed" class="uk.bl.wap.crawler.processor.AMQPIndexableCrawlLogFeed">
+    <property name="celeryMessageFormat" value="true"/>
+    <property name="targetCeleryTask" value="crawl.tasks.uri_of_doc"/>
+    <property name="routingKey" value="crawl.tasks.uri_of_doc"/>
+    <property name="exchange" value="default"/>
+    <property name="amqpUri" value="amqp://guest:guest@#{systemEnvironment['AMQP_HOST'] ?: localhost}:5672/%2f" />
+    <property name="extraFields">
+        <map>
+          <entry key="crawl_name" value="#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}"/>
+        </map>
+    </property>
+    <property name="shouldProcessRule">
+        <bean class="org.archive.modules.deciderules.DecideRuleSequence">
+            <property name="rules">
+                <list>
+                    <! - - Begin by REJECTing all... - - >
+                    <bean class="org.archive.modules.deciderules.RejectDecideRule"/>
+                    <! - - ...ACCEPT if on or via a WatchedTarget... - - >
+                    <bean class="org.archive.modules.deciderules.surt.SurtPrefixedDecideRule">
+                      <property name="seedsAsSurtPrefixes" value="true"/>
+                      <property name="alsoCheckVia" value="false"/>
+                      <property name="surtsSourceFile" value="watched-surts.txt"/>
+                      <property name="surtsDumpFile" value="watched-surts.dump"/>
+                    </bean>                    
+                    <! - - ...REJECT if NOT PDFs... - - >
+                    <bean class="org.archive.modules.deciderules.ContentTypeNotMatchesRegexDecideRule">
+                        <property name="decision" value="REJECT" />
+                        <property name="regex" value="^application/pdf.*"/>
+                    </bean>
+                </list>
+            </property>
+        </bean>
+    </property>
+  </bean>
+  -->
+     
+     <!-- This provides a crawl log feed to a queue - note that you'll need to set up a binding that matches these parameters to a queue -->
+     <bean id="toCrawlFeed" class="uk.bl.wap.crawler.postprocessor.KafkaKeyedToCrawlFeed">
+       <property name="enabled" value="#{systemEnvironment['KAFKA_CANDIDATES_LOG_ENABLED'] ?: true}" />
+       <property name="emitInScopeOnly" value="#{systemEnvironment['KAFKA_CANDIDATES_IN_SCOPE_ONLY'] ?: false}"/>
+       <property name="topic" value="#{systemEnvironment['KAFKA_CANDIDATES_TOPIC'] ?: 'uris.candidates'}" />
+       <property name="brokerList" value="#{systemEnvironment['KAFKA_BOOTSTRAP_SERVERS'] ?: 'kafka:9092'}" />
+       <property name="extraFields">
+           <map>
+             <entry key="CRAWL_NAME" value="#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}"/>
+           </map>
+       </property>
+       <property name="discardedUriFeedEnabled" value="#{systemEnvironment['KAFKA_DISCARDED_FEED_ENABLED'] ?: false}"/>
+     </bean>
+  
+	<bean id="candidates" class="org.archive.crawler.postprocessor.CandidatesProcessor">
+		<property name="seedsRedirectNewSeeds" value="true" />
+        <!-- Get outlinks discovered on non-success pages too (which includes WebRendered ones) -->
+        <property name="processErrorOutlinks" value="true"/>
+	</bean>
+    <!-- Modified DispositionProcessor so robots.txt doesn't get trashed accidentally. -->
+	<bean id="disposition" class="uk.bl.wap.crawler.postprocessor.ModifiedDispositionProcessor">
+		<property name="delayFactor" value="2.0" />
+		<property name="minDelayMs" value="500" />
+		<property name="respectCrawlDelayUpToSeconds" value="300" />
+		<property name="maxDelayMs" value="30000" />
+		<property name="maxPerHostBandwidthUsageKbSec" value="0" />
+		
+	</bean>
+	<!-- assembled into ordered DispositionChain bean -->
+	<bean id="dispositionProcessors" class="org.archive.modules.DispositionChain">
+		<property name="processors">
+			<list>
+                <!-- send the crawl log to a queue for downstream checks -->
+                <ref bean="crawlLogFeed"/>
+                <!-- allow the rest of the disposition chain to be skipped if it's not appropriate -->
+                <ref bean="skipDispositionChain"/>
+				<!-- write viral content to aggregate archival files... -->
+				<ref bean="warcWriterViral"/>
+				<!-- write to aggregate archival files... -->
+				<ref bean="warcWriterDefault"/>
+				<!-- update the persist store -->
+				<ref bean="persistStoreProcessor" />
+                <!-- route outlink candidate URIs via to-crawl feed -->
+                <ref bean="toCrawlFeed"/>
+                <!-- get any outlinks and enqueue them -->
+                <ref bean="candidates"/>
+				<!-- ...then update stats, shared-structures, frontier decisions -->
+				<ref bean="disposition"/>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- CRAWLCONTROLLER: Control interface, unifying context -->
+	<bean id="crawlController" class="org.archive.crawler.framework.CrawlController">
+		<property name="maxToeThreads" value="#{systemEnvironment['MAX_TOE_THREADS'] ?: 200}" />
+		<property name="pauseAtStart" value="#{systemEnvironment['PAUSE_AT_START'] ?: false}" />
+		<property name="runWhileEmpty" value="true" />
+		<property name="recorderInBufferBytes" value="524288" />
+		<property name="recorderOutBufferBytes" value="16384" />
+		<!-- property name="checkpointerPeriod" value="-1" / -->
+		<property name="scratchDir" value="/heritrix/scratch/#{systemEnvironment['HOSTNAME'] ?: 'host'}-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}/" />
+	</bean>
+	
+	<!-- FRONTIER: Record of all URIs discovered and queued-for-collection -->
+	<bean id="frontier" class="org.archive.crawler.frontier.BdbFrontier">
+        <property name="bdbModule" ref="bdbFrontierBdb"/>
+        <property name="extract404s" value="false" />
+		<property name="queueTotalBudget" value="-1" />
+		<property name="balanceReplenishAmount" value="3000" />
+		<property name="errorPenaltyAmount" value="100" />
+		<property name="precedenceFloor" value="255" />
+		<!-- Use this to ensure the deep crawl of many sites does not prevent the
+     		high-priority content from being crawled (although this is just a mitigation
+     		for not having enough crawl capacity) -->
+    	<property name="queuePrecedencePolicy">
+        	<bean class="org.archive.crawler.frontier.precedence.HighestUriQueuePrecedencePolicy" />
+    	</property>
+    	<!--
+		<property name="queuePrecedencePolicy">
+			<bean class="org.archive.crawler.frontier.precedence.BaseQueuePrecedencePolicy" />
+		</property>
+		-->
+		<property name="snoozeLongMs" value="60000" />
+		<property name="retryDelaySeconds" value="20" />
+		<property name="maxRetries" value="5" />
+		<property name="recoveryLogEnabled" value="false" />
+		<property name="maxOutlinks" value="6000" /> <!-- this is ignored by the sitemap extractor -->
+		<property name="dumpPendingAtClose" value="false" />
+		<property name="scope">
+			<ref bean="scope" />
+		</property>
+	</bean>
+	
+	<!-- URI UNIQ FILTER: Used by frontier to remember URIs currently in the BDBFrontier --> 
+   <bean id="uriUniqFilter" class="org.archive.crawler.util.BloomUriUniqFilter">
+      <property name="bloomFilter">
+         <bean class="org.archive.util.BloomFilter64bit">
+            <!-- roughly  1 in 2^30 (about a billion) false-positive rate while below 250 million probes. -->
+            <constructor-arg value="250000000" />
+            <constructor-arg value="30" /> 
+         </bean>
+      </property> 
+   </bean>
+   
+    <!-- Shared OutbackCDX client and configuration -->
+    <bean id="outbackCDXClient" class="uk.bl.wap.util.OutbackCDXClient">
+        <property name="endpoint" value="#{systemEnvironment['CDXSERVER_ENDPOINT'] ?: 'http://localhost:9090/fc'}"/>
+        <property name="socketTimeout" value="30000"/>
+        <property name="maxConnections" value="#{systemEnvironment['MAX_OUTBACKCDX_CONNECTIONS'] ?: 400}"/>
+    </bean>
+	
+	<!-- 
+		OPTIONAL BUT RECOMMENDED BEANS
+		-->
+		
+	<!-- ACTIONDIRECTORY: disk directory for mid-crawl operations
+		 Running job will watch directory for new files with URIs, 
+		 scripts, and other data to be processed during a crawl. -->
+	<bean id="actionDirectory" class="org.archive.crawler.framework.ActionDirectory">
+		<property name="actionDir" value="action" />
+		<property name="doneDir" value="${launchId}/actions-done" />
+		<property name="initialDelaySeconds" value="10" />
+		<property name="delaySeconds" value="30" />
+	</bean> 
+	
+	<!--  CRAWLLIMITENFORCER: stops crawl when it reaches configured limits -->
+	<bean id="crawlLimiter" class="org.archive.crawler.framework.CrawlLimitEnforcer">
+		<property name="maxBytesDownload" value="0" />
+		<property name="maxDocumentsDownload" value="0" />
+		<property name="maxTimeSeconds" value="0" />
+	</bean>
+	
+	<!-- CHECKPOINTSERVICE: checkpointing assistance -->
+	<bean id="checkpointService" class="org.archive.crawler.framework.CheckpointService">
+		<property name="checkpointIntervalMinutes" value="#{systemEnvironment['CHECKPOINT_INTERVAL_MINUTES'] ?: 1440}"/>
+		<property name="checkpointsDir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/checkpoints"/>
+        <!-- this controls whether we retain all checkpoints, or only the last one. Unfortunately, using is also keeps merging all the previous logs into a single massive log file: -->
+        <property name="forgetAllButLatest" value="#{systemEnvironment['CHECKPOINT_FORGET_ALL_BUT_LATEST'] ?: false}"/>
+	</bean>
+	
+	<!-- 
+		OPTIONAL BEANS
+		Uncomment and expand as needed, or if non-default alternate 
+		implementations are preferred.
+		-->
+		
+	<!-- CANONICALIZATION POLICY -->
+	<bean id="canonicalizationPolicy" class="org.archive.modules.canonicalize.RulesCanonicalizationPolicy">
+		<property name="rules">
+			<list>
+				<bean class="org.archive.modules.canonicalize.LowercaseRule" />
+				<bean class="org.archive.modules.canonicalize.StripUserinfoRule" />
+				<bean class="org.archive.modules.canonicalize.StripWWWNRule" />
+				<bean class="org.archive.modules.canonicalize.StripSessionIDs" />
+				<bean class="org.archive.modules.canonicalize.StripSessionCFIDs" />
+				<bean class="org.archive.modules.canonicalize.FixupQueryString" />
+			</list>
+		</property>
+	</bean>
+	<!-- QUEUE ASSIGNMENT POLICY -->
+	<bean id="queueAssignmentPolicy" class="org.archive.crawler.frontier.SurtAuthorityQueueAssignmentPolicy">
+		<property name="forceQueueAssignment" value="" />
+		<property name="deferToPrevious" value="true" />
+		<property name="parallelQueues" value="1" />
+	</bean>
+	
+	<!-- URI PRECEDENCE POLICY -->
+	<bean id="uriPrecedencePolicy"
+   class="org.archive.crawler.frontier.precedence.HopsUriPrecedencePolicy">
+	   <property name="navlinksOnly" value="false"/>
+ 	</bean>
+	
+	<!-- COST ASSIGNMENT POLICY -->
+	<bean id="costAssignmentPolicy" class="org.archive.crawler.frontier.UnitCostAssignmentPolicy">
+	</bean>
+	
+	<!-- CREDENTIAL STORE: HTTP authentication or FORM POST credentials -->
+	<bean id="credentialStore" class="org.archive.modules.credential.CredentialStore">
+	</bean>
+	
+	<!-- 
+		REQUIRED STANDARD BEANS
+		It will be very rare to replace or reconfigure the following beans.
+		-->
+	<!-- STATISTICSTRACKER: standard stats/reporting collector -->
+ <bean id="statisticsTracker"
+   class="org.archive.crawler.reporting.StatisticsTracker" autowire="byName">
+  <property name="bdbModule" ref="bdbStatisticsBdb"/>
+  <!-- disables end-of-job reporting altogether -->
+  <property name="reports">
+    <list>
+      <bean class="org.archive.crawler.reporting.ProcessorsReport"/>
+      <bean class="org.archive.crawler.reporting.FrontierSummaryReport"/>
+      <bean class="org.archive.crawler.reporting.ToeThreadsReport"/>
+      <bean class="uk.bl.wap.crawler.reporting.KafkaUrlReceiverReport"/>
+    </list>
+  </property>
+  <!-- <property name="reportsDir" value="reports" /> -->
+  <!-- <property name="liveHostReportSize" value="20" /> -->
+  <!-- <property name="intervalSeconds" value="3600" /> -->
+  <!-- 1 is sufficient for computing docs/s and KiB/s -->
+  <property name="keepSnapshotsCount" value="1" />
+  <!-- <property name="liveHostReportSize" value="20" /> -->
+  <property name="trackSources" value="false" /> <!-- Avoiding NPE when source accidentally null. -->
+ </bean>
+	
+	<!-- CRAWLERLOGGERMODULE: shared logging facility -->
+	<bean id="loggerModule" class="org.archive.crawler.reporting.BufferedCrawlerLoggerModule">
+		<property name="path" value="/heritrix/output/#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}/${launchId}/logs/" />
+		<property name="crawlLogPath" value="crawl.log" />
+		<property name="alertsLogPath" value="alerts.log" /> 
+		<property name="progressLogPath" value="progress-statistics.log" />
+		<property name="uriErrorsLogPath" value="uri-errors.log" />
+		<property name="runtimeErrorsLogPath" value="runtime-errors.log" />
+		<property name="nonfatalErrorsLogPath" value="nonfatal-errors.log" />
+		<property name="logExtraInfo" value="true" />
+	</bean>	
+	<!-- SHEETOVERLAYMANAGER: manager of sheets of contextual overlays
+		 Autowired to include any SheetForSurtPrefix or 
+		 SheetForDecideRuled beans -->
+	<bean id="sheetOverlaysManager" autowire="byType" class="org.archive.crawler.spring.SheetOverlaysManager">
+	</bean>
+    <import resource="sheets.xml"/>
+    
+	<!-- BDBMODULE: BDB-JE disk persistence manager -->
+  <bean id="bdbFrontierBdb" class="org.archive.bdb.BdbModule">
+    <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/frontier"/>
+    <property name="cachePercent" value="50"/>
+    <property name="expectedConcurrency" value="1000"/>
+  </bean>
+  <bean id="bdbUriUniqFilterBdb" class="org.archive.bdb.BdbModule">
+    <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/uriUniqFilter"/>
+    <property name="cachePercent" value="50"/>
+    <property name="expectedConcurrency" value="1000"/>
+  </bean>
+  <bean id="bdbStatisticsBdb" class="org.archive.bdb.BdbModule">
+    <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/statistics"/>
+    <property name="cachePercent" value="50"/>
+    <property name="expectedConcurrency" value="1000"/>
+  </bean>
+  <bean id="bdbCookieStoreBdb" class="org.archive.bdb.BdbModule">
+    <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/cookies"/>
+    <property name="cachePercent" value="50"/>
+    <property name="expectedConcurrency" value="1000"/>
+  </bean>
+  <bean id="bdbServerCacheBdb" class="org.archive.bdb.BdbModule">
+    <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/serverCache"/>
+    <property name="cachePercent" value="50"/>
+    <property name="expectedConcurrency" value="1000"/>
+  </bean>
+	
+	<!-- BDBCOOKIESTORAGE: disk-based cookie storage for FetchHTTP -->
+	<bean id="cookieStorage" class="org.archive.modules.fetcher.BdbCookieStore">
+        <property name="bdbModule" ref="bdbCookieStoreBdb"/>
+		<property name="cookiesLoadFile"><null/></property>
+		<property name="cookiesSaveFile"><null/></property>
+		<!-- property name="bdb">
+			<ref bean="bdb"/>
+		</property -->
+	</bean>
+	
+	<!-- SERVERCACHE: shared cache of server/host info -->
+	<bean id="serverCache" class="org.archive.modules.net.BdbServerCache">
+        <property name="bdbModule" ref="bdbServerCacheBdb"/>
+		<!-- property name="bdb">
+			<ref bean="bdb"/>
+		</property -->
+	</bean>
+	<!-- CONFIG PATH CONFIGURER: required helper making crawl paths relative
+		 to crawler-beans.cxml file, and tracking crawl files for web UI -->
+	<bean id="configPathConfigurer" class="org.archive.spring.ConfigPathConfigurer">
+	</bean>
+   
+   <!-- Metrics Endpoint for Monitoring with Prometheus -->
+   <bean class="uk.bl.wap.util.PrometheusMetricsExporterBean">
+      <property name="metricsPort" value="#{systemEnvironment['PROMETHEUS_METRICS_PORT'] ?: 9118}"/>
+   </bean>
+</beans>
+

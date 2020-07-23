@@ -1,0 +1,20 @@
+groups:
+- name: DC metrics
+  rules:
+
+  # Alert when crawl activity is low:
+  - alert: dc_low_crawl_activity
+    # If the number of finished URLs has increased by less than ten in
+    # the last four hours, then something as gone wrong beyond the usual 
+    # checkpointing activity
+    expr: increase(heritrix3_crawl_job_uris_total{kind='finished'}[4h]) < 10
+    for: 60m
+    labels:
+      severity: severe
+    annotations:
+      summary: "The Domain Crawl {{ $labels.instance }} is crawling too slowly"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} low DC crawl rate for 60 minutes."
+
+
+
+
