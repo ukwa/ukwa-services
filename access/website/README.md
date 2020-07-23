@@ -20,7 +20,21 @@ See the comments in [the stack definition](./docker-compose.yml) for details.
 Deployment Procedures
 ---------------------
 
-Where possible, deployment setup is handled in the launch script (e.g. [./dev/deploy-access-dev.sh](./dev/deploy-access-dev.sh)). However, some setup cannot be done this way.
+Where possible, deployment setup is handled in the launch script (e.g. [./dev/deploy-access-dev.sh](./dev/deploy-access-dev.sh)). However, some setup cannot be done this way...
+
+### Wayback Access Lists
+
+To function correctly, the Wayback (pywb) access service needs the list of URLs that are open access, and the list of URLs that should be blocked, using the [access control system supported by pywb](https://github.com/ukwa/ukwa-pywb/blob/master/docs/access_controls.md#access-control-system).  The Docker Compose file declares a volume mount from the host where the corresponding `allows.aclj` and `block.aclj` should be stored.
+
+The `allows.aclj` file is generated from the data in W3ACT, based on the license status. The [`python-w3act`](https://github.com/ukwa/python-w3act) tools are used to do this, via a cached version of the W3ACT database held on HDFS (generated independently by ingest-side processes). The [`update-acl.sh script`](./scripts/w3act/update-acl.sh) provides the implemention, downloading the data dump from HDFS and generating the `allows.aclj` file.
+
+The `blocks.aclj` file is managed by hand and stored in GitLab. _TBA management procedure?_
+
+### Populating the Collections Solr
+
+The current website uses a secondary Solr collection to hold the data from W3ACT that is used to generate the _Topics & Themes_ pages.  The Solr instance and schema is managed as a Docker container in this stack, but the data needs to be pulled in from W3ACT.
+
+There are scripts in <./scripts/collections-solr> for managing this service. In time, the functionality will be added to `python-w3act` and run as a Dockerised process (a like the `allows.aclj` generation mentioned above).
 
 ### Shine Database
 

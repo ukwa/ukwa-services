@@ -1,13 +1,10 @@
 #!/bin/sh
 
-# Pull in sensitive environment variables:
-#source ~/gitlab/ukwa-services-env/w3act/dev/w3act.env
-
-# Set up the dev.webarchive.org.uk vars
-export SERVER_NAME=dev.webarchive.org.uk
+# Set up the beta.webarchive.org.uk vars
+export SERVER_NAME=beta.webarchive.org.uk
 export USE_HTTPS=true
 export KAFKA_BROKER=192.168.45.15:9094
-export DEPLOYMENT_TAG=dev
+export DEPLOYMENT_TAG=beta
 export STORAGE_PATH=/mnt/nfs/data/website
 export SOLR_FULL_TEXT_SEARCH_PATH='http://solr.api.wa.bl.uk'
 export SOLR_UID=$UID
