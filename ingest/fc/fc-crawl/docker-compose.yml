@@ -1,4 +1,4 @@
-version: "3.2"
+version: "3.7"
 
 services:
 
@@ -87,6 +87,7 @@ services:
     networks:
       - default
       - kafka
+      - webrender
 
 
   # ----------------------------------------------
@@ -95,15 +96,15 @@ services:
 
   # PhantomJS web page rendering service
   webrender:
-    image: ukwa/webrender-api:1.0.11
+    image: ukwa/webrender-api:1.0.13
     #ports:
     #  - 8010:8010
     environment:
       - "WARCPROX=warcprox:8000"
       - "LC_ALL=en_US.utf8"
       - "WEB_RENDER_TMP=/tmp/webrender"
-      - "DOCKER_NETWORK=fc_crawl_default"
-      - "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.3"
+      - "DOCKER_NETWORK=fc_crawl_webrender_network"
+      #- "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.7"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # For launching containerised renderers
       - /tmp/webrender:/tmp/webrender
@@ -113,6 +114,10 @@ services:
       endpoint_mode: dnsrr # Use this to avoid the Ingress network, as it appears to forcibly reset long-running connections.
     depends_on:
       - warcprox
+    networks:
+      - default
+      - webrender
+
 
 
   # ----------------------------------------------
@@ -141,11 +146,16 @@ services:
       - kafka
 
 networks:
-  # Allow attachment of transient web-render containers, external monitoring:
+  # Allow attachment of external monitoring:
   default:
     driver: overlay
     attachable: true
+  # Dedicated webrender subnet:
+  webrender:
+    external: true
+    name: fc_crawl_webrender_network
+  # Link to Kafka service:
   kafka:
-    external:
-      name: fc_kafka_default
+    external: true
+    name: fc_kafka_default
 

@@ -3,10 +3,12 @@ version: '3.2'
 services:
   # PyWB for QA
   pywb:
-    image: ukwa/ukwa-pywb:1.0.9
+    #image: ukwa/ukwa-pywb:1.0.9.1
+    image: ukwa/ukwa-pywb:2.4.0-beta
+    #image: webrecorder/pywb:2.4.2-beta
     environment:
       WEBHDFS_USER: "access"
-      UKWA_INDEX: "xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      UKWA_INDEX: "cdx+http://cdx.api.wa.bl.uk/data-heritrix"
       UKWA_ARCHIVE: "webhdfs://hdfs.api.wa.bl.uk"
       SCRIPT_NAME: "/act/wayback"
     volumes:
@@ -90,3 +92,11 @@ services:
     volumes:
       - "${W3ACT_PSQL_DIR}:/var/lib/postgresql/data"
       - "${W3ACT_DUMPS_DIR}:/tmp"
+
+
+networks:
+  # Make network attachable so tasks can be run:
+  default:
+    driver: overlay
+    attachable: true
+
