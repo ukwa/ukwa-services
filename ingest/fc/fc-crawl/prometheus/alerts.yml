@@ -1,0 +1,5 @@
+
+
+sum(rate(kafka_log_logendoffset{topic="fc.crawled"}[10m]))
+
+

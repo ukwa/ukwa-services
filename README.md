@@ -20,6 +20,8 @@ Within each stack folder, we should have a single `docker-compose.yml` file whic
 
 These variables, any other context-specific configuration, should be held in `dev`,`beta` and `prod` subdirectories. For example, if `access/website/docker-compose.yml` is the main stack definition file, any addtional services needed only on `dev` might be declared in `access/website/dev/docker-compose.yml` and would be deployed separately.
 
+A top-level guide to all the different automated tasks is provided in [`TASKS.md`](./TASKS.md).
+
 ## Deployment Process
 
 First, individual components should be developed and tested on developers' own machines/VMs, using the [Docker Compose](https://docs.docker.com/compose/compose-file/) files within each tool's repository. e.g.

@@ -4,6 +4,11 @@ ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
 collections:
     # open access (with access controls) under /archive/
     archive:
+        # CDX Query index for pywb 2.x
+        #index:
+        #    type: cdx
+        #    api_url: 'http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!mimetype:warc/revisit'
+        #    replay_url: https://www.webarchive.org.uk/wayback/archive/{timestamp}id_/{url}
         index_paths: *INDEX
         archive_paths: *ARCHIVE
 

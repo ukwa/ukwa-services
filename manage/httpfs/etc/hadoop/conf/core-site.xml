@@ -9,29 +9,4 @@
   <value>hdfs://namenode:54310</value>
 </property>
 
-<property>
-    <name>hadoop.proxyuser.access.hosts</name>
-    <value>*</value>
-</property>
-<property>
-    <name>hadoop.proxyuser.access.groups</name>
-    <value>access</value>
-</property>
-<property>
-    <name>hadoop.proxyuser.access.users</name>
-    <value>access</value>
-</property>
-<property>
-    <name>hadoop.proxyuser.ingest.hosts</name>
-    <value>*</value>
-</property>
-<property>
-    <name>hadoop.proxyuser.ingest.groups</name>
-    <value>ingest</value>
-</property>
-<property>
-    <name>hadoop.proxyuser.ingest.users</name>
-    <value>ingest</value>
-</property>
-
 </configuration>
