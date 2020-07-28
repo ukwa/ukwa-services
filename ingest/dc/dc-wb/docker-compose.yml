@@ -1,0 +1,46 @@
+version: "3.2"
+
+services:
+
+  # ----------------------------------------------
+  # QA and mid-crawl playback
+  # ----------------------------------------------
+
+  # This resolves WARC files locally, by filename:
+  warc-server:
+    image: ukwa/warc-server
+    ports:
+      - 8001:8000
+    environment:
+      - "WARC_PATHS=/heritrix/output"
+    volumes:
+      - ${STORAGE_PATH}/heritrix/output:/heritrix/output
+
+  # OpenWayback instance:
+  openwayback:
+    image: ukwa/waybacks
+    ports:
+      - "8080:8080"
+      - "8090:8090"
+    environment:
+      - "UKWA_OWB_VERSION=qa"
+      - "WAYBACK_URL_PORT=8080"
+      - "WAYBACK_PROXY_PORT=8090"
+      - "CDX_WHITELIST="
+      - "WAYBACK_EXCLUDE_FILE=/usr/local/tomcat/webapps/ROOT/WEB-INF/classes/exclude.txt"
+      - "WAYBACK_EMBARGO=0"
+      - "WAYBACK_HTTPFS_PREFIX=http://warc-server:8000/by-filename/"
+      - "CDX_INDEX_SERVER=${CDXSERVER_ENDPOINT}"
+      - "WAYBACK_URL_PREFIX=http://${EXTERNAL_HOSTNAME}:8080"
+      - "WAYBACK_URL_HOST=${EXTERNAL_HOSTNAME}"
+
+  # Python Wayback
+  pywb:
+    image: ukwa/ukwa-pywb
+    ports:
+      - "8081:8080"
+    environment:
+      - "WEBHDFS_USER=access"
+      - "UKWA_INDEX=xmlquery+${CDXSERVER_ENDPOINT}"
+      - "UKWA_ARCHIVE=webhdfs://warc-server:8000/by-filename/"
+
