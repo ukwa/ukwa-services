@@ -3,9 +3,10 @@
 # Fail on errors:
 set -e
 
+# Load context vars from file (symlinked from ukwa-services-env/access/[dev|beta|prod]/access.env):
 # Common vars - TRACKDB_URL, TASK_IMG, SOLR_ZKS, SHARED all required:
 export DIR=$(dirname "$0")
-source ${DIR}/task.env.sh
+source ${DIR}/access.env
 if [[ -z ${TRACKDB_URL} || -z ${TASK_IMG} || -z ${SOLR_ZKS} ]]; then
 	echo "ERROR: Common vars undefined"
 	exit 1
@@ -61,7 +62,11 @@ unset lockfd
     flock -n ${lockfd}|| { echo "ERROR: $(basename $0) is already running!"; exit 1; }
 
     echo "Solr indexing WARCs from ${TRACKDB_URL} for ${STREAM} ${YEAR} and using ${TASK_IMG}, into ${SOLR_ZKS}/${SOLR_COLLECTION}..."
-#    docker run -i -v ${SHARED}:/shared ${TASK_IMG} windex solr-index \
+#    docker run -i \
+#        -v ${SHARED}:/shared \
+#        --add-host=namenode:$NAMENODE_IP \
+#        --add-host=jobtracker:$JOBTRACKER_IP \
+#        ukwa/ukwa-manage:latest windex solr-index \
 #        --trackdb-url ${TRACKDB_URL} \
 #        --stream ${STREAM} \
 #        --year ${YEAR} \
