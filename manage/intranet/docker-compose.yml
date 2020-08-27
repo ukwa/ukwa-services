@@ -25,8 +25,9 @@ services:
   api:
     image: ukwa/ukwa-access-api
     environment:
-      - "CDX_SERVER=http://cdx.api.wa.bl.uk/data-heritrix"
-      - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
+      - "CDX_SERVER=http://crawldb-fc.api.wa.bl.uk/fc"
+      - "WAYBACK_SERVER=http://pywb-nobanner:8080/archive/"
+      - "WEBHDFS_PREFIX=http://${CRAWLER_WEBHDFS}"
       - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
       - "KAFKA_SEEK_TO_BEGINNING=False"
@@ -36,6 +37,7 @@ services:
       - "HTTPS_PROXY=http://194.66.232.92:3127/"
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
+      - "WEBRENDER_ARCHIVE_SERVER=http://webrender:8010/render"
       - "SCRIPT_NAME=/intranet/api" # Deploy the API under this prefix
     volumes:
       - "/mnt/nfs/data/analysis-results:/analysis"
@@ -49,28 +51,30 @@ services:
 
   # An embedded, bannerless OA Wayback to render:
   pywb-nobanner:
-    image: ukwa/ukwa-pywb:latest
+    image: ukwa/ukwa-pywb:2.4.0-beta
+    ports:
+      - "8090:8080"
     environment:
       - "WEBHDFS_USER=access"
-      - "UKWA_INDEX=cdx+http://cdx.api.wa.bl.uk/data-heritrix"
-      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "UKWA_INDEX=cdx+http://crawldb-fc.api.wa.bl.uk/fc"
+      - "UKWA_ARCHIVE=webhdfs://${CRAWLER_WEBHDFS}"
     volumes:
       - ./config/pywb/config-nobanner.yaml:/webarchive/config.yaml
       - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
       # Used to store the access control lists used by the pywb services.
-      - "/mnt/nfs/data/website/open-access-acl:/ukwa_pywb/acl/"
+      #- "/mnt/nfs/data/website/open-access-acl:/ukwa_pywb/acl/"
 
   # Web page rendering post-crawl:
   webrender:
-    image: ukwa/webrender-api:1.0.10
+    image: ukwa/webrender-api:1.0.14
     environment:
       - "HTTP_PROXY=http://pywb-nobanner:8080"
-      - "DOCKER_NETWORK=website_default"
+      - "DOCKER_NETWORK=intranet_default"
       - "LC_ALL=en_US.utf8"
-      - "WEB_RENDER_TMP=/tmp/webrender"
+      - "WEB_RENDER_TMP=/tmp"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /tmp/webrender:/tmp/webrender
+      - /tmp:/tmp
     deploy:
       replicas: 1
 
