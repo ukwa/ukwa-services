@@ -20,7 +20,8 @@ services:
       - "KAFKA_CANDIDATES_TOPIC=dc.tocrawl"
       - "KAFKA_CRAWLED_TOPIC=dc.crawled"
       - "KAFKA_INSCOPE_TOPIC=dc.inscope"
-      - "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9092"
+      - "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092"
+      #- "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9092"
       - "CRAWL_NAME=dc2019"
       - "WARC_PREFIX=BL-NPLD"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
@@ -33,20 +34,20 @@ services:
       - "WARC_WRITER_POOL_SIZE=200"
       - "RETIRE_QUEUES=true" # Avoid logging all the over-quota URLs
     volumes:
-      - "/mnt/crawler06/localraid6/heritrix/output:/heritrix/output"
-      - "/mnt/e60san/state:/heritrix/state"
-      - "${STORAGE_PATH}/heritrix/surts:/shared" # Shared configuration - surts file held here.
-      - "${STORAGE_PATH}/heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml"
-      - type: tmpfs
-        target: /heritrix/scratch # Use RAM disk for scratch space.
+      - "/heritrix/output:/heritrix/output"
+      - "/heritrix/state:/heritrix/state"
+      - "/heritrix/scratch:/heritrix/scratch"
+      - "./shared:/shared" # Shared configuration - surts file held here.
+      #- "./crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml"
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == crawler01.bl.uk] # Only allow it to deploy on crawler01 as that has the e60 volume.
+        constraints: [node.hostname == crawler07.bl.uk] # Only allow it to deploy on crawler01 as that has the e60 volume.
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     depends_on:
       - clamd
       - kafka
+      - cdxserver
     networks:
       - default
       - kafka
@@ -57,9 +58,16 @@ services:
   clamd:
     image: ukwa/clamd
     deploy:
-      replicas: 16
-      placement:
-        constraints: [node.hostname == crawler04.bl.uk] # Lots going on on Crawler01
+      replicas: 8
+
+  cdxserver:
+    image: nlagovau/outbackcdx:0.7.0
+    # Verbose form logs submissions:
+    command: "java -jar outbackcdx.jar -v -d /cdx-data -p 8080 -b 0.0.0.0"
+    ports:
+      - "9090:8080"
+    volumes:
+      - /opt/data/cdx:/cdx-data
 
   # ----------------------------------------------
   # Monitoring
@@ -70,8 +78,8 @@ services:
     ports:
       - 9191:9090
     volumes:
-      - "${STORAGE_PATH}/prometheus/config:/etc/prometheus"
-      - "${STORAGE_PATH}/prometheus/data:/prometheus"
+      - "/heritrix/output/prometheus/config:/etc/prometheus"
+      - "/heritrix/output/prometheus/data:/prometheus"
     user: root
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
