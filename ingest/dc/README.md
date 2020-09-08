@@ -112,7 +112,12 @@ Launching the full crawl
 ------------------------
 
 TODO We also need to revisit the full-domain seeding protocol
+TODO Add part of setting up the full surts
 
 Feed in all known hosts. Pre-filter to avoid lots of empty queues in H3? Run through web render separately?
 
+TO ADD
+
+- update crawl name
+- constraints
 

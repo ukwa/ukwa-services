@@ -22,7 +22,7 @@ services:
       - "KAFKA_INSCOPE_TOPIC=dc.inscope"
       - "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092"
       #- "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9092"
-      - "CRAWL_NAME=dc2019"
+      - "CRAWL_NAME=dc2020"
       - "WARC_PREFIX=BL-NPLD"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
       - "MAX_OUTBACKCDX_CONNECTIONS=1200"
@@ -42,7 +42,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == crawler07.bl.uk] # Only allow it to deploy on crawler01 as that has the e60 volume.
+        constraints: [node.hostname == ip-172-31-29-0] # Only allow it to deploy on the appropriate server
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     depends_on:
       - clamd
