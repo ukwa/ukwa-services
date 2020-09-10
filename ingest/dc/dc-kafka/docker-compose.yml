@@ -8,6 +8,7 @@ services:
   # Needs a Zookeeper too
   # ----
   zookeeper:
+    #user: ${CURRENT_UID} # Appears to need to run as root as config cannot be read.
     image: zookeeper:3.4
     ports:
       - 2181:2181
@@ -19,6 +20,7 @@ services:
   # Kafka Broker Setup:
   #
   kafka-1:
+    #user: ${CURRENT_UID} # Appears to need to run as root as config cannot be read.
     image: wurstmeister/kafka:2.12-2.1.0
     ports:
       - target: 9094
@@ -56,6 +58,7 @@ services:
 
   # Kafka UI
   ui:
+    #user: ${CURRENT_UID}
     image: ukwa/docker-trifecta
     ports:
       - "9000:9000"

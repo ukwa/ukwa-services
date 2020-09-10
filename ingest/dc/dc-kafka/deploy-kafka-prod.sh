@@ -1,4 +1,5 @@
 #!/bin/sh
+export CURRENT_UID=$(id -u):$(id -g)
 export STORAGE_PATH=/heritrix/kafka
 
 mkdir -p ${STORAGE_PATH}/zookeeper/data
