@@ -15,7 +15,7 @@ services:
     environment:
       - "CRAWL_NAME=dc2020"
       - "LAUNCH_AUTOMATICALLY=false"
-      - "KAFKA_SEEK_TO_BEGINNING=true"
+      - "KAFKA_SEEK_TO_BEGINNING=false"
       - "KAFKA_TOCRAWL_TOPIC=dc.tocrawl"
       - "KAFKA_CANDIDATES_TOPIC=dc.tocrawl"
       - "KAFKA_CRAWLED_TOPIC=dc.crawled"
@@ -28,7 +28,7 @@ services:
       - "SURTS_SOURCE_FILE=/shared/surts.txt"
       - "SURTS_EXCLUDE_SOURCE_FILE=/shared/excluded-surts.txt"
       - "WEBRENDER_ENABLED=false"
-      - "JAVA_OPTS=-Xms16g -Xmx16g -XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -XX:+UseCompressedOops -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8484 -Dcom.sun.management.jmxremote.rmi.port=8484 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=192.168.45.12"
+      - "JAVA_OPTS=-Xms18g -Xmx18g -XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -XX:+UseCompressedOops -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8484 -Dcom.sun.management.jmxremote.rmi.port=8484 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=192.168.45.12"
       - "MAX_TOE_THREADS=800"
       - "WARC_WRITER_POOL_SIZE=200"
       - "RETIRE_QUEUES=true" # Avoid logging all the over-quota URLs
@@ -36,11 +36,13 @@ services:
       - "GEOIP_GB_ENABLED=true" # Allow inclusion based on GeoIP lookup
       - "URI_FORGETTING_ENABLED=false" # Domain crawl uriUniqFilter doesn't need to forget.
       - "PAUSE_AT_START=true" # Launch into PAUSED state.
+      - "MAX_RETRIES=3" # The default of 10 is not suitable as the domain crawl has a lot of unresponsive URLs.
     volumes:
       - "/heritrix/output:/heritrix/output"
-      - "/heritrix/state:/heritrix/state"
+      - "/heritrix/output/state:/heritrix/state"
       - "/heritrix/scratch:/heritrix/scratch"
       - "./shared:/shared" # Shared configuration - surts file held here.
+      - "./heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml" # Tweak the beans for DC.
       - "./heritrix/uriuniqfilter-bloom.xml:/jobs/frequent/uriuniqfilter.xml" # Use a Bloom filter for the domain crawl.
     deploy:
       replicas: 1
@@ -54,6 +56,8 @@ services:
     networks:
       - default
       - kafka
+    ulimits:
+      nofile: 51200
    # cap_add:
    #   - SYS_PTRACE
 
@@ -64,15 +68,23 @@ services:
     deploy:
       replicas: 8
 
+  # CDX service for storing crawl status:
   cdxserver:
     user: ${CURRENT_UID}
     image: nlagovau/outbackcdx:0.7.0
-    # Verbose form logs submissions:
-    command: "java -jar outbackcdx.jar -v -d /cdx-data -p 8080 -b 0.0.0.0 -t 2000"
+    # Add '-v' for verbose logs on submissions:
+    command: "java -jar outbackcdx.jar -d /cdx-data -p 8080 -b 0.0.0.0 -t 2000"
     ports:
       - "9090:8080"
     volumes:
       - /opt/data/cdx:/cdx-data
+    ulimits:
+      nofile: 51200
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1g"
+
 
   # ----------------------------------------------
   # Monitoring
