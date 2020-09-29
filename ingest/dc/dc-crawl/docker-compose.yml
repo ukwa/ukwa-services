@@ -5,7 +5,7 @@ services:
   # UKWA Heritrix for NPLD
   npld-dc-heritrix-worker:
     user: ${CURRENT_UID}
-    image: ukwa/heritrix-worker:2.7.5
+    image: ukwa/heritrix-worker:2.7.6
     hostname: "npld-dc-heritrix3-worker-{{.Task.Slot}}"
     ports:
       - 8443:8443 # https
@@ -37,12 +37,13 @@ services:
       - "URI_FORGETTING_ENABLED=false" # Domain crawl uriUniqFilter doesn't need to forget.
       - "PAUSE_AT_START=true" # Launch into PAUSED state.
       - "MAX_RETRIES=3" # The default of 10 is not suitable as the domain crawl has a lot of unresponsive URLs.
+      - "RECENTLY_SEEN_USE_LAUNCH_TIMESTAMP=false" # Block the launchTimestamp recrawl mechanism.
     volumes:
       - "/heritrix/output:/heritrix/output"
       - "/heritrix/output/state:/heritrix/state"
       - "/heritrix/scratch:/heritrix/scratch"
       - "./shared:/shared" # Shared configuration - surts file held here.
-      - "./heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml" # Tweak the beans for DC.
+      #- "./heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml" # Tweak the beans for DC.
       - "./heritrix/uriuniqfilter-bloom.xml:/jobs/frequent/uriuniqfilter.xml" # Use a Bloom filter for the domain crawl.
     deploy:
       replicas: 1

@@ -211,7 +211,9 @@
        <!-- if false, we will only run this rule if it could change the current decision, 
          i.e. if it could REJECT a URI that is not already REJECTED. CDX lookup is expensive 
          so lets skip it. Note that this will prevent de-duplication of otherwise out-of-scope pre-requisites (if there are any). -->
-       <property name="lookupEveryUri" value="#{systemEnvironment['RECENTLY_SEEN_LOOKUP_EVERY_URI'] ?: false}"/>       
+       <property name="lookupEveryUri" value="#{systemEnvironment['RECENTLY_SEEN_LOOKUP_EVERY_URI'] ?: false}"/>
+       <!-- Whether to support the launchTimestamp annotation for controlling recrawls -->
+       <property name="useLaunchTimestamp" value="#{systemEnvironment['RECENTLY_SEEN_USE_LAUNCH_TIMESTAMP'] ?: true}"/>
    </bean>
  
 	<!-- 
