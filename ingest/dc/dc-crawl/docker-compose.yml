@@ -40,7 +40,7 @@ services:
       - "RECENTLY_SEEN_USE_LAUNCH_TIMESTAMP=false" # Block the launchTimestamp recrawl mechanism.
     volumes:
       - "/heritrix/output:/heritrix/output"
-      - "/heritrix/output/state:/heritrix/state"
+      - "/heritrix/state:/heritrix/state"
       - "/heritrix/scratch:/heritrix/scratch"
       - "./shared:/shared" # Shared configuration - surts file held here.
       #- "./heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml" # Tweak the beans for DC.
