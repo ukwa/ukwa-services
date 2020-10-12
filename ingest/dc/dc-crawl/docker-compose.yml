@@ -77,8 +77,6 @@ services:
       - "9090:8080"
     volumes:
       - /opt/data/cdx:/cdx-data
-    deploy:
-      endpoint_mode: dnsrr # Use this to avoid the Ingress network, as it appears to forcibly reset long-running connections.
     logging:
       driver: "json-file"
       options:
