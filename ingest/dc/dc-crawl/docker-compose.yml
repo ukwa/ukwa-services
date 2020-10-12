@@ -57,8 +57,6 @@ services:
     networks:
       - default
       - kafka
-    ulimits:
-      nofile: 51200
    # cap_add:
    #   - SYS_PTRACE
 
@@ -74,13 +72,13 @@ services:
     user: ${CURRENT_UID}
     image: nlagovau/outbackcdx:0.7.0
     # Add '-v' for verbose logs on submissions:
-    command: "java -jar outbackcdx.jar -d /cdx-data -p 8080 -b 0.0.0.0 -t 2000"
+    command: "java -jar outbackcdx.jar -d /cdx-data -p 8080 -b 0.0.0.0 -t 5000 -u"
     ports:
       - "9090:8080"
     volumes:
       - /opt/data/cdx:/cdx-data
-    ulimits:
-      nofile: 51200
+    #deploy:
+    #  endpoint_mode: dnsrr # Use this to avoid the Ingress network, as it appears to forcibly reset long-running connections.
     logging:
       driver: "json-file"
       options:
