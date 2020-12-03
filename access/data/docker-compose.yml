@@ -19,7 +19,7 @@ services:
   # Collections index for Topics & Themes of the UKWA UI
   # -------------------------------------------------------------
   collections_solr:
-    image: ukwa/ukwa-ui-collections-solr
+    image: ukwa/ukwa-ui-collections-solr:1.1.0
     user: "${UID}"
     volumes:
         - "${STORAGE_PATH}/collections_solr_cores:/opt/solr/server/solr/mycores"

@@ -14,8 +14,8 @@ services:
     command: --listener rf_prometheus_listener.py --outputdir /results /tests
     environment: 
       - "HOST=${HOST}"
-      - "PUSH_GATEWAY=monitor.wa.bl.uk:9091"
-      - "PROMETHEUS_JOB_NAME=access_website_rf_tests"
+      - "PUSH_GATEWAY=${PUSH_GATEWAY}"
+      - "PROMETHEUS_JOB_NAME=${PROMETHEUS_JOB_NAME}"
     volumes:
       - ./robot/tests:/tests:ro
       - ./results:/results:rw
@@ -24,6 +24,10 @@ services:
       - firefox
       - chrome
       - hub
+    deploy:
+      # Run once:
+      restart_policy:
+        condition: on-failure
 
   firefox:
     image: selenium/node-firefox:3.141.59-zinc
