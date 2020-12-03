@@ -127,7 +127,7 @@ services:
 
   # Web page rendering post-crawl:
   webrender:
-    image: ukwa/webrender-api:1.0.10
+    image: ukwa/webrender-api:1.0.14
     environment:
       - "HTTP_PROXY=http://pywb-nobanner:8080"
       - "DOCKER_NETWORK=website_default"

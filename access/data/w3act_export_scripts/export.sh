@@ -37,7 +37,4 @@ mv -f blocks.aclj.new blocks.aclj
 # Now update the Collections Solr:`
 w3act -d w3act-db-csv update-collections-solr http://collections_solr:8983/solr/collections
 
-# Worked, so sleeping
-echo "Sleeping..."
-sleep 20m
 

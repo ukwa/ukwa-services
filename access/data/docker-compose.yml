@@ -14,6 +14,13 @@ services:
     volumes:
         - "./w3act_export_scripts:/w3act_export_scripts"
         - "w3act_export:/w3act_export"
+    deploy:
+      restart_policy:
+        # Run once:
+        condition: on-failure
+        # If it fails, retry every 15 mins:
+        delay: 15m
+
 
   # -------------------------------------------------------------
   # Collections index for Topics & Themes of the UKWA UI
