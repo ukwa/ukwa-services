@@ -3,6 +3,8 @@ The Access Stack <!-- omit in toc -->
 
 - [Introduction](#introduction)
   - [The Access Data Stack](#the-access-data-stack)
+    - [W3ACT Exports](#w3act-exports)
+    - [Crawl Log Analyser](#crawl-log-analyser)
   - [The Website Stack](#the-website-stack)
     - [NGINX Proxy](#nginx-proxy)
     - [Website Services](#website-services)
@@ -25,6 +27,8 @@ The stack is deployed using:
 
 The shell script sets up the right environment variables for each context (dev/beta/prod) before launching the services.
 
+### W3ACT Exports
+
 The `w3act_export` service downloads the regular W3ACT database dump from HDFS (`/9_processing/w3act/w3act-db-csv.zip`) and uses it to generate the data sources the rest of the stack needs.  The service runs once when the stack is deployed or when it is updated. Regular updates can be orchestrated by using cron to run:
 
     docker service update --force access_data_w3act_export
@@ -37,6 +41,10 @@ The outputs of the `w3act_export` service are placed on a volume called `access_
 The service also populates the secondary Solr collection used to generate the _Topics & Themes_ pages of the UKWA website.  The Solr instance and schema is managed as a Docker container in this stack.
 
 TODO: On completing these tasks, the service sends metrics to Prometheus for monitoring (TBA).
+
+### Crawl Log Analyser
+
+... TBA...
 
 ## The Website Stack
 

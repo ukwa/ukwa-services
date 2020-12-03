@@ -6,7 +6,7 @@ collections:
     archive:
         index:
           type: cdx
-          api_url: http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429
+          api_url: *INDEX
           replay_url: ""
         archive_paths: *ARCHIVE
 

@@ -53,13 +53,26 @@ services:
     environment:
       - "DEBUG=True"
       - "WEBHDFS_USER=access"
-      - "UKWA_INDEX=cdx+http://cdx.api.wa.bl.uk/data-heritrix"
-      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "UKWA_INDEX=${UKWA_INDEX}"
+      - "UKWA_ARCHIVE=${UKWA_ARCHIVE}"
     volumes:
       - ./config/pywb/config.yaml:/webarchive/config.yaml
       # Used to store the access control lists used by the pywb services.
       - open_access_acls:/ukwa_pywb/acl/
 
+
+  # An embedded, bannerless OA Wayback to render screenshots:
+  pywb-nobanner:
+    image: ukwa/ukwa-pywb:2.4.0-beta
+    environment:
+      - "DEBUG=True"
+      - "WEBHDFS_USER=access"
+      - "UKWA_INDEX=${UKWA_INDEX}"
+      - "UKWA_ARCHIVE=${UKWA_ARCHIVE}"
+    volumes:
+      - ./config/pywb/config-nobanner.yaml:/webarchive/config.yaml
+      - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
+      - open_access_acls:/ukwa_pywb/acl/
 
   # -------------------------------------------------------------
   # Mementos
@@ -96,7 +109,7 @@ services:
   ukwa-access-api:
     image: ukwa/ukwa-access-api
     environment:
-      - "CDX_SERVER=http://cdx.api.wa.bl.uk/data-heritrix"
+      - "CDX_SERVER=${CDX_SERVER}"
       - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
       - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
@@ -109,33 +122,25 @@ services:
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
       - "SCRIPT_NAME=/api" # Deploy the API under this prefix
       - "HTTP_X_FORWARDED_PROTO=https"
+      - "WEBRENDER_ARCHIVE_SERVER=http://webrender:8010/render"
     volumes:
       - "analysis_volume:/analysis"
-
-  # An embedded, bannerless OA Wayback to render:
-  pywb-nobanner:
-    image: ukwa/ukwa-pywb:2.4.0-beta
-    environment:
-      - "WEBHDFS_USER=access"
-      - "UKWA_INDEX=cdx+http://cdx.api.wa.bl.uk/data-heritrix"
-      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
-    volumes:
-      - ./config/pywb/config-nobanner.yaml:/webarchive/config.yaml
-      - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
-      # Used to store the access control lists used by the pywb services.
-      - open_access_acls:/ukwa_pywb/acl/
+    depends_on:
+      - webrender
 
   # Web page rendering post-crawl:
   webrender:
     image: ukwa/webrender-api:1.0.14
     environment:
       - "HTTP_PROXY=http://pywb-nobanner:8080"
-      - "DOCKER_NETWORK=website_default"
+      - "DOCKER_NETWORK=access_website_default"
       - "LC_ALL=en_US.utf8"
       - "WEB_RENDER_TMP=/tmp/webrender"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/webrender:/tmp/webrender
+    depends_on:
+      - pywb-nobanner
     deploy:
       replicas: 1
   
