@@ -4,30 +4,30 @@ services:
 
 # -----------------------------------------------------------
 # Automated test engine - tests the website from 'outside'
+#
+# Based on https://github.com/SeleniumHQ/docker-selenium/tree/3.141.59-zirconium#version-3-with-swarm-support
 # -----------------------------------------------------------
 
   robot:
-    build:
-      context: robot
-      args:
-        - "https_proxy=${HTTPS_PROXY}"
-    command: --listener rf_prometheus_listener.py --outputdir /results /tests
+    image: ukwa/robot-framework
     environment: 
       - "HOST=${HOST}"
       - "PUSH_GATEWAY=${PUSH_GATEWAY}"
       - "PROMETHEUS_JOB_NAME=${PROMETHEUS_JOB_NAME}"
     volumes:
-      - ./robot/tests:/tests:ro
+      - ./make_profile.py:/tmp/make_profile.py
+      - ./tests:/tests:ro
       - ./results:/results:rw
-      - ./robot/make_profile.py:/tmp/make_profile.py
     depends_on:
       - firefox
       - chrome
       - hub
     deploy:
-      # Run once:
       restart_policy:
+        # Run once:
         condition: on-failure
+        # If it fails, run every hour:
+        delay: 60m
 
   firefox:
     image: selenium/node-firefox:3.141.59-zinc
@@ -40,6 +40,7 @@ services:
       - "https_proxy=${https_proxy}"
       - "no_proxy=hub"
       - "HUB_HOST=hub"
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME" /opt/bin/entry_point.sh'
 
   chrome:
     image: selenium/node-chrome:3.141.59-zinc
@@ -52,9 +53,13 @@ services:
       - "https_proxy=${https_proxy}"
       - "no_proxy=hub"
       - "HUB_HOST=hub"
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME" /opt/bin/entry_point.sh'
 
   hub:
     image: selenium/hub:3.141.59-zinc
     ports:
       - "4444:4444"
+    depends_on:
+      - firefox
+      - chrome
 

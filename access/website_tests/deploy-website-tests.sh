@@ -12,6 +12,5 @@ export PUSH_GATEWAY=monitor.wa.bl.uk:9091
 echo Running tests using HOST = $HOST
 echo WARNING! Tests will fail if the HOST variable has a trailing slash!
 
-docker-compose build robot
-docker-compose run robot
-docker-compose down
+docker stack deploy -c docker-compose.yml access_website_tests
+

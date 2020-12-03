@@ -1,4 +1,0 @@
-robotframework-seleniumlibrary
-requests
-robotframework-requests
-prometheus_client
