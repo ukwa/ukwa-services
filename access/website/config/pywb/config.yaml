@@ -4,7 +4,10 @@ ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
 collections:
     # open access (with access controls) under /archive/
     archive:
-        index_paths: *INDEX
+        index:
+          type: cdx
+          api_url: http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429
+          replay_url: ""
         archive_paths: *ARCHIVE
 
         acl_paths:
@@ -27,7 +30,7 @@ proxy:
 
 
 # redirect to exact url behavior
-redirect_to_exact: false
+redirect_to_exact: true
 
 # enable memento
 enable_memento: true

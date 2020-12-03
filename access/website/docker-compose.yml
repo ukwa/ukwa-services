@@ -22,12 +22,12 @@ services:
   # The main UKWA UI itself
   # -------------------------------------------------------------
   ukwa-ui:
-    image: ukwa/ukwa-ui:latest
+    image: ukwa/ukwa-ui:v1.3.4
     command: java -Djava.security.egd=file:/dev/./urandom -jar /ukwa-ui.war --spring.config.location=file:/application.properties
     environment:
      - "SET_PROTOCOL_TO_HTTPS=${USE_HTTPS}"
      - "OFF_SITE_URL=https://${SERVER_NAME}/wayback/archive/"
-     - "SOLR_COLLECTION_SEARCH_PATH=http://ukwa_collections:8983"
+     - "SOLR_COLLECTION_SEARCH_PATH=http://collections_solr:8983"
      - "SOLR_COLLECTION_SEARCH_REQUEST_HANDLER=/solr/collections/select"
      - "SOLR_FULL_TEXT_SEARCH_PATH=${SOLR_FULL_TEXT_SEARCH_PATH}"
      - "SOLR_FULL_TEXT_SEARCH_REQUEST_HANDLER=/solr/all/select"
@@ -40,27 +40,10 @@ services:
      - "BL_SMTP_USERNAME="
      - "BL_SMTP_PASSWORD="
     volumes:
-      - ./config/ukwa-ui/ukwa-ui.properties:/application.properties:ro   
-
-  # -------------------------------------------------------------
-  # Collections index for Topics & Themes of the UKWA UI
-  # -------------------------------------------------------------
-  ukwa_collections:
-    image: solr:6
-    user: "${SOLR_UID}"
-    command:
-      - "solr-precreate"
-      - "collections"
-      - "/config/solr/collections"
-    volumes:
-        - "./config/solr:/config/solr"
-    # Used to store the Solr index used to provide the Topic & Themes part of the main UI. Populated by an external task.
-    # n.b container solr userid (8983) should have write permission on host solr dir
-        - "${STORAGE_PATH}/ukwa-collections-solr/mycores:/opt/solr/server/solr/mycores"
-        - "${STORAGE_PATH}/ukwa-collections-solr/logs:/opt/solr/server/logs"
-    ports:
-        - "9020:8983" # Exposed port so external clients can read/populate
-
+      - ./config/ukwa-ui/ukwa-ui.properties:/application.properties:ro
+    networks:
+      - default
+      - access_data_default
 
   # -------------------------------------------------------------
   # OA Wayback configuration:
@@ -75,7 +58,7 @@ services:
     volumes:
       - ./config/pywb/config.yaml:/webarchive/config.yaml
       # Used to store the access control lists used by the pywb services.
-      - "${STORAGE_PATH}/open-access-acl:/ukwa_pywb/acl/"
+      - open_access_acls:/ukwa_pywb/acl/
 
 
   # -------------------------------------------------------------
@@ -127,18 +110,11 @@ services:
       - "SCRIPT_NAME=/api" # Deploy the API under this prefix
       - "HTTP_X_FORWARDED_PROTO=https"
     volumes:
-      - "analysis-volume:/analysis"
-
-  # Analyses recent crawl behaviour by processing the crawled data stream:
-  analyse:
-    image: ukwa/crawl-streams
-    command: "analyse -k ${KAFKA_BROKER} -u 2 -o /analysis/fc.crawled.json"
-    volumes:
-      - "analysis-volume:/analysis"
+      - "analysis_volume:/analysis"
 
   # An embedded, bannerless OA Wayback to render:
   pywb-nobanner:
-    image: ukwa/ukwa-pywb:latest
+    image: ukwa/ukwa-pywb:2.4.0-beta
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=cdx+http://cdx.api.wa.bl.uk/data-heritrix"
@@ -147,7 +123,7 @@ services:
       - ./config/pywb/config-nobanner.yaml:/webarchive/config.yaml
       - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
       # Used to store the access control lists used by the pywb services.
-      - "${STORAGE_PATH}/open-access-acl:/ukwa_pywb/acl/"
+      - open_access_acls:/ukwa_pywb/acl/
 
   # Web page rendering post-crawl:
   webrender:
@@ -170,7 +146,14 @@ services:
 volumes:
   # Used to store analysis generated from Kafka, so it can be made available via the API component.
   # Only transient storage so can be managed entirely by Docker.
-  analysis-volume:
+  analysis_volume:
+    external:
+      name: access_data_fc_analysis
+
+  # Used to store the open access control lists
+  open_access_acls:
+    external:
+      name: access_data_w3act_export
 
 networks:
   # This attachable network is needed so the screenshotter can spin up containers and talk to them over HTTP.
@@ -178,16 +161,6 @@ networks:
   default:
     driver: overlay
     attachable: true
-
-# -----------------------------------------
-# Logging configuration
-# -----------------------------------------
-#
-# Has to be done at Daemon level or service level.
-#
-#logging:
-#  driver: gelf
-#  options:
-#    gelf-address: "${LOG_SERVER}"
-#    tag: "${DEPLOYMENT_TAG}"
+  access_data_default:
+    external: true
 
