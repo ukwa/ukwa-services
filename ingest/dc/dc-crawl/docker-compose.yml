@@ -3,50 +3,57 @@ version: "3.2"
 services:
 
   # UKWA Heritrix for NPLD
-  # 
-  # Note on crawler06 we have /mnt/localraid6/state/
-  #
   npld-dc-heritrix-worker:
-    image: ukwa/heritrix-worker:${HERITRIX_VERSION}
+    user: ${CURRENT_UID}
+    image: ukwa/heritrix-worker:2.7.6
     hostname: "npld-dc-heritrix3-worker-{{.Task.Slot}}"
     ports:
-      - 8443:8443
-      - 8484:8484
+      - 8443:8443 # https
+      - 8484:8484 # jmx
+      - 9118:9118 # metrics
     env_file: heritrix-shared-settings.env
     environment:
+      - "CRAWL_NAME=dc2020"
       - "LAUNCH_AUTOMATICALLY=false"
       - "KAFKA_SEEK_TO_BEGINNING=false"
       - "KAFKA_TOCRAWL_TOPIC=dc.tocrawl"
       - "KAFKA_CANDIDATES_TOPIC=dc.tocrawl"
       - "KAFKA_CRAWLED_TOPIC=dc.crawled"
       - "KAFKA_INSCOPE_TOPIC=dc.inscope"
-      - "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9092"
-      - "CRAWL_NAME=dc2019"
+      - "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092"
+      #- "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9092"
       - "WARC_PREFIX=BL-NPLD"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
       - "MAX_OUTBACKCDX_CONNECTIONS=1200"
       - "SURTS_SOURCE_FILE=/shared/surts.txt"
       - "SURTS_EXCLUDE_SOURCE_FILE=/shared/excluded-surts.txt"
       - "WEBRENDER_ENABLED=false"
-      - "JAVA_OPTS=-Xmx128g -XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8484 -Dcom.sun.management.jmxremote.rmi.port=8484 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=192.168.45.12"
-      - "MAX_TOE_THREADS=1000"
+      - "JAVA_OPTS=-Xms18g -Xmx18g -XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -XX:+UseCompressedOops -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8484 -Dcom.sun.management.jmxremote.rmi.port=8484 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=192.168.45.12"
+      - "MAX_TOE_THREADS=800"
       - "WARC_WRITER_POOL_SIZE=200"
       - "RETIRE_QUEUES=true" # Avoid logging all the over-quota URLs
+      - "USER_AGENT_PREFIX=bl.uk_lddc_bot" # Use domain crawl user agent
+      - "GEOIP_GB_ENABLED=true" # Allow inclusion based on GeoIP lookup
+      - "URI_FORGETTING_ENABLED=false" # Domain crawl uriUniqFilter doesn't need to forget.
+      - "PAUSE_AT_START=true" # Launch into PAUSED state.
+      - "MAX_RETRIES=3" # The default of 10 is not suitable as the domain crawl has a lot of unresponsive URLs.
+      - "RECENTLY_SEEN_USE_LAUNCH_TIMESTAMP=false" # Block the launchTimestamp recrawl mechanism.
     volumes:
-      - "/mnt/crawler06/localraid6/heritrix/output:/heritrix/output"
-      - "/mnt/e60san/state:/heritrix/state"
-      - "${STORAGE_PATH}/heritrix/surts:/shared" # Shared configuration - surts file held here.
-      - "${STORAGE_PATH}/heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml"
-      - type: tmpfs
-        target: /heritrix/scratch # Use RAM disk for scratch space.
+      - "/heritrix/output:/heritrix/output"
+      - "/heritrix/state:/heritrix/state"
+      - "/heritrix/scratch:/heritrix/scratch"
+      - "./shared:/shared" # Shared configuration - surts file held here.
+      #- "./heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml" # Tweak the beans for DC.
+      - "./heritrix/uriuniqfilter-bloom.xml:/jobs/frequent/uriuniqfilter.xml" # Use a Bloom filter for the domain crawl.
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == crawler01.bl.uk] # Only allow it to deploy on crawler01 as that has the e60 volume.
+        constraints: [node.hostname == ip-172-31-29-0] # Only allow it to deploy on the appropriate server
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     depends_on:
       - clamd
       - kafka
+      - cdxserver
     networks:
       - default
       - kafka
@@ -58,23 +65,39 @@ services:
 
   # Clamd virus scanning Service
   clamd:
+    #user: ${CURRENT_UID} # Can't work as writes to /var/log/clamav as root.
     image: ukwa/clamd
     deploy:
-      replicas: 16
-      placement:
-        constraints: [node.hostname == crawler04.bl.uk] # Lots going on on Crawler01
+      replicas: 8
+
+  # CDX service for storing crawl status:
+  cdxserver:
+    user: ${CURRENT_UID}
+    image: nlagovau/outbackcdx:0.7.0
+    # Add '-v' for verbose logs on submissions:
+    command: "java -jar outbackcdx.jar -d /cdx-data -p 8080 -b 0.0.0.0 -t 5000 -u"
+    ports:
+      - "9090:8080"
+    volumes:
+      - /opt/data/cdx:/cdx-data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1g"
+
 
   # ----------------------------------------------
   # Monitoring
   # ----------------------------------------------
 
   prometheus:
+    user: ${CURRENT_UID}
     image: prom/prometheus
     ports:
       - 9191:9090
     volumes:
-      - "${STORAGE_PATH}/prometheus/config:/etc/prometheus"
-      - "${STORAGE_PATH}/prometheus/data:/prometheus"
+      - "/heritrix/output/prometheus/config:/etc/prometheus"
+      - "/heritrix/output/prometheus/data:/prometheus"
     user: root
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'

@@ -188,7 +188,7 @@
 		<property name="maxHops" value="#{systemEnvironment['MAX_HOPS_DEFAULT'] ?: 20}" />
 	</bean>
 	<!-- ...and REJECT those from a configurable (initially empty) set of URI regexes... -->
-	<bean id="listRegexFilterOut" class="org.archive.modules.deciderules.MatchesListRegexDecideRule">
+	<bean id="listRegexFilterOut" class="uk.bl.wap.modules.deciderules.MatchesListRegexDecideRule">
 		<property name="decision" value="REJECT" />
 		<property name="listLogicalOr" value="true" />
         <property name="regexList" ref="scopeExcludesList"/>
@@ -211,7 +211,9 @@
        <!-- if false, we will only run this rule if it could change the current decision, 
          i.e. if it could REJECT a URI that is not already REJECTED. CDX lookup is expensive 
          so lets skip it. Note that this will prevent de-duplication of otherwise out-of-scope pre-requisites (if there are any). -->
-       <property name="lookupEveryUri" value="#{systemEnvironment['RECENTLY_SEEN_LOOKUP_EVERY_URI'] ?: false}"/>       
+       <property name="lookupEveryUri" value="#{systemEnvironment['RECENTLY_SEEN_LOOKUP_EVERY_URI'] ?: false}"/>
+       <!-- Whether to support the launchTimestamp annotation for controlling recrawls -->
+       <property name="useLaunchTimestamp" value="#{systemEnvironment['RECENTLY_SEEN_USE_LAUNCH_TIMESTAMP'] ?: true}"/>
    </bean>
  
 	<!-- 
@@ -251,19 +253,21 @@
 			<ref bean="scope" />
 		</property>
 	</bean>
-     <!-- This copies the stream of discovered, in-scope URIs to a Kafka topic (as a check/disaster-recovery mechanism) -->
-     <bean id="inScopeUriFeed" class="uk.bl.wap.crawler.postprocessor.KafkaKeyedToCrawlFeed">
-       <property name="enabled" value="#{systemEnvironment['KAFKA_INSCOPE_LOG_ENABLED'] ?: true}" />
-       <property name="emitOutlinks" value="false" /> <!-- this module should at on the CrawlURI in the chain, not it's outlinks -->
-       <property name="topic" value="#{systemEnvironment['KAFKA_INSCOPE_TOPIC'] ?: 'uris.inscope'}" />
-       <property name="brokerList" value="#{systemEnvironment['KAFKA_BOOTSTRAP_SERVERS'] ?: 'kafka:9092'}" />
-       <property name="extraFields">
-           <map>
-             <entry key="CRAWL_NAME" value="#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}"/>
-           </map>
-       </property>
-       <property name="discardedUriFeedEnabled" value="#{systemEnvironment['KAFKA_DISCARDED_FEED_ENABLED'] ?: false}"/>
-     </bean>
+    <bean id="quotaResetPropagator" class="uk.bl.wap.crawler.prefetch.QuotaResetPropagationProcessor">
+    </bean>
+    <!-- This copies the stream of discovered, in-scope URIs to a Kafka topic (as a check/disaster-recovery mechanism) -->
+    <bean id="inScopeUriFeed" class="uk.bl.wap.crawler.postprocessor.KafkaKeyedToCrawlFeed">
+      <property name="enabled" value="#{systemEnvironment['KAFKA_INSCOPE_LOG_ENABLED'] ?: true}" />
+      <property name="emitOutlinks" value="false" /> <!-- this module should at on the CrawlURI in the chain, not it's outlinks -->
+      <property name="topic" value="#{systemEnvironment['KAFKA_INSCOPE_TOPIC'] ?: 'uris.inscope'}" />
+      <property name="brokerList" value="#{systemEnvironment['KAFKA_BOOTSTRAP_SERVERS'] ?: 'kafka:9092'}" />
+      <property name="extraFields">
+         <map>
+            <entry key="CRAWL_NAME" value="#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}"/>
+         </map>
+      </property>
+      <property name="discardedUriFeedEnabled" value="#{systemEnvironment['KAFKA_DISCARDED_FEED_ENABLED'] ?: false}"/>
+    </bean>
 	<!-- assembled into ordered CandidateChain bean.
          NOTE that seeds are prepared and scheduled via a SeedListener and don't run through the candidate chain. -->
 	<bean id="candidateProcessors" class="org.archive.modules.CandidateChain">
@@ -272,6 +276,8 @@
 				<!-- apply scoping rules to each individual candidate URI... -->
 				<ref bean="candidateScoper"/>
 				<ref bean="preparer"/>
+                <!-- Ensure quota reset events get propagated to aliases via pre-requisites or redirects... -->
+                <ref bean="quotaResetPropagator"/>
                 <!-- also emit log of URIs determined to be in-scope, and enqueued in the frontier -->
                 <ref bean="inScopeUriFeed"/>
 			</list>
@@ -327,7 +333,7 @@
          See https://github.com/internetarchive/heritrix3/blob/master/modules/src/main/java/org/archive/modules/fetcher/FetchDNS.java#L74-L78
              http://www.dnsjava.org/doc/org/xbill/DNS/ResolverConfig.html 
          (i.e. /etc/hosts does not override domain names for H3 -->
-		<property name="acceptNonDnsResolves" value="false" />
+		<property name="acceptNonDnsResolves" value="true" />
 		<property name="digestContent" value="true" />
 		<property name="digestAlgorithm" value="sha1" />
         <!-- AFAICT /etc/resolv.conf is only read once at startup. -->
@@ -649,6 +655,10 @@
     </property>
   </bean>
   -->
+     <!-- This lets the crawler forget about the URIs that were in the frontier -->
+     <bean id="forgetfulFrontierProcessor" class="uk.bl.wap.crawler.postprocessor.ForgettingFrontierProcessor">
+       <property name="enabled" value="#{systemEnvironment['URI_FORGETTING_ENABLED'] ?: true}" />
+     </bean>
      
      <!-- This provides a crawl log feed to a queue - note that you'll need to set up a binding that matches these parameters to a queue -->
      <bean id="toCrawlFeed" class="uk.bl.wap.crawler.postprocessor.KafkaKeyedToCrawlFeed">
@@ -682,6 +692,8 @@
 	<bean id="dispositionProcessors" class="org.archive.modules.DispositionChain">
 		<property name="processors">
 			<list>
+                <!-- get the frontier to 'forget' this URI was queued -->
+                <ref bean="forgetfulFrontierProcessor" />
                 <!-- send the crawl log to a queue for downstream checks -->
                 <ref bean="crawlLogFeed"/>
                 <!-- allow the rest of the disposition chain to be skipped if it's not appropriate -->
@@ -734,7 +746,7 @@
 		-->
 		<property name="snoozeLongMs" value="60000" />
 		<property name="retryDelaySeconds" value="20" />
-		<property name="maxRetries" value="5" />
+		<property name="maxRetries" value="#{systemEnvironment['MAX_RETRIES'] ?: 10 }" />
 		<property name="recoveryLogEnabled" value="false" />
 		<property name="maxOutlinks" value="6000" /> <!-- this is ignored by the sitemap extractor -->
 		<property name="dumpPendingAtClose" value="false" />
@@ -743,17 +755,10 @@
 		</property>
 	</bean>
 	
-	<!-- URI UNIQ FILTER: Used by frontier to remember URIs currently in the BDBFrontier --> 
-   <bean id="uriUniqFilter" class="org.archive.crawler.util.BloomUriUniqFilter">
-      <property name="bloomFilter">
-         <bean class="org.archive.util.BloomFilter64bit">
-            <!-- roughly  1 in 2^30 (about a billion) false-positive rate while below 250 million probes. -->
-            <constructor-arg value="250000000" />
-            <constructor-arg value="30" /> 
-         </bean>
-      </property> 
-   </bean>
-   
+	<!-- URI UNIQ FILTER: Used by frontier to remember URIs currently in the BDBFrontier -->
+    <import resource="uriuniqfilter.xml"/>
+    <!-- n.b. uses a separate file so it can be overridden for the domain crawl -->
+     
     <!-- Shared OutbackCDX client and configuration -->
     <bean id="outbackCDXClient" class="uk.bl.wap.util.OutbackCDXClient">
         <property name="endpoint" value="#{systemEnvironment['CDXSERVER_ENDPOINT'] ?: 'http://localhost:9090/fc'}"/>
@@ -814,6 +819,7 @@
 		<property name="forceQueueAssignment" value="" />
 		<property name="deferToPrevious" value="true" />
 		<property name="parallelQueues" value="1" />
+        <property name="parallelQueuesRandomAssignment" value="true" />
 	</bean>
 	
 	<!-- URI PRECEDENCE POLICY -->
@@ -875,30 +881,27 @@
     <import resource="sheets.xml"/>
     
 	<!-- BDBMODULE: BDB-JE disk persistence manager -->
+    <!-- By default, the cache is shared across all databases, and the cachePercent specifies the global percentage of heap to use.
+         Therefore, the same value should be used for all modules to that it definately gets set to the right value. -->
   <bean id="bdbFrontierBdb" class="org.archive.bdb.BdbModule">
     <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/frontier"/>
-    <property name="cachePercent" value="50"/>
-    <property name="expectedConcurrency" value="1000"/>
-  </bean>
-  <bean id="bdbUriUniqFilterBdb" class="org.archive.bdb.BdbModule">
-    <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/uriUniqFilter"/>
-    <property name="cachePercent" value="50"/>
-    <property name="expectedConcurrency" value="1000"/>
+    <property name="cachePercent" value="10"/>
+    <property name="expectedConcurrency" value="100"/>
   </bean>
   <bean id="bdbStatisticsBdb" class="org.archive.bdb.BdbModule">
     <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/statistics"/>
-    <property name="cachePercent" value="50"/>
-    <property name="expectedConcurrency" value="1000"/>
+    <property name="cachePercent" value="10"/>
+    <property name="expectedConcurrency" value="100"/>
   </bean>
   <bean id="bdbCookieStoreBdb" class="org.archive.bdb.BdbModule">
     <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/cookies"/>
-    <property name="cachePercent" value="50"/>
-    <property name="expectedConcurrency" value="1000"/>
+    <property name="cachePercent" value="10"/>
+    <property name="expectedConcurrency" value="100"/>
   </bean>
   <bean id="bdbServerCacheBdb" class="org.archive.bdb.BdbModule">
     <property name="dir" value="/heritrix/state/crawl-#{systemEnvironment['CRAWL_NAME'] ?: 'frequent'}.host-#{systemEnvironment['HOSTNAME'] ?: 'host'}/serverCache"/>
-    <property name="cachePercent" value="50"/>
-    <property name="expectedConcurrency" value="1000"/>
+    <property name="cachePercent" value="10"/>
+    <property name="expectedConcurrency" value="100"/>
   </bean>
 	
 	<!-- BDBCOOKIESTORAGE: disk-based cookie storage for FetchHTTP -->

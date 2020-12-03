@@ -9,12 +9,12 @@ rule_files:
 
 
 # prometheus has a dependency on alertmanager, as defined in docker_compose.yml
-alerting:
-  alertmanagers:
-  - scheme: http
-    static_configs:
-    - targets:
-      - "monitor.wa.bl.uk:9093"
+#alerting:
+#  alertmanagers:
+#  - scheme: http
+#    static_configs:
+#    - targets:
+#      - "monitor.wa.bl.uk:9093"
 
 scrape_configs:
 
@@ -22,9 +22,13 @@ scrape_configs:
     static_configs:
       - targets: ['prometheus:9090']
 
+  - job_name: 'aws_node_exporter'
+    static_configs:
+    - targets: ['ip-172-31-29-0:9100']
+
   - job_name: 'kafka'
     static_configs:
-      - targets: ['kafka-1:7071', 'kafka-2:7071']
+      - targets: ['kafka-1:7071']
 
   - job_name: 'npld-dc-heritrix-workers'
     dns_sd_configs:
