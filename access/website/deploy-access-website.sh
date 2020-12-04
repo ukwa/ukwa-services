@@ -28,6 +28,7 @@ export SHINE_SOLR="http://solr-jisc.api.wa.bl.uk/solr/jisc"
 #export LOG_SERVER="udp://logs.wa.bl.uk:12201"
 # Set up folders needed by different components
 mkdir -p ${STORAGE_PATH}/shine-postgres-data
+mkdir -p ${STORAGE_PATH}/cache
 
 # Set up a tmp space for the web renderer that only gets deleted on reboot:
 export WEB_RENDER_TMP=${STORAGE_PATH}/webrender-tmp

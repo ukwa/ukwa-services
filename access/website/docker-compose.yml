@@ -123,13 +123,17 @@ services:
       - "API_LABEL=UK Web Archive API"
       - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
-      - "HTTPS_PROXY=http://194.66.232.92:3127/"
+      #- "HTTPS_PROXY=http://194.66.232.92:3127/"
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
       - "SCRIPT_NAME=/api" # Deploy the API under this prefix
       - "HTTP_X_FORWARDED_PROTO=https"
       - "WEBRENDER_ARCHIVE_SERVER=http://webrender:8010/render"
+      - "CACHE_FOLDER=/cache"
+      # Used to check access permissions:
+      - "WAYBACK_SERVER=http://pywb:8080/archive/"
     volumes:
+      - "${STORAGE_PATH}/cache:/cache"
       - "analysis_volume:/analysis"
     depends_on:
       - webrender
