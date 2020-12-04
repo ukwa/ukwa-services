@@ -21,7 +21,7 @@ services:
       - shine
       - pywb
       - ukwa-ui
-      - ukwa-access-api
+      - api
       - mementos
 
   # -------------------------------------------------------------
@@ -112,7 +112,7 @@ services:
   # -------------------------------------------------------------
   # The Python service that provides some basic APIs
   # -------------------------------------------------------------
-  ukwa-access-api:
+  api:
     image: ukwa/ukwa-access-api
     environment:
       - "CDX_SERVER=${CDX_SERVER}"
