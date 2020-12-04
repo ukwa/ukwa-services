@@ -141,10 +141,11 @@ services:
       - "HTTP_PROXY=http://pywb-nobanner:8080"
       - "DOCKER_NETWORK=access_website_default"
       - "LC_ALL=en_US.utf8"
-      - "WEB_RENDER_TMP=/tmp/webrender"
+      - "WEB_RENDER_TMP=${WEB_RENDER_TMP}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /tmp/webrender:/tmp/webrender
+      # Current implementation means this has to be a disk mount that has the same path as on host:
+      - ${WEB_RENDER_TMP}:${WEB_RENDER_TMP}
     depends_on:
       - pywb-nobanner
     deploy:

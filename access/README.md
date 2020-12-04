@@ -81,7 +81,7 @@ Behind the NGINX, we have a set of modular components:
 - The ukwa-pywb service that provides access to archive web pages
 - The mementos service that allows users to look up URLs via Memento.
 - The shine and shinedb services that provide our older prototype researcher interface.
-- The api and related services (pywb-nobanner and webrender-api) that provide the early prototype of an UKWA API.
+- The api and related services (pywb-nobanner and webrender-api) that provide the early prototype of an UKWA API.  e.g. https://dev.webarchive.org.uk/api/screenshots/?url=http%3A%2F%2Fportico.bl.uk%2F&type=thumbnail&source=archive
 
 ### Shine Database
 
@@ -105,7 +105,11 @@ To do a restore, use `download-shine-db-dump.sh` to grab a database dump from HD
 
 #### Creating a backup of the Shine database
 
-...TBA...
+An additional helper script will download a dated dump file of the live database and push it to HDFS, `backup-shine-db-to-hdfs.sh`.
+
+     ./backup-shine-db-to-hdfs.sh dev
+
+This should be run daily.
 
 ## The Website Regression Test Stack
 

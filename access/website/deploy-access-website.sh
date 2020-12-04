@@ -29,8 +29,9 @@ export SHINE_SOLR="http://solr-jisc.api.wa.bl.uk/solr/jisc"
 # Set up folders needed by different components
 mkdir -p ${STORAGE_PATH}/shine-postgres-data
 
-# Set up a tmp space for the web renderer:
-mkdir -p /tmp/webrender
+# Set up a tmp space for the web renderer that only gets deleted on reboot:
+export WEB_RENDER_TMP=${STORAGE_PATH}/webrender-tmp
+mkdir -p ${WEB_RENDER_TMP}
 
 # Launch the common configuration with these environment variable:
 docker stack deploy -c docker-compose.yml access_website
