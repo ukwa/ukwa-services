@@ -15,7 +15,7 @@ services:
       - "PUSH_GATEWAY=${PUSH_GATEWAY}"
       - "PROMETHEUS_JOB_NAME=${PROMETHEUS_JOB_NAME}"
     volumes:
-      - ./make_profile.py:/tmp/make_profile.py
+      - ./make_profile.py:/make_profile.py
       - ./tests:/tests:ro
       - ./results:/results:rw
     depends_on:

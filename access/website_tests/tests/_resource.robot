@@ -5,7 +5,7 @@ Documentation     A resource file with reusable keywords and variables.
 ...               domain specific language. They utilize keywords provided
 ...               by the imported SeleniumLibrary.
 Library           SeleniumLibrary
-Library           /tmp/make_profile.py
+Library           /make_profile.py
 Library           RequestsLibrary
 Library           OperatingSystem
 
