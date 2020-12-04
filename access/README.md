@@ -7,7 +7,7 @@ The Access Stack <!-- omit in toc -->
     - [Crawl Log Analyser](#crawl-log-analyser)
   - [The Website Stack](#the-website-stack)
     - [NGINX Proxy](#nginx-proxy)
-    - [Website Services](#website-services)
+    - [Website component services](#website-component-services)
     - [Shine Database](#shine-database)
       - [Creating the Shine database](#creating-the-shine-database)
       - [Restoring the Shine database from a backup](#restoring-the-shine-database-from-a-backup)
@@ -67,18 +67,21 @@ The set of current proxies and historical redirects associated with the website 
 
 Having set this chain up, if we visit e.g. `dev.webarchive.org.uk` the traffic should show up on the API server as well as the Docker container.
 
-### Website Services
+Note that changes to NGINX configuration are only picked up when it starts, so necessary to run:
 
- docker service update --force access_website_nginx
-     $ docker service scale access_website_nginx=0
-    $ docker service scale access_website_nginx=1
+    docker service update --force access_website_nginx
 
+After which NGINX should restart and pick up any configuration changes and re-check whether it can connect to any proxied services.
 
-- The ukwa-ui service
-- The ukwa-pywb service
-- The mementos service
-- The shine and shinedb services
-- The api and related services (pywb-nobanner and webrender-api)
+### Website component services
+
+Behind the NGINX, we have a set of modular components:
+
+- The [ukwa-ui]() service that provides the main user interface.
+- The ukwa-pywb service that provides access to archive web pages
+- The mementos service that allows users to look up URLs via Memento.
+- The shine and shinedb services that provide our older prototype researcher interface.
+- The api and related services (pywb-nobanner and webrender-api) that provide the early prototype of an UKWA API.
 
 ### Shine Database
 
