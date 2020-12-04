@@ -9,6 +9,9 @@ The Access Stack <!-- omit in toc -->
     - [NGINX Proxy](#nginx-proxy)
     - [Website Services](#website-services)
     - [Shine Database](#shine-database)
+      - [Creating the Shine database](#creating-the-shine-database)
+      - [Restoring the Shine database from a backup](#restoring-the-shine-database-from-a-backup)
+      - [Creating a backup of the Shine database](#creating-a-backup-of-the-shine-database)
   - [The Website Regression Test Stack](#the-website-regression-test-stack)
   - [The Reading Room Wayback Stack](#the-reading-room-wayback-stack)
 
@@ -18,14 +21,16 @@ This folder contains the components used for access to our web archives. There a
 
 ## The Access Data Stack
 
-The other access services depend on a number of data sources and the Access Data Stack handles those. The [access_data stack definition](./data/docker-compose.yml) describes data volumes as well as services that the other stacks can refer to.
+The other access stacks depend on a number of data sources and the `access_data` stack handles those. The [access_data stack definition](./data/docker-compose.yml) describes data volumes as well as services that the other stacks can refer to.
+
+**NOTE** that this means that the stacks should be deployed consistently under the same names, as the `access_website` stack will not be able to find the networks associated with the `access_data` stack if the stack has been deployed under a different name.
 
 The stack is deployed using:
 
     cd data
     ./deploy-access-data.sh dev
 
-The shell script sets up the right environment variables for each context (dev/beta/prod) before launching the services.
+The deployment shell script sets up the right environment variables for each context (dev/beta/prod) before launching the services.
 
 ### W3ACT Exports
 
@@ -44,7 +49,7 @@ TODO: On completing these tasks, the service sends metrics to Prometheus for mon
 
 ### Crawl Log Analyser
 
-... TBA...
+The `analyse` service connects to the Kafka crawl log of the frequent crawler, and aggregates statistics on recent crawling activity. This is summarised into a regularly-updated JSON file that the UKWA Access API part of the website stack can make available for users. This is used by the https://ukwa-vis.glitch.me/ live crawler glitch experiment.
 
 ## The Website Stack
 
@@ -64,6 +69,11 @@ Having set this chain up, if we visit e.g. `dev.webarchive.org.uk` the traffic s
 
 ### Website Services
 
+ docker service update --force access_website_nginx
+     $ docker service scale access_website_nginx=0
+    $ docker service scale access_website_nginx=1
+
+
 - The ukwa-ui service
 - The ukwa-pywb service
 - The mementos service
@@ -74,16 +84,25 @@ Having set this chain up, if we visit e.g. `dev.webarchive.org.uk` the traffic s
 
 Shine requires a PostgreSQL database, so additional setup is required using the scripts in [./scripts/postgres](./scripts/postgres).
 
-If starting from a new deployment, and having deployed the stack, you first need to stop Shine itself from running, as otherwise it will attempt to start up and will insert and empty database into PostgreSQL and this will interfere with the restore process. So, use
+When modifying the database, and having deployed the stack, you first need to stop Shine itself from running, as otherwise it will attempt to start up and will insert and empty database into PostgreSQL and this will interfere with the restore process. So, use
 
-    $ docker service rm website_shine
+    $ docker service scale access_website_shine=0
 
-Now you can run `create-db.sh` to create the database itself, and you can use `list-db.sh` to check the database is there. Then, run `create-user.sh` to run the `setup_user.sql` script and set up a suitable user with access to the database.  
+This will drop the Shine service but leave all the rest of the stack running. Once you have created and restored the database as needed, re-scale the service and Shine will restart using the restored database.
 
-To do a restore, use `download-shine-db-dump.sh` to grab a database dump from HDFS, but you'll need to edit the file to select the backup with a given date. Now, running `restore-shine-db-from-dump.sh` should populate the database.
+    $ docker service scale access_website_shine=1
 
-Re-deploy the whole service stack, and Shine will restart using the restored database.
+#### Creating the Shine database
 
+You can run `create-db.sh` to create the database itself, and you can use `list-db.sh` to check the database is there. Then, run `create-user.sh` to run the `setup_user.sql` script and set up a suitable user with access to the database.  
+
+#### Restoring the Shine database from a backup
+
+To do a restore, use `download-shine-db-dump.sh` to grab a database dump from HDFS. Currently, the backups are dated and are in the `/2_backups/access/access_shinedb/` folder, so you'll need to edit the file to use the appropriate backup location and date. Now, running `restore-shine-db-from-dump.sh` should populate the database.
+
+#### Creating a backup of the Shine database
+
+...TBA...
 
 ## The Website Regression Test Stack
 

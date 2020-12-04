@@ -22,7 +22,8 @@ export CDX_SERVER="http://cdx.api.wa.bl.uk/data-heritrix"
 export UKWA_INDEX="${CDX_SERVER}?url={url}&closest={closest}&sort=closest&filter=!statuscode:429"
 export UKWA_ARCHIVE="webhdfs://hdfs.api.wa.bl.uk"
 export USE_HTTPS=true
-export SOLR_FULL_TEXT_SEARCH_PATH='http://solr.api.wa.bl.uk'
+export SOLR_FULL_TEXT_SEARCH_PATH="http://solr.api.wa.bl.uk"
+export SHINE_SOLR="http://solr-jisc.api.wa.bl.uk/solr/jisc"
 
 #export LOG_SERVER="udp://logs.wa.bl.uk:12201"
 # Set up folders needed by different components
