@@ -14,6 +14,7 @@ The Access Stack <!-- omit in toc -->
       - [Creating a backup of the Shine database](#creating-a-backup-of-the-shine-database)
   - [The Website Regression Test Stack](#the-website-regression-test-stack)
   - [The Reading Room Wayback Stack](#the-reading-room-wayback-stack)
+  - [Regular Tasks](#regular-tasks)
 
 # Introduction
 
@@ -151,3 +152,14 @@ These can be run each morning, and the metrics posted to Prometheus used to trac
 ## The Reading Room Wayback Stack
 
 The `rrwb` stack defines the necessary services for running our reading room access services via proxied connections rather than DLS VMs. This new approach is on hold at present.
+
+
+## Regular Tasks
+
+Having deployed all of the above, the following cron jobs should be set up:
+
+- Hourly updates of the access data.
+- Daily (early morning) backup of the Shine database.
+- Daily (early morning) run of the website tests.
+  
+The `ukwa-monitor` service should be used to check that these are running, and that the W3ACT database export file on HDFS is being updated.
