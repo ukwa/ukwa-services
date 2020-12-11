@@ -29,7 +29,7 @@ This folder contains the components used for access to our web archives. It's ma
 
 ## Integration Points
 
-These services can be deployed id different contexts (dev/beta/prod/etc.) but in call cases are designed to run (read-only!) against the following external services. Specifically:
+These services can be deployed id different contexts (dev/beta/prod/etc.) but in call cases are designed to run (read-only!) against:
 
 - The WebHDFS API.
 - The OutbackCDX API.
@@ -37,6 +37,8 @@ These services can be deployed id different contexts (dev/beta/prod/etc.) but in
 - The Prometheus Push Gateway metrics API.
 
 These are set in the stack launch scripts, and can be changed as needed, based on deployment context if necessary.
+
+The web site part is designed to be run behind an edge server than handles the SSL/non-SSL transition and proxies the requests downstream. More details are provided in the relevant Deployment section.
 
 # The Access Data Stack
 
@@ -101,17 +103,17 @@ The set of current proxies and historical redirects associated with the website 
 Because most of the complexity of the NGINX setup is in the internal NGINX, the proxy setup at the edge is much simpler. e.g. for DEV:
 
 ```
-       location / {
-                # Used to tell downstream services what external host/port/etc. is:
-                proxy_set_header        Host                    $host;
-                proxy_set_header        X-Forwarded-Proto       $scheme;
-                proxy_set_header        X-Forwarded-Host        $host;
-                proxy_set_header        X-Forwarded-Port        $server_port;
-                proxy_set_header        X-Forwarded-For         $remote_addr;
-                # Used for rate-limiting Mementos lookups:
-                proxy_set_header        X-Real-IP               $remote_addr;
-                proxy_pass              http://website.dapi.wa.bl.uk/;
-        }
+    location / {
+        # Used to tell downstream services what external host/port/etc. is:
+        proxy_set_header        Host                    $host;
+        proxy_set_header        X-Forwarded-Proto       $scheme;
+        proxy_set_header        X-Forwarded-Host        $host;
+        proxy_set_header        X-Forwarded-Port        $server_port;
+        proxy_set_header        X-Forwarded-For         $remote_addr;
+        # Used for rate-limiting Mementos lookups:
+        proxy_set_header        X-Real-IP               $remote_addr;
+        proxy_pass              http://website.dapi.wa.bl.uk/;
+    }
 ```
 
 (See the `dev_443.conf` setup for details.)
