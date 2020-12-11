@@ -34,6 +34,7 @@ These services can be deployed id different contexts (dev/beta/prod/etc.) but in
 - The WebHDFS API.
 - The OutbackCDX API.
 - The Solr full-text search API(s).
+- The Prometheus Push Gateway metrics API.
 
 These are set in the stack launch scripts, and can be changed as needed, based on deployment context if necessary.
 
