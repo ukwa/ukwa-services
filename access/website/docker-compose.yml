@@ -154,7 +154,29 @@ services:
       - pywb-nobanner
     deploy:
       replicas: 1
-  
+
+  # IIIF Server to cache and manipulate images
+  iiif:
+    image: lyrasis/cantaloupe
+    environment:
+      SOURCE_STATIC: "HttpSource"
+      HTTPSOURCE_BASICLOOKUPSTRATEGY_URL_PREFIX: "http://api:8000/api/render_raw?pwid="
+      HTTPSOURCE_BASICLOOKUPSTRATEGY_URL_SUFFIX: ""
+      HTTPSOURCE_REQUEST_TIMEOUT: 3600
+      PROCESSOR_STREAM_RETRIEVAL_STRATEGY: "CacheStrategy"
+      # Seems to cope better with sharp edges:
+      PROCESSOR_DOWNSCALE_FILTER: "Lanczos3"
+      # Web pages suffer badly from JPEG artefacts. Can use PNG instead.
+      PROCESSOR_JPG_QUALITY: 100
+      CACHE_SERVER_RESOLVE_FIRST: "false"
+      LOG_APPLICATION_LEVEL: "info"
+      LOG_ACCESS_CONSOLEAPPENDER_ENABLED: "true"
+      # Not needed in prod:
+      PRINT_STACK_TRACE_ON_ERROR_PAGES: "false"
+    #ports:
+    #  - 8182:8182
+    volumes:
+      - ${STORAGE_PATH}/iiif_cache:/var/cache/cantaloupe
 
 # -----------------------------------------
 # Volumes and networks supporting the above

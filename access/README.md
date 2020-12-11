@@ -2,36 +2,46 @@ The Access Stack <!-- omit in toc -->
 ================
 
 - [Introduction](#introduction)
-  - [The Access Data Stack](#the-access-data-stack)
+- [The Access Data Stack](#the-access-data-stack)
+  - [Deployment](#deployment)
+  - [Components](#components)
     - [W3ACT Exports](#w3act-exports)
     - [Crawl Log Analyser](#crawl-log-analyser)
-  - [The Website Stack](#the-website-stack)
-    - [NGINX Proxy](#nginx-proxy)
-    - [Website component services](#website-component-services)
+  - [Cron Tasks](#cron-tasks)
+- [The Website Stack](#the-website-stack)
+  - [Deployment](#deployment-1)
+    - [NGINX Proxies](#nginx-proxies)
+  - [Components](#components-1)
     - [Shine Database](#shine-database)
       - [Creating the Shine database](#creating-the-shine-database)
       - [Restoring the Shine database from a backup](#restoring-the-shine-database-from-a-backup)
       - [Creating a backup of the Shine database](#creating-a-backup-of-the-shine-database)
-  - [The Website Regression Test Stack](#the-website-regression-test-stack)
-  - [The Reading Room Wayback Stack](#the-reading-room-wayback-stack)
-  - [Regular Tasks](#regular-tasks)
+  - [Cron Jobs](#cron-jobs)
+- [The Website Regression Test Stack](#the-website-regression-test-stack)
+  - [Cron Jobs](#cron-jobs-1)
+- [The Reading Room Wayback Stack](#the-reading-room-wayback-stack)
+- [Monitoring](#monitoring)
 
 # Introduction
 
-This folder contains the components used for access to our web archives. There are a number of separate service stacks outlined in the following sections.
+This folder contains the components used for access to our web archives. It's made up of a number of separate stacks, with the first providing support for the others.
 
-## The Access Data Stack
+# The Access Data Stack
 
 The other access stacks depend on a number of data sources and the `access_data` stack handles those. The [access_data stack definition](./data/docker-compose.yml) describes data volumes as well as services that the other stacks can refer to.
 
 **NOTE** that this means that the stacks should be deployed consistently under the same names, as the `access_website` stack will not be able to find the networks associated with the `access_data` stack if the stack has been deployed under a different name.
+
+## Deployment
 
 The stack is deployed using:
 
     cd data
     ./deploy-access-data.sh dev
 
-The deployment shell script sets up the right environment variables for each context (dev/beta/prod) before launching the services.
+The deployment shell script sets up the right environment variables for each context (dev/beta/prod) before launching the services. This sets the `STORAGE_PATH` location where service data should be held, and this needs to be updated depending on what file system the Swarm nodes in a given deployment context share.
+
+## Components
 
 ### W3ACT Exports
 
@@ -50,39 +60,63 @@ TODO: On completing these tasks, the service sends metrics to Prometheus for mon
 
 ### Crawl Log Analyser
 
-The `analyse` service connects to the Kafka crawl log of the frequent crawler, and aggregates statistics on recent crawling activity. This is summarised into a regularly-updated JSON file that the UKWA Access API part of the website stack can make available for users. This is used by the https://ukwa-vis.glitch.me/ live crawler glitch experiment.
+The `analyse` service connects to the Kafka crawl log of the frequent crawler, and aggregates statistics on recent crawling activity. This is summarised into a regularly-updated JSON file that the UKWA Access API part of the website stack makes available for users. This is used by the https://ukwa-vis.glitch.me/ live crawler glitch experiment.
 
-## The Website Stack
+## Cron Tasks
+
+As mentioned above, a cron task should be set up to run the W3ACT Export. This cron task should run hourly.
+
+# The Website Stack
 
 The [access_website stack](./website/docker-compose.yml) runs the services that actually provide the end-user website for https://www.webarchive.org.uk/ or https://beta.webarchive.org.uk/ or https://dev.webarchive.org.uk.
+
+## Deployment
 
 The stack is deployed using:
 
     ./deploy-access-website.sh dev
 
-### NGINX Proxy
+As with the data stack, this script must be setup for the variations across deployment contexts. For example, DEV version is password protected and it configured to pick this up from our internal repository. 
+
+Note that this website stack generates and caches images of archived web pages, and hence will require a reasonable amount of storage for this cache (see below for details).
+
+### NGINX Proxies
 
 The website is designed to be run behind a boundary web proxy that handles SSL etc.  To make use of this stack of services, the server that provides e.g. `dev.webarchive.org.uk` will need to be configured to point to the right API endpoint, which by convention is `website.dapi.wa.bl.uk`.
 
 The set of current proxies and historical redirects associated with the website are now contained in the [internal nginx.conf](./config/nginx.conf). This sets up a service on port 80 where all the site components can be accessed. Once running, the entire system should be exposed properly via the API gateway. For example, for accessing the dev system we want `website.dapi.wa.bl.uk` to point to `dev-swarm-members:80`.
 
+Because most of the complexity of the NGINX setup is in the internal NGINX, the proxy setup at the edge is much simpler. e.g. for DEV:
+
+```
+        location / {
+                proxy_set_header        Host    $host;
+                # Used for rate-limiting Mementos lookups:
+                proxy_set_header        X-Real-IP       $remote_addr;
+                proxy_pass      http://website.dapi.wa.bl.uk/;
+        }
+```
+
+(See the `dev_443.conf` setup for details.)
+
 Having set this chain up, if we visit e.g. `dev.webarchive.org.uk` the traffic should show up on the API server as well as the Docker container.
 
-Note that changes to NGINX configuration are only picked up when it starts, so necessary to run:
+Note that changes to the internal NGINX configuration are only picked up when it starts, so necessary to run:
 
     docker service update --force access_website_nginx
 
-After which NGINX should restart and pick up any configuration changes and re-check whether it can connect to any proxied services.
+After which NGINX should restart and pick up any configuration changes and re-check whether it can connect to any proxied services inside the stack.
 
-### Website component services
+## Components
 
 Behind the NGINX, we have a set of modular components:
 
-- The [ukwa-ui]() service that provides the main user interface.
-- The ukwa-pywb service that provides access to archive web pages
-- The mementos service that allows users to look up URLs via Memento.
-- The shine and shinedb services that provide our older prototype researcher interface.
-- The api and related services (pywb-nobanner and webrender-api) that provide the early prototype of an UKWA API.  e.g. https://dev.webarchive.org.uk/api/screenshots/?url=http%3A%2F%2Fportico.bl.uk%2F&type=thumbnail&source=archive
+- The [ukwa-ui](https://github.com/ukwa/ukwa-ui) service that provides the main user interface.
+- The [ukwa-pywb](https://github.com/ukwa/ukwa-pywb) service that provides access to archive web pages
+- The [mementos](https://github.com/ukwa/mementoweb-webclient) service that allows users to look up URLs via Memento.
+- The [shine](https://github.com/ukwa/shine) and shinedb services that provide our older prototype researcher interface.
+- The [ukwa-access-api](https://github.com/ukwa/ukwa-access-api) and related services (pywb-nobanner, webrender-api, Cantaloupe) that provide API services.
+  - The API services include a caching image server ([Cantaloupe](https://cantaloupe-project.github.io/)) that takes rendered versions of archived websites and exposes them via the standard [IIIF Image API](https://iiif.io/api/image/2.1/). This will need substantial disk space (~1TB).
 
 ### Shine Database
 
@@ -112,7 +146,11 @@ An additional helper script will download a dated dump file of the live database
 
 This should be run daily.
 
-## The Website Regression Test Stack
+## Cron Jobs
+
+There should be a daily (early morning) backup of the Shine database.
+
+# The Website Regression Test Stack
 
 A series of tests for the website are held under the `tests` folder.  As well as checking service features and critical APIs, these test also cover features relating legal compliance.
 
@@ -149,17 +187,20 @@ The tests are run once on startup, and results are posted to Prometheus.  Follow
 
 These can be run each morning, and the metrics posted to Prometheus used to track compliance and raise alerts if needed.
 
-## The Reading Room Wayback Stack
+## Cron Jobs
+
+There should be a Daily (early morning) run of the website tests.
+
+
+# The Reading Room Wayback Stack
 
 The `rrwb` stack defines the necessary services for running our reading room access services via proxied connections rather than DLS VMs. This new approach is on hold at present.
 
 
-## Regular Tasks
+# Monitoring
 
-Having deployed all of the above, the following cron jobs should be set up:
+Having deployed all of the above, the cron jobs mentioned above should be in place.
 
-- Hourly updates of the access data.
-- Daily (early morning) backup of the Shine database.
-- Daily (early morning) run of the website tests.
-  
 The `ukwa-monitor` service should be used to check that these are running, and that the W3ACT database export file on HDFS is being updated.
+
+...monitoring setup TBC...
