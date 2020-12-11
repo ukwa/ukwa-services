@@ -2,6 +2,7 @@ The Access Stack <!-- omit in toc -->
 ================
 
 - [Introduction](#introduction)
+  - [Integration Points](#integration-points)
 - [The Access Data Stack](#the-access-data-stack)
   - [Deployment](#deployment)
   - [Components](#components)
@@ -25,6 +26,16 @@ The Access Stack <!-- omit in toc -->
 # Introduction
 
 This folder contains the components used for access to our web archives. It's made up of a number of separate stacks, with the first providing support for the others.
+
+## Integration Points
+
+These services can be deployed id different contexts (dev/beta/prod/etc.) but in call cases are designed to run (read-only!) against the following external services. Specifically:
+
+- The WebHDFS API.
+- The OutbackCDX API.
+- The Solr full-text search API(s).
+
+These are set in the stack launch scripts, and can be changed as needed, based on deployment context if necessary.
 
 # The Access Data Stack
 
