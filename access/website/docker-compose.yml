@@ -31,8 +31,7 @@ services:
     image: ukwa/ukwa-ui:v1.3.4
     command: java -Djava.security.egd=file:/dev/./urandom -jar /ukwa-ui.war --spring.config.location=file:/application.properties
     environment:
-     - "SET_PROTOCOL_TO_HTTPS=${USE_HTTPS}"
-     - "OFF_SITE_URL=https://${SERVER_NAME}/wayback/archive/"
+     - "OFF_SITE_URL=/wayback/archive/"
      - "SOLR_COLLECTION_SEARCH_PATH=http://collections_solr:8983"
      - "SOLR_COLLECTION_SEARCH_REQUEST_HANDLER=/solr/collections/select"
      - "SOLR_FULL_TEXT_SEARCH_PATH=${SOLR_FULL_TEXT_SEARCH_PATH}"

@@ -101,11 +101,16 @@ The set of current proxies and historical redirects associated with the website 
 Because most of the complexity of the NGINX setup is in the internal NGINX, the proxy setup at the edge is much simpler. e.g. for DEV:
 
 ```
-        location / {
-                proxy_set_header        Host    $host;
+       location / {
+                # Used to tell downstream services what external host/port/etc. is:
+                proxy_set_header        Host                    $host;
+                proxy_set_header        X-Forwarded-Proto       $scheme;
+                proxy_set_header        X-Forwarded-Host        $host;
+                proxy_set_header        X-Forwarded-Port        $server_port;
+                proxy_set_header        X-Forwarded-For         $remote_addr;
                 # Used for rate-limiting Mementos lookups:
-                proxy_set_header        X-Real-IP       $remote_addr;
-                proxy_pass      http://website.dapi.wa.bl.uk/;
+                proxy_set_header        X-Real-IP               $remote_addr;
+                proxy_pass              http://website.dapi.wa.bl.uk/;
         }
 ```
 

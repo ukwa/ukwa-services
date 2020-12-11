@@ -19,7 +19,7 @@ fi
 
 # Common configuration
 export CDX_SERVER="http://cdx.api.wa.bl.uk/data-heritrix"
-export UKWA_INDEX="${CDX_SERVER}?url={url}&closest={closest}&sort=closest&filter=!statuscode:429"
+export UKWA_INDEX="${CDX_SERVER}?url={url}&closest={closest}&sort=closest&filter=!statuscode:429&filter=!mimetype:warc/revisit"
 export UKWA_ARCHIVE="webhdfs://hdfs.api.wa.bl.uk"
 export USE_HTTPS=true
 export SOLR_FULL_TEXT_SEARCH_PATH="http://solr.api.wa.bl.uk"

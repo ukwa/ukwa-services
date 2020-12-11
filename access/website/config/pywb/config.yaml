@@ -30,7 +30,9 @@ proxy:
 
 
 # redirect to exact url behavior
-redirect_to_exact: true
+redirect_to_exact: false
+# This seems to cause a lot of problems, perhaps in combination with warc/revisit records?
+#redirect_to_exact: true
 
 # enable memento
 enable_memento: true
