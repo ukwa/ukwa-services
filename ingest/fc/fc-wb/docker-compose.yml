@@ -30,6 +30,6 @@ services:
       - "WAYBACK_EMBARGO=0"
       - "WAYBACK_HTTPFS_PREFIX=http://warc-server:8000/by-filename/"
       - "CDX_INDEX_SERVER=${CDXSERVER_ENDPOINT}"
-      - "WAYBACK_URL_PREFIX=http://${CRAWL_HOST_WAN_IP}:8080"
-      - "WAYBACK_URL_HOST=${CRAWL_HOST_WAN_IP}"
+      - "WAYBACK_URL_PREFIX=http://${WB_HOST}:8080"
+      - "WAYBACK_URL_HOST=${WB_HOST}"
 
