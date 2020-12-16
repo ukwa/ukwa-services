@@ -10,6 +10,7 @@ services:
   # -------------------------------------------------------------
   w3act_export:
     image: ukwa/python-w3act
+    user: "${CURRENT_UID}"
     command: "/w3act_export_scripts/export.sh"
     volumes:
         - "./w3act_export_scripts:/w3act_export_scripts"
@@ -27,7 +28,7 @@ services:
   # -------------------------------------------------------------
   collections_solr:
     image: ukwa/ukwa-ui-collections-solr:1.1.1
-    user: "${UID}"
+    user: "${CURRENT_UID}"
     volumes:
         - "${STORAGE_PATH}/collections_solr_cores:/opt/solr/server/solr/mycores"
         - "${STORAGE_PATH}/collections_solr_logs:/opt/solr/server/logs"
@@ -39,6 +40,7 @@ services:
   # ----------------------------------------------------------------------
   analyse:
     image: ukwa/crawl-streams
+    user: "${CURRENT_UID}"
     command: "analyse -k ${KAFKA_BROKER} -u 2 -o /analysis/fc.crawled.json"
     volumes:
       - "fc_analysis:/analysis"
