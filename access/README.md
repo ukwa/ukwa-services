@@ -25,18 +25,18 @@ The Access Stack <!-- omit in toc -->
 
 # Introduction
 
-This folder contains the components used for access to our web archives. It's made up of a number of separate stacks, with the first providing support for the others.
+This folder contains the components used for access to our web archives. It's made up of a number of separate stacks, with the first, 'Access Data', providing support for the others.
 
 ## Integration Points
 
-These services can be deployed id different contexts (dev/beta/prod/etc.) but in call cases are designed to run (read-only!) against:
+These services can be deployed in different contexts (dev/beta/prod/etc.) but in all cases are designed to run (read-only!) against:
 
 - The WebHDFS API.
 - The OutbackCDX API.
 - The Solr full-text search API(s).
 - The Prometheus Push Gateway metrics API.
 
-These are set in the stack launch scripts, and can be changed as needed, based on deployment context if necessary.
+These are defined in the stack launch scripts, and can be changed as needed, based on deployment context if necessary.
 
 The web site part is designed to be run behind an edge server than handles the SSL/non-SSL transition and proxies the requests downstream. More details are provided in the relevant Deployment section.
 

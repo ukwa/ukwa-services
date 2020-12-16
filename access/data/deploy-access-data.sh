@@ -11,8 +11,12 @@ if ! [[ ${ENVIRON} =~ dev|beta|prod ]]; then
 fi
 
 
-# Where to store persistant data:
-if [[ ${ENVIRON} = 'dev' ]]; then
+# Where to store persistant data (current same for dev|beta|prod):
+if [[ ${ENVIRON} == 'dev' ]]; then
+	export STORAGE_PATH=/mnt/nfs/data/access_data
+elif [[ ${ENVIRON} == 'beta' ]]; then
+	export STORAGE_PATH=/mnt/nfs/data/access_data
+elif [[ ${ENVIRON} == 'prod' ]]; then
 	export STORAGE_PATH=/mnt/nfs/data/access_data
 else
 	echo "ERROR: STORAGE_PATH not set for ${ENVIRON}!"
@@ -20,9 +24,8 @@ else
 fi
 
 # Which Kafka to talk to for recent FC activity:
+# 192.168.45.15 is crawler05.n45
 export KAFKA_BROKER=192.168.45.15:9094
-
-# ---
 
 # Create needed folders:
 mkdir -p $STORAGE_PATH/w3act_export
