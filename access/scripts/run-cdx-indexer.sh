@@ -3,9 +3,16 @@
 # Fail on errors:
 set -e
 
-# Load context vars from file (symlinked from ukwa-services-env/access/[dev|beta|prod]/access.env):
+# read script environ argument
+ENVIRON=$1
+if ! [[ ${ENVIRON} =~ dev|beta|prod ]]; then
+	echo "ERROR: Script $0 requires environment argument"
+	exit
+fi
+
+# First load access.[dev|beta|prod].env:
 export DIR=$(dirname "$0")
-source ${DIR}/access.env
+source ${DIR}/access.${ENVIRON}.env
 
 # Check expected VARS exist:
 if [[ -z ${TRACKDB_URL} || -z ${NAMENODE_IP} || -z ${JOBTRACKER_IP} || -z ${CDX_SERVICE} || -z ${CDX_COLLECTION} ]]; then
@@ -29,7 +36,7 @@ unset lockfd
 
     for STREAM in frequent webrecorder domain;
     do
-        echo "CDX indexing WARCs from $TRACKDB_URL for ${STREAM} ${YEAR} into ${CDX_SERVICE}/${CDX_COLLECTION}..."
+        echo "Running CDX indexing of WARCs from $TRACKDB_URL for ${STREAM} ${YEAR} into ${CDX_SERVICE}/${CDX_COLLECTION}..."
         docker run -i \
             --add-host=namenode:$NAMENODE_IP \
             --add-host=jobtracker:$JOBTRACKER_IP \

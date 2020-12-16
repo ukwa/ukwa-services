@@ -1,0 +1,71 @@
+# -------------------------------------------------------------
+# This service configuration defines our main public website access stack.
+# -------------------------------------------------------------
+
+version: '3.2'
+
+services:
+  # -------------------------------------------------------------
+  # Get W3ACT data from HDFS and generate derivatives
+  # -------------------------------------------------------------
+  w3act_export:
+    image: ukwa/python-w3act
+    command: "/w3act_export_scripts/export.sh"
+    volumes:
+        - "./w3act_export_scripts:/w3act_export_scripts"
+        - "w3act_export:/w3act_export"
+    deploy:
+      restart_policy:
+        # Run once:
+        condition: on-failure
+        # If it fails, retry every 15 mins:
+        delay: 15m
+
+
+  # -------------------------------------------------------------
+  # Collections index for Topics & Themes of the UKWA UI
+  # -------------------------------------------------------------
+  collections_solr:
+    image: ukwa/ukwa-ui-collections-solr:1.1.0
+    user: "${UID}"
+    volumes:
+        - "${STORAGE_PATH}/collections_solr_cores:/opt/solr/server/solr/mycores"
+        - "${STORAGE_PATH}/collections_solr_logs:/opt/solr/server/logs"
+    ports:
+        - "9021:8983" # Exposed port so external clients can run checks (TBC)
+
+  # ----------------------------------------------------------------------
+  # Analyses recent crawl behaviour by processing the crawled data stream:
+  # ----------------------------------------------------------------------
+  analyse:
+    image: ukwa/crawl-streams
+    command: "analyse -k ${KAFKA_BROKER} -u 2 -o /analysis/fc.crawled.json"
+    volumes:
+      - "fc_analysis:/analysis"
+
+# Volumes and networks supporting the above
+# -----------------------------------------
+volumes:
+  # Used to store the exported W3ACT data.
+  w3act_export:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${STORAGE_PATH}/w3act_export
+      o: bind
+
+  # Used to store analysis generated from Kafka, so it can be made available via the API component.
+  # Only transient storage so can be managed entirely by Docker.
+  fc_analysis:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${STORAGE_PATH}/fc_analysis
+      o: bind
+
+networks:
+  # This attachable network is needed so the website stack can see the Collections Solr without having to expose a host port.
+  default:
+    driver: overlay
+    attachable: true
+

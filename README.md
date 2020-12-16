@@ -14,9 +14,9 @@ See the [change log](./CHANGELOG.md) for information on how this setup has chang
 
 ## Structure
 
-Service stacks are grouped by broad service area, e.g. `access/website` is the service stack that provides the public website part of our access system.
+Service stacks are grouped by broad service area, e.g. [`access`](./access) contains the stacks that provides the access services, and the [access README](./access/README.md) provides detailed documentation on how the access services are deployed.
 
-Within each stack folder, we should have a single `docker-compose.yml` file which should be used for all deployment contexts (`dev`,`beta` and `prod`). Any necessary variations should be defined via environment variables.
+Within each sub-folder, e.g. `access/website`], we should have a single `docker-compose.yml` file which should be used for all deployment contexts (`dev`,`beta` and `prod`). Any necessary variations should be defined via environment variables.
 
 These variables, any other context-specific configuration, should be held in `dev`,`beta` and `prod` subdirectories. For example, if `access/website/docker-compose.yml` is the main stack definition file, any addtional services needed only on `dev` might be declared in `access/website/dev/docker-compose.yml` and would be deployed separately.
 

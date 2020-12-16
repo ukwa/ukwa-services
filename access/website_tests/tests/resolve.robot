@@ -9,7 +9,7 @@ Suite teardown    Run Keywords    Close All Browsers
 Open Browser
     Open Browser To Home Page
 
-Resolve an Archived Web Page
+Get to Archived Web Page via the Resolve API
     [Tags]   resolve
     Go To    %{HOST}/access/resolve/19950418155600/http://portico.bl.uk
     Page Should Contain    Portico

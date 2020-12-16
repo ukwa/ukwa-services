@@ -4,7 +4,10 @@ ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
 collections:
     # open access (with access controls) under /archive/
     archive:
-        index_paths: *INDEX
+        index:
+          type: cdx
+          api_url: *INDEX
+          replay_url: ""
         archive_paths: *ARCHIVE
 
         acl_paths:
@@ -28,6 +31,8 @@ proxy:
 
 # redirect to exact url behavior
 redirect_to_exact: false
+# This seems to cause a lot of problems, perhaps in combination with warc/revisit records?
+#redirect_to_exact: true
 
 # enable memento
 enable_memento: true

@@ -5,7 +5,7 @@ Documentation     A resource file with reusable keywords and variables.
 ...               domain specific language. They utilize keywords provided
 ...               by the imported SeleniumLibrary.
 Library           SeleniumLibrary
-Library           /tmp/make_profile.py
+Library           /make_profile.py
 Library           RequestsLibrary
 Library           OperatingSystem
 
@@ -21,7 +21,7 @@ ${DELAY}             0
 Reset Browsers
     Set Selenium Speed    ${DELAY}
     Log To Console    Waiting for ${BROWSER} browser startup
-    Sleep     10s     Wait for browser startup
+    Sleep     30s     Wait for browser startup
     Close All Browsers
 
 
