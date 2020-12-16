@@ -3,7 +3,17 @@
 # Fail and halt execution on errors
 set -e
 
-source ./prod-env.sh
+if [[ "$1" != "" ]]; then
+    ENV_TAG="$1"
+else
+    echo "You must give an argument that specifies the deployment, e.g. crawler06 uses prod-env-crawler06.sh."
+    exit 1
+fi
+
+
+source ./prod-env-${ENV_TAG}.sh
+
+echo Using UID $H3_UID for Heritrix
 
 mkdir -p ${STORAGE_PATH}/heritrix/output
 mkdir -p ${STORAGE_PATH}/heritrix/wren

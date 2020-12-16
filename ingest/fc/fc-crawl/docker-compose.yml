@@ -4,6 +4,7 @@ services:
 
   # UKWA Heritrix for NPLD
   npld-heritrix-worker:
+    user: ${H3_UID}
     image: ukwa/heritrix-worker:${HERITRIX_VERSION}
     hostname: "npld-heritrix3-worker-{{.Task.Slot}}"
     ports:
@@ -33,6 +34,7 @@ services:
 
   # UKWA Heritrix for NPLD
   bypm-heritrix-worker:
+    user: ${H3_UID}
     image: ukwa/heritrix-worker:${HERITRIX_VERSION}
     hostname: "bypm-heritrix3-worker-{{.Task.Slot}}"
     ports:
@@ -73,8 +75,8 @@ services:
 
   # The WARChiving proxy itself
   warcprox:
-    image: ukwa/warcprox:2.3.1
-    command: "warcprox -b 0.0.0.0 -d /output/warcs --base32 --gzip --rollover-idle-time 600 --dedup-db-file /dev/null --stats-db-file /dev/null --quiet --plugin warcprox-plugins.listeners.UpdateOutbackCDX --plugin warcprox-plugins.listeners.KafkaCaptureFeed"
+    image: ukwa/warcprox:2.4.17
+    command: "warcprox -b 0.0.0.0 -d /output/warcs --base32 --gzip --rollover-idle-time 600 --dedup-db-file /dev/null --stats-db-file /dev/null --quiet --plugin warcprox-plugins.listeners.UpdateOutbackCDX --plugin warcprox-plugins.listeners.KafkaCaptureFeed --max-threads 1000 --queue-size 1000"
     environment:
       - "KAFKA_BOOTSTRAP_SERVERS=kafka:9092"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
@@ -96,7 +98,7 @@ services:
 
   # PhantomJS web page rendering service
   webrender:
-    image: ukwa/webrender-api:1.0.13
+    image: ukwa/webrender-api:1.0.15
     #ports:
     #  - 8010:8010
     environment:
@@ -104,7 +106,7 @@ services:
       - "LC_ALL=en_US.utf8"
       - "WEB_RENDER_TMP=/tmp/webrender"
       - "DOCKER_NETWORK=fc_crawl_webrender_network"
-      #- "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.7"
+      - "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.11"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # For launching containerised renderers
       - /tmp/webrender:/tmp/webrender
@@ -150,7 +152,7 @@ networks:
   default:
     driver: overlay
     attachable: true
-  # Dedicated webrender subnet:
+  # Dedicated webrender subnet (defined externally so it's large enough):
   webrender:
     external: true
     name: fc_crawl_webrender_network
