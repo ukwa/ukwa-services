@@ -35,6 +35,7 @@ mkdir -p $STORAGE_PATH/w3act_export
 mkdir -p $STORAGE_PATH/fc_analysis
 mkdir -p $STORAGE_PATH/collections_solr_cores
 mkdir -p $STORAGE_PATH/collections_solr_logs
+chown -R ${CURRENT_UID} ${STORAGE_PATH}
 chmod a+w $STORAGE_PATH/collections_solr_*
 
 # Launch the common configuration with these environment variable:

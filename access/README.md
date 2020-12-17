@@ -55,6 +55,8 @@ The stack is deployed using:
 
 The deployment shell script sets up the right environment variables for each context (dev/beta/prod) before launching the services. This sets the `STORAGE_PATH` location where service data should be held, and this needs to be updated depending on what file system the Swarm nodes in a given deployment context share.
 
+**NOTE** that after deployment, the Solr collection data is pulled into the service, which takes ~10 minutes to appear.
+
 ## Components
 
 ### W3ACT Exports
@@ -88,11 +90,12 @@ The [access_website stack](./website/docker-compose.yml) runs the services that 
 
 The stack is deployed using:
 
+    cd website/
     ./deploy-access-website.sh dev
 
 As with the data stack, this script must be setup for the variations across deployment contexts. For example, DEV version is password protected and it configured to pick this up from our internal repository. 
 
-Note that this website stack generates and caches images of archived web pages, and hence will require a reasonable amount of storage for this cache (see below for details).
+**NOTE** that this website stack generates and caches images of archived web pages, and hence will require a reasonable amount of storage for this cache (see below for details).
 
 ### NGINX Proxies
 
@@ -120,7 +123,7 @@ Because most of the complexity of the NGINX setup is in the internal NGINX, the 
 
 Having set this chain up, if we visit e.g. `dev.webarchive.org.uk` the traffic should show up on the API server as well as the Docker container.
 
-Note that changes to the internal NGINX configuration are only picked up when it starts, so necessary to run:
+**NOTE** that changes to the internal NGINX configuration are only picked up when it starts, so necessary to run:
 
     docker service update --force access_website_nginx
 
