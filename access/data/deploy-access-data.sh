@@ -27,6 +27,9 @@ fi
 # 192.168.45.15 is crawler05.n45
 export KAFKA_BROKER=192.168.45.15:9094
 
+# Get the UID so we can run services as the same UID:
+export CURRENT_UID=$(id -u):$(id -g)
+
 # Create needed folders:
 mkdir -p $STORAGE_PATH/w3act_export
 mkdir -p $STORAGE_PATH/fc_analysis
