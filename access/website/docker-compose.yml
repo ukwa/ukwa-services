@@ -78,6 +78,7 @@ services:
       - ./config/pywb/config-nobanner.yaml:/webarchive/config.yaml
       - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
       - open_access_acls:/ukwa_pywb/acl/
+      - "${CONFIG_PATH}/pywb-ca.pem:/certs/pywb-ca.pem"
 
   # -------------------------------------------------------------
   # Mementos
