@@ -34,9 +34,10 @@ export USE_HTTPS=true
 export SOLR_FULL_TEXT_SEARCH_PATH="http://solr.api.wa.bl.uk"
 export SHINE_SOLR="http://solr-jisc.api.wa.bl.uk/solr/jisc"
 export CURRENT_UID=$(id -u):$(id -g)
-export KAFKA_BROKER=192.168.45.15:9094
 export PROXYHOST=http://194.66.232.92
 export PROXYPORT=3127
+# Crawler05 (n45 is not in DNS and we want to connect that way):
+export KAFKA_BROKER="192.168.45.15:9094"
 
 #export LOG_SERVER="udp://logs.wa.bl.uk:12201"
 # Set up folders needed by different components

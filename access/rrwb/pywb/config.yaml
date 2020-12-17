@@ -10,10 +10,17 @@ collections:
         acl_paths:
             - ./acl/blocks.aclj
 
-        default_access: block
+        default_access: allow
 
         # up the query limit:
         query_limit: 100000
+
+proxy:
+    # collection for proxy mode
+    coll: archive
+    ca_name: UKWA pywb HTTPS Proxy CA
+    enable_content_rewrite: false
+
 
 # redirect to exact url behavior
 redirect_to_exact: true

@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /wayback/
+Disallow: /ukwa/search
+Disallow: /en/ukwa/search
+Disallow: /cy/ukwa/search
+Disallow: /gd/ukwa/search
+Disallow: /datasets/
+Disallow: /shine/
+
