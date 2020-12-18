@@ -144,21 +144,35 @@ Behind the NGINX, we have a set of modular components:
 
 Shine requires a PostgreSQL database, so additional setup is required using the scripts in [./scripts/postgres](./scripts/postgres).
 
+#### Stop the Shine service
+
 When modifying the database, and having deployed the stack, you first need to stop Shine itself from running, as otherwise it will attempt to start up and will insert and empty database into PostgreSQL and this will interfere with the restore process. So, use
 
     $ docker service scale access_website_shine=0
 
-This will drop the Shine service but leave all the rest of the stack running. Once you have created and restored the database as needed, re-scale the service and Shine will restart using the restored database.
-
-    $ docker service scale access_website_shine=1
+This will drop the Shine service but leave all the rest of the stack running. 
 
 #### Creating the Shine database
 
-You can run `create-db.sh` to create the database itself, and you can use `list-db.sh` to check the database is there. Then, run `create-user.sh` to run the `setup_user.sql` script and set up a suitable user with access to the database.  
+* `create-db.sh`
+* `create-user.sh`
+* `list-db.sh`
+
+Within `scripts/postgres/`, you can run `create-db.sh` to create the database itself. Then, run `create-user.sh` to run the `setup_user.sql` script and set up a suitable user with access to the database. Use `list-db.sh` to check the database is there at this pont.
 
 #### Restoring the Shine database from a backup
 
-To do a restore, use `download-shine-db-dump.sh` to grab a database dump from HDFS. Currently, the backups are dated and are in the `/2_backups/access/access_shinedb/` folder, so you'll need to edit the file to use the appropriate backup location and date. Now, running `restore-shine-db-from-dump.sh` should populate the database.
+* Edit `download-shine-db-dump.sh` to use the most recent date version from HDFS
+* `download-shine-db-dump.sh`
+* `restore-shine-db-from-dump.sh`
+
+To do a restore, you need to grab a database dump from HDFS. Currently, the backups are dated and are in the HDFS `/2_backups/access/access_shinedb/` folder, so you'll need to edit the file to use the appropriate date, then run `download-shine-db-dump.sh` to actually get the database dump. Now, running `restore-shine-db-from-dump.sh` should populate the database.
+
+#### Restart the Shine service
+
+Once you have created and restored the database as needed, re-scale the service and Shine will restart using the restored database.
+
+    $ docker service scale access_website_shine=1
 
 #### Creating a backup of the Shine database
 

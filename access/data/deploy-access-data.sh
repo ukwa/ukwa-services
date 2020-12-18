@@ -12,15 +12,13 @@ fi
 
 
 # Where to store persistant data (current same for dev|beta|prod):
-if [[ ${ENVIRON} == 'dev' ]]; then
-	export STORAGE_PATH=/mnt/nfs/data/access_data
+if [[ ${ENVIRON} == 'prod' ]]; then
+	export STORAGE_PATH=/mnt/nfs/prod1/data/access_data
 elif [[ ${ENVIRON} == 'beta' ]]; then
 	export STORAGE_PATH=/mnt/nfs/data/access_data
-elif [[ ${ENVIRON} == 'prod' ]]; then
-	export STORAGE_PATH=/mnt/nfs/data/access_data
 else
-	echo "ERROR: STORAGE_PATH not set for ${ENVIRON}!"
-        exit
+	# dev vars
+	export STORAGE_PATH=/mnt/nfs/data/access_data
 fi
 
 # Which Kafka to talk to for recent FC activity:
