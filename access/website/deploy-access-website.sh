@@ -13,17 +13,20 @@ if [[ ${ENVIRON} == 'prod' ]]; then
 	export DEPLOYMENT_TAG=prod
 	export STORAGE_PATH=/mnt/nfs/data/prod1/website
 	export CONFIG_PATH=/mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/pywb
+        source /mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/app_secret.env
 elif [[ ${ENVIRON} == 'beta' ]]; then
 	export SERVER_NAME=beta.webarchive.org.uk
 	export DEPLOYMENT_TAG=beta
 	export STORAGE_PATH=/mnt/nfs/data/website
 	export CONFIG_PATH=/mnt/nfs/access/config/gitlab/ukwa-services-env/access/pywb
+        source /mnt/nfs/access/config/gitlab/ukwa-services-env/access/app_secret.env
 else
 	# dev vars
 	export SERVER_NAME=dev.webarchive.org.uk
 	export DEPLOYMENT_TAG=dev
 	export STORAGE_PATH=/mnt/nfs/data/website
 	export CONFIG_PATH=/mnt/nfs/config/gitlab/ukwa-services-env/access/pywb
+        source /mnt/nfs/config/gitlab/ukwa-services-env/access/app_secret.env
 fi
 
 # Common configuration

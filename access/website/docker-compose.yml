@@ -128,6 +128,8 @@ services:
       - "CACHE_FOLDER=/cache"
       # Used to check access permissions:
       - "WAYBACK_SERVER=http://pywb:8080/archive/"
+      # Used to secure cookies/tokens/etc.
+      - "APP_SECRET=${APP_SECRET}"
     volumes:
       - "${STORAGE_PATH}/cache:/cache"
       - "analysis_volume:/analysis"
