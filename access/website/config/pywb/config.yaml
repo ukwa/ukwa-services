@@ -8,6 +8,8 @@ collections:
           type: cdx
           api_url: *INDEX
           replay_url: ""
+          # Up the limit used when querying for the closest match (?)
+          closest_limit: 1000
         archive_paths: *ARCHIVE
 
         acl_paths:
@@ -18,6 +20,7 @@ collections:
 
         # up the query limit:
         query_limit: 100000
+
 
 proxy:
     # collection for proxy mode
@@ -30,9 +33,9 @@ proxy:
 
 
 # redirect to exact url behavior
-redirect_to_exact: false
+#redirect_to_exact: false
 # This seems to cause a lot of problems, perhaps in combination with warc/revisit records?
-#redirect_to_exact: true
+redirect_to_exact: true
 
 # enable memento
 enable_memento: true

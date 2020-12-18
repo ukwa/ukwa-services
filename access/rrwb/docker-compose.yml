@@ -8,7 +8,7 @@ services:
   # Reading Room Wayback configuration per LDL:
   # -------------------------------------------------------------
   pywb-bl:
-    image: ukwa/ukwa-pywb:2.4.0-beta-5
+    image: ukwa/ukwa-pywb:2.4.0-beta
     environment:
       - "DEBUG=True"
       - "WEBHDFS_USER=access"
@@ -20,6 +20,8 @@ services:
       - rr-access-acl:/ukwa_pywb/acl/
     depends_on:
       - redis
+    ports:
+      - "8111:8080"
 
   # Redis service to hold locks
   redis:
@@ -30,10 +32,11 @@ services:
     image: nginx:1.13-alpine
 
     volumes:
-      - ./nginx/pywb.conf:/etc/nginx/conf.d/pywb.conf:ro
+      - ./nginx/:/etc/nginx/conf.d/:ro
 
     ports:
       - "8100:8100"
+      - "8101:8101"
 
     depends_on:
       - pywb
@@ -42,6 +45,9 @@ services:
 volumes:
   # Where the access block list is held:
   rr-access-acl:
+    external:
+      name: access_data_w3act_export
+
 
 #logging:
 #  driver: gelf

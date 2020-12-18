@@ -17,6 +17,7 @@ services:
       - "80:80"
     volumes:
       - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./config/static:/webroot:ro
     depends_on:
       - shine
       - pywb
@@ -56,7 +57,6 @@ services:
   pywb:
     image: ukwa/ukwa-pywb:2.4.0-beta
     environment:
-      - "DEBUG=True"
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
       - "UKWA_ARCHIVE=${UKWA_ARCHIVE}"
@@ -70,7 +70,6 @@ services:
   pywb-nobanner:
     image: ukwa/ukwa-pywb:2.4.0-beta
     environment:
-      - "DEBUG=True"
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
       - "UKWA_ARCHIVE=${UKWA_ARCHIVE}"
@@ -117,13 +116,10 @@ services:
     environment:
       - "CDX_SERVER=${CDX_SERVER}"
       - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
-      - "KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BROKER}"
-      - "KAFKA_CRAWLED_TOPIC=fc.crawled"
-      - "KAFKA_SEEK_TO_BEGINNING=False"
       - "API_LABEL=UK Web Archive API"
       - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
-      #- "HTTPS_PROXY=http://194.66.232.92:3127/"
+      #- "HTTPS_PROXY=http://${PROXYHOST}:${PROXYPORT}"
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
       - "SCRIPT_NAME=/api" # Deploy the API under this prefix
@@ -140,10 +136,11 @@ services:
 
   # Web page rendering post-crawl:
   webrender:
-    image: ukwa/webrender-api:1.0.14
+    image: ukwa/webrender-api:1.0.15
     environment:
       - "HTTP_PROXY=http://pywb-nobanner:8080"
       - "DOCKER_NETWORK=access_website_default"
+      - "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.11"
       - "LC_ALL=en_US.utf8"
       - "WEB_RENDER_TMP=${WEB_RENDER_TMP}"
     volumes:
