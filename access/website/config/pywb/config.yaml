@@ -32,8 +32,6 @@ proxy:
     enable_content_rewrite: false
 
 
-# Limit for 
-
 # redirect to exact url behavior
 #redirect_to_exact: false
 # This seems to cause a lot of problems, perhaps in combination with warc/revisit records?

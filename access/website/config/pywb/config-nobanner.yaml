@@ -30,7 +30,7 @@ proxy:
 
 
 # redirect to exact url behavior
-redirect_to_exact: false
+redirect_to_exact: true
 
 # Disable the frame
 framed_replay: false
