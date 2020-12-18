@@ -23,7 +23,7 @@ else
 	export SERVER_NAME=dev.webarchive.org.uk
 	export DEPLOYMENT_TAG=dev
 	export STORAGE_PATH=/mnt/nfs/data/website
-	export CONFIG_PATH=/mnt/nfs/access/config/gitlab/ukwa-services-env/access/pywb
+	export CONFIG_PATH=/mnt/nfs/config/gitlab/ukwa-services-env/access/pywb
 fi
 
 # Common configuration
