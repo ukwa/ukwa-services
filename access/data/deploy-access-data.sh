@@ -37,4 +37,4 @@ chown -R ${CURRENT_UID} ${STORAGE_PATH}
 chmod a+w $STORAGE_PATH/collections_solr_*
 
 # Launch the common configuration with these environment variable:
-docker stack deploy -c docker-compose.yml access_data
+docker stack deploy -c ../docker-compose.shared.yml -c docker-compose.yml access_data

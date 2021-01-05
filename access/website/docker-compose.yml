@@ -60,10 +60,11 @@ services:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
       - "UKWA_ARCHIVE=${UKWA_ARCHIVE}"
+      - "LANG=en_GB.UTF-8"
     volumes:
       - ./config/pywb/config.yaml:/webarchive/config.yaml
       # Used to store the access control lists used by the pywb services.
-      - open_access_acls:/ukwa_pywb/acl/
+      - w3act_export:/ukwa_pywb/acl/
 
 
   # An embedded, bannerless OA Wayback to render screenshots:
@@ -76,7 +77,7 @@ services:
     volumes:
       - ./config/pywb/config-nobanner.yaml:/webarchive/config.yaml
       - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
-      - open_access_acls:/ukwa_pywb/acl/
+      - w3act_export:/ukwa_pywb/acl/
       - "${CONFIG_PATH}/pywb-ca.pem:/certs/pywb-ca.pem"
 
   # -------------------------------------------------------------
@@ -105,7 +106,7 @@ services:
     image: postgres:9.6.2
     volumes:
       # Used to store the Shine PostgreSQL database (which hold user accounts).
-      - "${STORAGE_PATH}/shine-postgres-data:/var/lib/postgresql/data"
+      - "${STORAGE_PATH_WEBSITE}/shine-postgres-data:/var/lib/postgresql/data"
       
       
   # -------------------------------------------------------------
@@ -131,8 +132,8 @@ services:
       # Used to secure cookies/tokens/etc.
       - "APP_SECRET=${APP_SECRET}"
     volumes:
-      - "${STORAGE_PATH}/cache:/cache"
-      - "analysis_volume:/analysis"
+      - "${STORAGE_PATH_WEBSITE}/cache:/cache"
+      - fc_analysis:/analysis
     depends_on:
       - webrender
 
@@ -175,22 +176,11 @@ services:
     #ports:
     #  - 8182:8182
     volumes:
-      - ${STORAGE_PATH}/iiif_cache:/var/cache/cantaloupe
+      - ${STORAGE_PATH_WEBSITE}/iiif_cache:/var/cache/cantaloupe
 
 # -----------------------------------------
 # Volumes and networks supporting the above
 # -----------------------------------------
-volumes:
-  # Used to store analysis generated from Kafka, so it can be made available via the API component.
-  # Only transient storage so can be managed entirely by Docker.
-  analysis_volume:
-    external:
-      name: access_data_fc_analysis
-
-  # Used to store the open access control lists
-  open_access_acls:
-    external:
-      name: access_data_w3act_export
 
 networks:
   # This attachable network is needed so the screenshotter can spin up containers and talk to them over HTTP.
