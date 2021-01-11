@@ -7,9 +7,9 @@ services:
     image: ukwa/ukwa-pywb:2.4.0-beta
     #image: webrecorder/pywb:2.4.2-beta
     environment:
-      WEBHDFS_USER: "access"
-      UKWA_INDEX: "cdx+http://cdx.api.wa.bl.uk/data-heritrix"
+      UKWA_INDEX: "http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429&filter=!mimetype:warc/revisit"
       UKWA_ARCHIVE: "webhdfs://hdfs.api.wa.bl.uk"
+      WEBHDFS_USER: "access"
       SCRIPT_NAME: "/act/wayback"
     volumes:
       - ./pywb-config.yaml:/webarchive/config.yaml
