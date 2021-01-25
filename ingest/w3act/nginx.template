@@ -2,9 +2,9 @@ server {
     listen 8100;
 
     # Rewrite URLs if no collection is specifed, map to `archive` collection:
-    location ~ ^/(?!(static|archive|en|cy|replay)) {
-        rewrite ^/(.*)$ /archive/$1 last;
-    }
+    #location ~ ^/(?!(static|archive|en|cy|replay)) {
+    #    rewrite ^/(.*)$ /archive/$1 last;
+    #}
 
     # Check the whitepaces and replace them
     location ~ [\s+] {

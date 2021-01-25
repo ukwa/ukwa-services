@@ -8,9 +8,19 @@ collections:
           type: cdx
           api_url: *INDEX
           replay_url: ""
-          # Up the limit used when querying for the closest match (?)
+          # Up the limit used when querying for the closest match
+          # (putting this here doesn't seem to change anything)
           closest_limit: 1000
         archive_paths: *ARCHIVE
+
+        # up the query limit:
+        query_limit: 100000
+
+    # QA Access to crawl-time data
+    crawler:
+        index: cdx+http://crawldb-fc.api.wa.bl.uk/fc
+        archive_paths:
+          - http://192.168.45.15:8001/by-filename/
 
         # up the query limit:
         query_limit: 100000
