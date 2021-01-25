@@ -22,25 +22,7 @@ services:
     ports:
       - "7070:8080"
     volumes:
-      - ./pywb-config.yaml:/webarchive/config.yaml
-
-  # NGINX for PYWB
-  # To ensure pywb gets proxied behind the right location, we use
-  # this NGINX instance to set the deployment scheme, hostname and path
-  # (unfortunately there does not seem to be a way to tell pywb this directly)
-  nginx_pywb:
-    image: nginx
-    environment:
-      - SERVER_NAME=${SERVER_NAME}
-      - SERVER_SCHEME=${SERVER_SCHEME}
-    command: /bin/bash -c "envsubst '$$SERVER_NAME $$SERVER_SCHEME' < /etc/nginx/conf.d/nginx.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
-    volumes:
-      - ./nginx.template:/etc/nginx/conf.d/nginx.template:ro
-    # Accessible port only needed for debugging:
-    #ports:
-    #  - "8100:8100"
-    depends_on:
-      - pywb
+      - ./config/pywb.yaml:/webarchive/config.yaml
 
   # PDF to HTML service
   pdf2htmlex:
@@ -51,7 +33,6 @@ services:
           cpus: '2.0'
           memory: '2G'
     depends_on:
-      - nginx_pywb
       - pywb
 
   # W3ACT
@@ -68,7 +49,7 @@ services:
       - "USE_TEST_DATA=false"
       - "ENABLE_DDHAPT=true"
       - "SMTP_SERVER=juno.bl.uk"
-      - "WAYBACK_URL=http://nginx_pywb:8100/"
+      - "WAYBACK_URL=http://pywb:8080/archive/" # Used by PDF2HTML proxy
       - "CDXSERVER_ENDPOINT=http://cdx.api.wa.bl.uk/data-heritrix"
       - "MONITRIX_URI=http://monitrix:5601/app/kibana"
       - "PDFTOHTMLEX_URI=http://pdf2htmlex:5000/convert?url="
@@ -87,7 +68,6 @@ services:
       - "9001:9000"
       - "1898:1898"
     depends_on:
-      - nginx_pywb
       - pywb
       - pdf2htmlex
 
