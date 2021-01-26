@@ -2,7 +2,7 @@ export CURRENT_UID=$(id -u):$(id -g)
 
 echo $CURRENT_UID
 
-mkdir cores
+mkdir -p cores
 
-docker-compose -f docker-compose.dev.yml up -d solrcloud
+docker stack deploy -c docker-compose.dev.yml crawl_db_solr
 
