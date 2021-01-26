@@ -83,6 +83,15 @@ services:
       - "${W3ACT_PSQL_DIR}:/var/lib/postgresql/data"
       - "${W3ACT_DUMPS_DIR}:/tmp"
 
+  # -------------------------------------------------------------
+  # Crawl log viewer
+  # -------------------------------------------------------------
+  crawl-log-viewer:
+    image: ukwa/crawl-log-viewer
+    environment:
+      - "SCRIPT_NAME=/act/intranet/logs"
+    volumes:
+      - ./config/crawl-log-viewer-topics.json:/usr/src/app/topics.json
 
 networks:
   # Make network attachable so tasks can be run:
