@@ -1,0 +1,17 @@
+
+version: '3.7'
+
+services:
+  solrcloud:
+    image: solr:8.7
+    #command: solr -f -cloud
+    entrypoint:
+      - bash
+      - "-c"
+      - "init-var-solr; exec solr -f -cloud"
+    user: "${CURRENT_UID}"
+    volumes:
+     - "./cores:/var/solr"
+    ports:
+     - "8913:8983"
+
