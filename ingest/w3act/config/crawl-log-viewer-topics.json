@@ -1,0 +1,12 @@
+{
+  "fc": {
+    "title": "Frequent Crawl",
+    "topic": "fc.crawled",
+    "broker": "192.168.45.15:9094"
+  },
+  "dc": {
+    "title": "Domain Crawl",
+    "topic": "dc.crawled",
+    "broker": "192.168.45.12:9094"
+  }
+}

@@ -12,9 +12,7 @@ services:
 
   # PyWB for QA
   pywb:
-    #image: ukwa/ukwa-pywb:1.0.9.1
-    image: ukwa/ukwa-pywb:2.4.0-beta
-    #image: webrecorder/pywb:2.4.2-beta
+    image: ukwa/ukwa-pywb:2.5.x-beta
     environment:
       UKWA_INDEX: "http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429&filter=!mimetype:warc/revisit"
       UKWA_ARCHIVE: "webhdfs://hdfs.api.wa.bl.uk"
@@ -89,9 +87,19 @@ services:
   crawl-log-viewer:
     image: ukwa/crawl-log-viewer
     environment:
-      - "SCRIPT_NAME=/act/intranet/logs"
+      - "SCRIPT_NAME=/act/logs"
     volumes:
       - ./config/crawl-log-viewer-topics.json:/usr/src/app/topics.json
+
+  # -------------------------------------------------------------
+  # Notebooks and Dashboards
+  # -------------------------------------------------------------
+  nbapps:
+    image: ukwa/ukwa-notebook-apps
+    command: "--base_url=/act/nbapps/ --no-browser --template=lab --debug /app"
+    environment:
+     - "HTTPS_PROXY=https://explorer.bl.uk:3127" # This is needed because we're talking to the live public API (we should have an internal one)
+     - "PYTHONPATH=/app"
 
 networks:
   # Make network attachable so tasks can be run:
