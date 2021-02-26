@@ -9,33 +9,16 @@ import json
 import os
 
 from airflow.models import Variable, DAG
-from airflow.decorators import dag, task
 from airflow.utils.dates import days_ago
 from airflow.operators.docker_operator import DockerOperator
 
-# Define the parameters that can vary between deployment contexts:
-trackdb_url = Variable.get('trackdb_url')
-hadoop_namenode_ip = Variable.get('hadoop_namenode_ip')
-hadoop_jobtracker_ip = Variable.get('hadoop_jobtracker_ip')
-webhdfs_url = Variable.get('webhdfs_url', 'http://webhdfs.api.wa.bl.uk/')
-webhdfs_user = Variable.get('webhdfs_user', 'access')
-storage_path = Variable.get('storage_path')
+from _common_ import Config
 
-# Define the common parameters for running Docker tasks:
-volumes = ['%s:/storage' % storage_path ]
-hadoop_docker_image = 'ukwa/docker-hadoop:hadoop-0.20'
-ukwa_task_image = 'ukwa/ukwa-manage:latest'
-# This is how the Hadoop jobs know where to run:
-extra_hosts = {
-    'namenode': hadoop_namenode_ip,
-    'jobtracker': hadoop_jobtracker_ip
-}
+# Pick up shared configuration:
+c = Config()
 
-# These args will get passed on to each operator
-# You can override them on a per-task basis during operator initialization
-default_args = {
-    'owner': 'airflow',
-}
+# These args will get passed on to each operator/task:
+default_args = c.get_default_args_for_access()
 
 # Use a function to generate parameterised DAGs:
 def generate_update_dag(path, schedule_interval):
@@ -46,6 +29,12 @@ def generate_update_dag(path, schedule_interval):
         schedule_interval=schedule_interval, 
         start_date=days_ago(1),
         catchup=False,
+        params= {
+            'path': path,
+            'lsr_txt': '/storage/hadoop_lsr_%s.txt' % dag_id,
+            'lsr_jsonl': '/storage/hadoop_lsr_%s.jsonl' % dag_id,
+            'trackdb_url': c.access_trackdb_url,
+        },
         tags=['trackdb', 'manage']
     ) as update_trackdb_dag:
         update_trackdb_dag.doc_md = \
@@ -56,43 +45,32 @@ This lists %s and updates TrackDB.
 
 """ % path
 
-        #
-        hadoop_lsr_path = path
-        hadoop_lsr_txt = '/storage/hadoop_lsr_%s.txt' % dag_id
-        hadoop_lsr_jsonl = '/storage/hadoop_lsr_%s.jsonl' % dag_id
-
         # List HDFS location using Hadoop lsr command.
         # This returns 255/-1 if there are permission-denied errors, so we use '; true' for now.
         # TODO User that scans HDFS should have (ideally read-only) access to _EVERYTHING_.
         lsr = DockerOperator(
             task_id='list_hadoop_fs',
-            image=hadoop_docker_image,
-            command='bash -c "hadoop fs -lsr %s > %s; true"' % (hadoop_lsr_path, hadoop_lsr_txt),
+            image=c.hadoop_docker_image,
+            command='bash -c "hadoop fs -lsr {{ params.path }} > {{ params.lsr_txt }}; true"',
             do_xcom_push=False,
-            extra_hosts=extra_hosts,
-            volumes=volumes
         )
 
         lsr_to_jsonl = DockerOperator(
             task_id='convert_lsr_to_jsonl',
-            image=ukwa_task_image,
-            command='store lsr-to-jsonl %s %s' % (hadoop_lsr_txt, hadoop_lsr_jsonl),
+            image=c.ukwa_task_image,
+            command='store lsr-to-jsonl {{ params.lsr_txt }} {{ params.lsr_jsonl }}',
             do_xcom_push=False,
-            extra_hosts=extra_hosts,
-            volumes=volumes
         )
 
         jsonl_to_trackdb = DockerOperator(
             task_id='jsonl_to_trackdb',
-            image=ukwa_task_image,
-            command='trackdb import -v -t %s files %s ' % (trackdb_url, hadoop_lsr_jsonl),
+            image=c.ukwa_task_image,
+            command='trackdb import -v -t {{ params.trackdb_url }} files {{ params.lsr_jsonl }}',
             do_xcom_push=False,
-            extra_hosts=extra_hosts,
-            volumes=volumes
         )
 
         lsr >> lsr_to_jsonl >> jsonl_to_trackdb
-        
+
         globals()[dag_id] = update_trackdb_dag
 
 # Create DAGs for each path and schedule:

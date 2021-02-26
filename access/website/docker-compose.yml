@@ -55,12 +55,14 @@ services:
   # OA Wayback configuration:
   # -------------------------------------------------------------
   pywb:
-    image: ukwa/ukwa-pywb:2.4.0-beta
+    image: ukwa/ukwa-pywb:2.5.x-beta
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
       - "UKWA_ARCHIVE=${UKWA_ARCHIVE}"
       - "LANG=en_GB.UTF-8"
+    ports:
+      - "7171:8080"
     volumes:
       - ./config/pywb/config.yaml:/webarchive/config.yaml
       # Used to store the access control lists used by the pywb services.
@@ -69,7 +71,7 @@ services:
 
   # An embedded, bannerless OA Wayback to render screenshots:
   pywb-nobanner:
-    image: ukwa/ukwa-pywb:2.4.0-beta
+    image: ukwa/ukwa-pywb:2.5.x-beta
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"

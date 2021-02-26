@@ -15,6 +15,15 @@ collections:
         # up the query limit:
         query_limit: 100000
 
+        # Enable SCU locks
+        single-use-lock: true
+
+    # Access to internal documents using live web support:
+    # TODO Test if this actually works!
+    access:
+        index: $live
+        single-use-lock: true
+
 proxy:
     # collection for proxy mode
     coll: archive
