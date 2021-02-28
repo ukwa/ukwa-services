@@ -47,16 +47,16 @@ x-airflow-common:
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
-    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__FERNET_KEY: '${FERNET_KEY}'
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
   env_file:
     - ${CONTEXT_ENV_FILE}
   volumes:
-    - ./dags:/opt/airflow/dags
-    - ./logs:/opt/airflow/logs
-    - ./plugins:/opt/airflow/plugins
-    - /var/run/docker.sock:/var/run/docker.sock
+    - "./dags:/opt/airflow/dags"
+    - "./plugins:/opt/airflow/plugins"
+    - "${STORAGE_PATH}/logs:/opt/airflow/logs"
+    - "/var/run/docker.sock:/var/run/docker.sock"
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on:
     - redis
@@ -70,7 +70,7 @@ services:
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
     volumes:
-      - postgres-db-volume:/var/lib/postgresql/data
+      - "${STORAGE_PATH}/postgres:/var/lib/postgresql/data"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 5s

@@ -37,6 +37,7 @@ class Config():
         return {
             # Shared configuration for all tasks:
             'owner': 'airflow',
+            'retries': 3,
             # Shared configuration for all Docker tasks:
             'extra_hosts': {
                 'namenode': self.access_hadoop_namenode_ip,
