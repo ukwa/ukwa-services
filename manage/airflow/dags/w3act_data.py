@@ -1,5 +1,7 @@
 """
-## w3act_to_hdfs.py
+## w3act_data.py
+
+Tasks handling the W3ACT database and data exports.
 """
 import json
 import os
