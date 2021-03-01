@@ -39,15 +39,15 @@ def generate_update_dag(path, schedule_interval):
     ) as update_trackdb_dag:
         update_trackdb_dag.doc_md = \
 """
-### Update TrackDB with WARCs from HDFS
+### Update TrackDB with file information from HDFS
 
-This lists %s and updates TrackDB. 
+This recursively lists the `%s` folder of HDFS and updates TrackDB with information about those files. 
 
 """ % path
 
         # List HDFS location using Hadoop lsr command.
         # This returns 255/-1 if there are permission-denied errors, so we use '; true' for now.
-        # TODO User that scans HDFS should have (ideally read-only) access to _EVERYTHING_.
+        # TODO User that scans HDFS should have _read-only_ access to _EVERYTHING_.
         lsr = DockerOperator(
             task_id='list_hadoop_fs',
             image=c.hadoop_docker_image,

@@ -85,9 +85,56 @@ These are necessary pre-requisites for access processes, like indexing and playb
     # Shared operator definitions:
     cleanup = W3ACTDumpCleanupOperator()
     dump = W3ACTDumpOperator()
-    
+
+    mkd = DockerOperator(
+        task_id='make_dir',
+        image=c.w3act_task_image,
+        command='bash -c "mkdir -p /storage/data_exports && chmod a+rwx /storage/data_exports"',
+        do_xcom_push=False,
+    )
+
+    aclj = DockerOperator(
+        task_id='generate_allows_aclj',
+        image=c.w3act_task_image,
+        command='w3act -d /storage/{{ params.dump_name }} gen-acl /storage/data_exports/allows.aclj.new',
+        do_xcom_push=False,
+    )
+
+    acl = DockerOperator(
+        task_id='generate_allows_acl',
+        image=c.w3act_task_image,
+        command='w3act -d /storage/{{ params.dump_name }} gen-acl --format surts /storage/data_exports/allows.txt.new',
+        do_xcom_push=False,
+    )
+
+    ann = DockerOperator(
+        task_id='generate_solr_indexer_annotations',
+        image=c.w3act_task_image,
+        command='w3act -d /storage/{{ params.dump_name }} gen-annotations /storage/data_exports/annotations.json.new',
+        do_xcom_push=False,
+    )
+
+    blk = DockerOperator(
+        task_id='download_blocks_from_gitlab',
+        image=c.ukwa_task_image,
+        command='curl -o /storage/data_exports/blocks.aclj.new "http://git.wa.bl.uk/bl-services/wayback_excludes_update/-/raw/master/oukwa/acl/blocks.aclj"', 
+        do_xcom_push=False,
+    )
+
+    mvs = DockerOperator(
+        task_id='atomic_update',
+        image=c.w3act_task_image,
+        command="""bash -c "
+mv -f /storage/data_exports/annotations.json.new /storage/data_exports/annotations.json &&
+mv -f /storage/data_exports/allows.txt.new /storage/data_exports/allows.txt &&
+mv -f /storage/data_exports/allows.aclj.new /storage/data_exports/allows.aclj &&
+mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
+        """,
+        do_xcom_push=False,
+    )
+
     # Define workflow dependencies:
-    cleanup >> dump
+    cleanup >> dump >> mkd >> [ acl, aclj, ann, blk] >> mvs
 
 # ----------------------------------------------------------------------------
 # Backup to HDFS

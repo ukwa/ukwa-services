@@ -11,3 +11,5 @@ http://dev1.n45.wa.bl.uk:5050/admin/metrics/
 
 https://eugeneyan.com/writing/why-airflow-jobs-one-day-late/
 
+- All commands should error properly, e.g. raise a non zero exit code, send logs to stderr etc.
+- Use Docker, via DockerOperator, and use this to managed dependencies and limit the parts of the filesystem each task has access to.
