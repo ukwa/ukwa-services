@@ -14,6 +14,6 @@ mkdir -p ${STORAGE_PATH}/postgres
 
 sudo chmod -R a+rwx ${STORAGE_PATH}
 
-export STORAGE_PATH FERNET_KEY
+export STORAGE_PATH FERNET_KEY MANAGE_SENTRY_DSN
 
 docker stack deploy -c docker-compose.yaml airflow

@@ -11,6 +11,7 @@ from airflow.utils.decorators import apply_defaults
 from airflow.utils.dates import days_ago
 from airflow.operators.bash import BashOperator
 from airflow.operators.docker_operator import DockerOperator
+from airflow.operators.python import get_current_context
 
 from _common_ import Config
 
@@ -133,8 +134,37 @@ mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
         do_xcom_push=False,
     )
 
+    @task()
+    def push_w3act_data_stats():
+        from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
+
+        registry = CollectorRegistry()
+        # Gather stats from files:
+        g = Gauge('ukwa_record_count', 'Number of records', ['kind'], registry=registry)
+        def make_line_gauge(g, filename, kind):
+            lines = 0
+            with open(filename) as f:
+                for line in f:
+                    lines += 1
+            g.labels(kind=kind).set(lines)
+        # Files to record:
+        make_line_gauge(g, '/storage/data_exports/allows.txt', 'allows.txt')
+        make_line_gauge(g, '/storage/data_exports/allows.aclj', 'allows.aclj')
+        make_line_gauge(g, '/storage/data_exports/blocks.aclj', 'blocks.aclj')
+        make_line_gauge(g, '/storage/data_exports/annotations.json', 'annotations.json')
+
+        #context = get_current_context()
+ 
+        # Successful task completion timestamp:
+        g = Gauge('ukwa_task_workflow_complete', 'Last time this job (workflow) successfully finished', registry=registry)
+        g.set_to_current_time()
+        # And push:
+        push_to_gateway(c.metrics_push_gateway, job='w3act_export', registry=registry)
+
+    stat = push_w3act_data_stats()
+
     # Define workflow dependencies:
-    cleanup >> dump >> mkd >> [ acl, aclj, ann, blk] >> mvs
+    cleanup >> dump >> mkd >> [ acl, aclj, ann, blk] >> mvs >> stat
 
 # ----------------------------------------------------------------------------
 # Backup to HDFS
@@ -206,6 +236,60 @@ so the access services can download the lastest version.
     # SQL upload goes...
     cleanup >> pg_dump >> upload_sql
 
+
+# ----------------------------------------------------------------------------
+# Run W3ACT QA checks
+# ----------------------------------------------------------------------------
+@dag(
+    default_args=default_args, 
+    schedule_interval='0 8 * * *', 
+    start_date=days_ago(1),
+    catchup=False,
+    params={
+        'host': c.access_w3act_host,
+        'port': c.access_w3act_port,
+        'pw': c.w3act_password,
+        'dump_name': 'w3act_qa_dump',
+        'tag': c.deployment_context.lower()
+    },
+    tags=['ingest', 'w3act']
+)
+def w3act_qa_checks():
+    """
+### W3ACT data QA checks
+
+This runs some QA checks on the database and sends out reports via email as appropriate.
+    """
+
+    # Shared operator definitions:
+    cleanup = W3ACTDumpCleanupOperator()
+    dump = W3ACTDumpOperator()
+
+    to_json =  DockerOperator(
+        task_id='convert_to_json',
+        image=c.w3act_task_image,
+        command='w3act -d /storage/{{ params.dump_name }} csv-to-json',
+        do_xcom_push=False,
+    )
+
+    qa_full = DockerOperator(
+        task_id='run_full_report',
+        image=c.w3act_task_image,
+        command='w3act-qa-check -m "Andrew.Jackson@bl.uk" -f -W /storage/{{ params.dump_name }}.json',
+        do_xcom_push=False,
+    ) 
+
+    qa_short = DockerOperator(
+        task_id='run_full_report',
+        image=c.w3act_task_image,
+        command='w3act-qa-check -m "Andrew.Jackson@bl.uk" -W /storage/{{ params.dump_name }}.json',
+        do_xcom_push=False,
+    ) 
+
+    cleanup >> dump >> to_json >> qa_full >> qa_short
+
+
 # Create the DAGs:
 w3act_backup_dag = w3act_backup()
 w3act_export_dag = w3act_export()
+w3act_qa_checks_dag = w3act_qa_checks()

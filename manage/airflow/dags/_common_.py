@@ -25,6 +25,7 @@ class Config():
     access_webhdfs_user = Variable.get('webhdfs_user', 'access')
     access_w3act_host = Variable.get('access_w3act_host')
     access_w3act_port = Variable.get('access_w3act_port')
+    metrics_push_gateway = Variable.get('metrics_push_gateway')
 
     # Define the common parameters for running Docker tasks:
     hadoop_docker_image = 'ukwa/docker-hadoop:hadoop-0.20'
