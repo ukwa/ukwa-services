@@ -41,7 +41,7 @@ class W3ACTDumpOperator(DockerOperator):
             super().__init__(
                 task_id = 'dump_w3act',
                 image = c.w3act_task_image,
-                command = 'w3act -d /storage/{{ params.dump_name }} get-csv -H {{ params.host }} -P {{ params.port }} -p {{ params.pw }}',
+                command = 'w3act get-csv -d /storage/{{ params.dump_name }} -H {{ params.host }} -P {{ params.port }} -p {{ params.pw }}',
                 do_xcom_push = False,
                 **kwargs)
 
@@ -97,21 +97,21 @@ These are necessary pre-requisites for access processes, like indexing and playb
     aclj = DockerOperator(
         task_id='generate_allows_aclj',
         image=c.w3act_task_image,
-        command='w3act -d /storage/{{ params.dump_name }} gen-acl /storage/data_exports/allows.aclj.new',
+        command='w3act gen-oa-acl -d /storage/{{ params.dump_name }} /storage/data_exports/allows.aclj.new',
         do_xcom_push=False,
     )
 
     acl = DockerOperator(
         task_id='generate_allows_acl',
         image=c.w3act_task_image,
-        command='w3act -d /storage/{{ params.dump_name }} gen-acl --format surts /storage/data_exports/allows.txt.new',
+        command='w3act gen-oa-acl -d /storage/{{ params.dump_name }} --format surts /storage/data_exports/allows.txt.new',
         do_xcom_push=False,
     )
 
     ann = DockerOperator(
         task_id='generate_solr_indexer_annotations',
         image=c.w3act_task_image,
-        command='w3act -d /storage/{{ params.dump_name }} gen-annotations /storage/data_exports/annotations.json.new',
+        command='w3act gen-annotations -d /storage/{{ params.dump_name }} /storage/data_exports/annotations.json.new',
         do_xcom_push=False,
     )
 
@@ -280,7 +280,7 @@ This runs some QA checks on the database and sends out reports via email as appr
     ) 
 
     qa_short = DockerOperator(
-        task_id='run_full_report',
+        task_id='run_short_report',
         image=c.w3act_task_image,
         command='w3act-qa-check -m "Andrew.Jackson@bl.uk" -W /storage/{{ params.dump_name }}.json',
         do_xcom_push=False,
