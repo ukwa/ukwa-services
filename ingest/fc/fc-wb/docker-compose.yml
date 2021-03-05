@@ -11,9 +11,14 @@ services:
       - 8001:8000
     environment:
       - "WARC_PATHS=/heritrix/output,/heritrix/wren"
+      - "TRACKDB_URL=http://solr8.api.wa.bl.uk/solr/tracking"
     volumes:
       - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
       - "${STORAGE_PATH}/heritrix/wren:/heritrix/wren"
+    # To resolve solr8.api.wa.bl.uk
+    dns:
+      - 194.66.236.150
+      - 194.66.236.163
 
   # OpenWayback for QA
   openwayback:
@@ -32,4 +37,17 @@ services:
       - "CDX_INDEX_SERVER=${CDXSERVER_ENDPOINT}"
       - "WAYBACK_URL_PREFIX=http://${WB_HOST}:8080"
       - "WAYBACK_URL_HOST=${WB_HOST}"
+
+  # PyWB for QA
+  pywb:
+    image: ukwa/ukwa-pywb:2.5.x-beta
+    environment:
+      UKWA_INDEX: "cdx+${CDXSERVER_ENDPOINT}"
+      UKWA_ARCHIVE: "webhdfs://warc-server:8000/by-filename/"
+      WEBHDFS_USER: "access"
+    ports:
+      - "7070:8080"
+    volumes:
+      - ./pywb-config.yaml:/webarchive/config.yaml
+
 
