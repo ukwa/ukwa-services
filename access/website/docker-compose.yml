@@ -49,7 +49,6 @@ services:
       - ./config/ukwa-ui/ukwa-ui.properties:/application.properties:ro
     networks:
       - default
-      - access_data_default
 
   # -------------------------------------------------------------
   # OA Wayback configuration:
@@ -180,6 +179,24 @@ services:
     volumes:
       - ${STORAGE_PATH_WEBSITE}/iiif_cache:/var/cache/cantaloupe
 
+  # Collections index for Topics & Themes of the UKWA UI
+  collections_solr:
+    image: ukwa/ukwa-ui-collections-solr:1.1.1
+    user: "${CURRENT_UID}"
+    volumes:
+        - "${STORAGE_PATH_WEBSITE}/collections_solr_cores:/opt/solr/server/solr/mycores"
+        - "${STORAGE_PATH_WEBSITE}/collections_solr_logs:/opt/solr/server/logs"
+    ports:
+        - "9021:8983" # Exposed port so external clients can run checks (TBC)
+
+  # Analyses recent crawl behaviour by processing the crawled data stream:
+  analyse:
+    image: ukwa/crawl-streams
+    user: "${CURRENT_UID}"
+    command: "analyse -k ${KAFKA_BROKER} -u 2 -o /analysis/fc.crawled.json"
+    volumes:
+      - "fc_analysis:/analysis"
+
 # -----------------------------------------
 # Volumes and networks supporting the above
 # -----------------------------------------
@@ -190,6 +207,20 @@ networks:
   default:
     driver: overlay
     attachable: true
-  access_data_default:
-    external: true
 
+volumes:
+
+  # Used to store the exported W3ACT data.
+  w3act_export:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${STORAGE_PATH_SHARED}
+      o: bind
+
+  fc_analysis:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${STORAGE_PATH_WEBSITE}/fc_analysis
+      o: bind
