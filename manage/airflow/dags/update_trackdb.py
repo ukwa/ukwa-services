@@ -28,6 +28,7 @@ def generate_update_dag(path, schedule_interval):
         default_args=default_args, 
         schedule_interval=schedule_interval, 
         start_date=days_ago(1),
+        max_active_runs=1,
         catchup=False,
         params= {
             'path': path,

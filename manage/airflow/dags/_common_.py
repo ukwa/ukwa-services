@@ -45,5 +45,5 @@ class Config():
                 'jobtracker': self.access_hadoop_jobtracker_ip
             },
             'volumes': ['%s:/storage' % self.storage_path ],
-            'auto_remove': True
+            'auto_remove': False # True is a bit aggressive and stops Airflow grabbing logs.
         }   

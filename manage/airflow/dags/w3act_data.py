@@ -60,13 +60,15 @@ class W3ACTDumpOperator(DockerOperator):
     schedule_interval='@hourly',
     start_date=days_ago(1),
     catchup=False,
+    max_active_runs=1,
     params={
         'host': c.access_w3act_host,
         'port': c.access_w3act_port,
         'pw': c.w3act_password,
         'dump_name': 'w3act_export',
         'storage_path': c.storage_path,
-        'tag': c.deployment_context.lower()
+        'collections_solr': 'http://192.168.45.91:9021/solr/collections',
+        'tag': c.deployment_context.lower(),
     },
     tags=['access', 'w3act']
 )
@@ -122,6 +124,13 @@ These are necessary pre-requisites for access processes, like indexing and playb
         do_xcom_push=False,
     )
 
+    socol = DockerOperator(
+        task_id='update_collections_solr',
+        image=c.w3act_task_image,
+        command='w3act update-collections-solr -d /storage/{{ params.dump_name }} {{ params.collections_solr }}',
+        do_xcom_push=False,
+    )
+
     mvs = DockerOperator(
         task_id='atomic_update',
         image=c.w3act_task_image,
@@ -164,7 +173,12 @@ mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
     stat = push_w3act_data_stats()
 
     # Define workflow dependencies:
-    cleanup >> dump >> mkd >> [ acl, aclj, ann, blk] >> mvs >> stat
+    cleanup >> dump >> mkd >> [ acl, aclj, ann, blk ] >> mvs >> socol >> stat
+
+    # To Add
+    # list-urls -f nevercrawl --include-hidden --include-expired -F surts crawl_never.surts
+    # crawl-feed -d /mnt/nfs/data/airflow/w3act_export/ -F jsonl -f all -t bypm --include-hidden crawl_bypm.jsonl
+    # crawl-feed -F jsonl -f all -t npld --include-hidden crawl_feed.jsonl
 
 # ----------------------------------------------------------------------------
 # Backup to HDFS
@@ -174,6 +188,7 @@ mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
     schedule_interval='0 0,12 * * *', # Twice a day
     start_date=days_ago(1),
     catchup=False,
+    max_active_runs=1,
     params={
         'host': c.access_w3act_host,
         'port': c.access_w3act_port,
@@ -245,6 +260,7 @@ so the access services can download the lastest version.
     schedule_interval='0 8 * * *', 
     start_date=days_ago(1),
     catchup=False,
+    max_active_runs=1,
     params={
         'host': c.access_w3act_host,
         'port': c.access_w3act_port,
@@ -268,7 +284,7 @@ This runs some QA checks on the database and sends out reports via email as appr
     to_json =  DockerOperator(
         task_id='convert_to_json',
         image=c.w3act_task_image,
-        command='w3act -d /storage/{{ params.dump_name }} csv-to-json',
+        command='w3act csv-to-json -d /storage/{{ params.dump_name }}',
         do_xcom_push=False,
     )
 

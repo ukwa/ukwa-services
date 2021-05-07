@@ -18,6 +18,7 @@ default_args = {
     default_args=default_args, 
     schedule_interval=None,
     start_date=days_ago(1),
+    max_active_runs=1,
     catchup=False,
     tags=['manage', 'airflow']
 )
