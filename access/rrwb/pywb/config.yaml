@@ -20,16 +20,9 @@ collections:
 
     # Access to internal documents using live web support:
     # TODO Test if this actually works!
-    access:
+    live:
         index: $live
         single-use-lock: true
-
-proxy:
-    # collection for proxy mode
-    coll: archive
-    ca_name: UKWA pywb HTTPS Proxy CA
-    enable_content_rewrite: false
-
 
 # redirect to exact url behavior
 redirect_to_exact: true
@@ -38,7 +31,7 @@ redirect_to_exact: true
 enable_memento: true
 
 # enable experimental Memento Prefer
-enable_prefer: true
+enable_prefer: false
 
 # Locale setup
 locales_root_dir: ./i18n/translations/
