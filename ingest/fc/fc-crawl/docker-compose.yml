@@ -67,7 +67,7 @@ services:
   clamd:
     image: ukwa/clamd
     deploy:
-      replicas: 4
+      replicas: 8
 
   # ----------------------------------------------
   # WARC Proxy
@@ -106,7 +106,8 @@ services:
       - "LC_ALL=en_US.utf8"
       - "WEB_RENDER_TMP=/tmp/webrender"
       - "DOCKER_NETWORK=fc_crawl_webrender_network"
-      - "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.11"
+      - "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.14"
+    #  - "DOCKER_TIMEOUT=900"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # For launching containerised renderers
       - /tmp/webrender:/tmp/webrender
