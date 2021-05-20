@@ -46,7 +46,13 @@ The topics should now show up at e.g. http://crawler04.bl.uk:9000/
 
 ## Heritrix setup
 
-Deploy the services and check they are running:
+The dynamic container-based web rendering services uses a lot of temporary IP addresses, so a dedicated subnet is used:
+
+
+    $ ./create-webrender-network.sh
+
+
+Once this is in place, deploy the services and check they are running:
 
     $ sh deploy-fc-crawl.sh
     $ docker service ls

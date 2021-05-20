@@ -2,25 +2,15 @@ INDEX:   &INDEX ${UKWA_INDEX}
 ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
 
 collections:
-    # NPLD access under /archive/
+    # open access (with access controls) under /archive/
     archive:
+        # CDX Query index for pywb 2.x
+        #index:
+        #    type: cdx
+        #    api_url: 'http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!mimetype:warc/revisit'
+        #    replay_url: https://www.webarchive.org.uk/wayback/archive/{timestamp}id_/{url}
         index_paths: *INDEX
         archive_paths: *ARCHIVE
-
-        acl_paths:
-            - ./acl/blocks.aclj
-
-        default_access: allow
-
-        # up the query limit:
-        query_limit: 100000
-
-proxy:
-    # collection for proxy mode
-    coll: archive
-    ca_name: UKWA pywb HTTPS Proxy CA
-    enable_content_rewrite: false
-
 
 # redirect to exact url behavior
 redirect_to_exact: true
@@ -31,7 +21,6 @@ enable_memento: true
 # enable experimental Memento Prefer
 enable_prefer: true
 
-# Locale setup
 locales_root_dir: ./i18n/translations/
 locales:
   - en

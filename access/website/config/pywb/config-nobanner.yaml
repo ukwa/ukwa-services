@@ -4,7 +4,10 @@ ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
 collections:
     # open access (with access controls) under /archive/
     archive:
-        index_paths: *INDEX
+        index:
+          type: cdx
+          api_url: *INDEX
+          replay_url: ""
         archive_paths: *ARCHIVE
 
         acl_paths:
@@ -13,18 +16,21 @@ collections:
 
         default_access: block
 
+        # up the query limit:
+        query_limit: 100000
+
 proxy:
     # collection for proxy mode
     coll: archive
     ca_name: UKWA pywb HTTPS Proxy CA
-    ca_file_cache: /mnt/nfs/config/gitlab/ukwa-services-env/access/pywb/pywb-ca.pem
+    ca_file_cache: /certs/pywb-ca.pem
     use_banner: false
     enable_banner: false # More recent syntax for upcoming versions
     enable_content_rewrite: false
 
 
 # redirect to exact url behavior
-redirect_to_exact: false
+redirect_to_exact: true
 
 # Disable the frame
 framed_replay: false

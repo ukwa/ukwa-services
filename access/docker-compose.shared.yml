@@ -1,0 +1,28 @@
+# -------------------------------------------------------------
+# This file defines shared resources used across stacks
+# -------------------------------------------------------------
+
+version: '3.2'
+
+# --------------
+# Shared volumes
+# --------------
+volumes:
+
+  # Used to store the exported W3ACT data.
+  w3act_export:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${STORAGE_PATH}/w3act_export
+      o: bind
+
+  # Used to store analysis generated from Kafka, so it can be made available via the API component.
+  # Only transient storage so can be managed entirely by Docker.
+  fc_analysis:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${STORAGE_PATH}/fc_analysis
+      o: bind
+
