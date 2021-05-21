@@ -21,7 +21,7 @@ For the disk volumes attached to the drive, they need to be set up so that they 
 | `/opt/data/cdx`      | 500GB | `io1` | Fast disk (at 3000 IOPS) for the OutbackCDX index of what's been crawled.  Scaling to 1TB+ as needed. |
 | `/heritrix/kafka`    | 1TB   | `st1` | Disks for storing Kafka logs (append-only data files). Scaling to 4TB+ as needed. |
 | `/heritrix/output`   | 5TB   | `st1` | Disks for storing crawler output (append-only data files). |
-| `/heritrix/state `   | 10TB  | `st1` | Disks for storing crawler state (append-only data files). Scaling up in 5TB chunks as needed. |
+| `/heritrix/state `   | 5TB   | `gp2` | Reasonably fast disk for storing crawler state. Scaling up in 5TB chunks as needed. |
 | `/var/lib/docker`    | 256GB | `gp2` | Reasonably fast disk for storing the Docker container state and logs. |
 
 Note that for `gp2` SSD storage, the available IOPS is related to the volume site (see [the AWS docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html)). As the CDX service needs fast disk, but is not that large, it makes more sense to use storage with provisioned IOPS. 
