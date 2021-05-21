@@ -1,67 +1,81 @@
 # Setting up a AWS Cloud server for the Domain Crawl
 
-When running the Domain Crawl on AWS, we need to:
+This current approach to the domain crawl on the cloud runs in a very similar way to running on site. The biggest difference is that rather than having a large machine with large disks from the outset, we manage costs and scale by starting with a small EC2 machine with small EBS volumes, and then allow each to grow over time. For example, for DC 2020 we used this sequence of EC2 instances:
 
-Set nofile limit to 102400 and nproc to unlimited.
-/etc/sysconfig/docker instead. Updated to OPTIONS="--default-ulimit nofile=51200:102400"
+- t3.2xlarge (32GB, 8vcpus, 5Gbe) 
+- m5.4xlarge (64GB, 16vcpus, 10Gbe)
+- m5.8xlarge (128GB, 32vcpus, up to 10Gbe)
 
-Log in as ec2-user and admin via sudo.
+This progression was based on memory usage. At scale, Heritrix3 requires larger and larger amounts of memory as the crawl state grows in size.  When it starts to struggle, e.g. hanging for long periods while garbage collection takes place, it's time to move to an instance with more RAM.
 
-Drives
+## Storage Drives
 
-/opt/data/cdx gp2 SSD with io1 3000 IOPS (maybe up to 6000 later if it's the bottleneck).
-/var/lib/docker? gp2 256gb volume, mounted at /var/lib/docker/
-/heritrix/state grows in 5TB chunks (better performance)
-/ukwa volume with setup on it?
+For the disk volumes attached to the drive, they need to be set up using LVM so that the logical volumes can be grown over time by adding EBS chunks to them. This is particularly important for the state folder, as that tends to grow very large.
 
-/heritrix/scratch 500G, as listed
-/heritrix/kafka 1TB, scaling to 4T later if needed.
-/heritrix/output 5TB, scaling to 10T later if needed.
-/opt/data/cdx 500GB, scaling to 1T later if needed.
+| Mount point          | Initial Size  | Type  | Description   |
+| -------------------- | ----- | ----- | ------------- |
+| `/ukwa`              | 500GB | `gp2` | To store all configuration information and helper scripts etc. |
+| `/heritrix/scratch`  | 500GB | `gp2` | Scratch space used by Heritrix when downloading files. |
+| `/opt/data/cdx`      | 500GB | `io1` | Fast disk (at 3000 IOPS) for the OutbackCDX index of what's been crawled.  Scaling to 1TB+ as needed. |
+| `/heritrix/kafka`    | 1TB   | `st1` | Disks for storing Kafka logs (append-only data files). Scaling to 4TB+ as needed. |
+| `/heritrix/output`   | 5TB   | `st1` | Disks for storing crawler output (append-only data files). Scaling up in 5TB chunks as needed. |
+| `/var/lib/docker`    | 256GB | `gp2` | Reasonably fast disk for storing the Docker container state and logs. |
 
-As of September 29:
+Note that for `gp2` SSD storage, the available IOPS is related to the volume site (see [the AWS docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html)). As the CDX service needs fast disk, but is not that large, it makes more sense to use storage with provisioned IOPS. 
 
-Filesystem Type Size Used Avail Use% Mounted on 
-/dev/nvme0n1p1 ext4 89G 5.8G 83G 7% / 
-/dev/nvme2n1p1 ext4 493G 1.4G 466G 1% /heritrix/scratch 
-/dev/nvme5n1p1 ext4 496G 8.3G 462G 2% /opt/data/cdx 
-/dev/nvme7n1p1 ext4 4.0T 378G 3.4T 10% /heritrix/kafka 
-/dev/nvme8n1p1 ext4 9.9T 3.2T 6.2T 35% /heritrix/output 
-/dev/nvme3n1p1 ext4 494G 602M 468G 1% /ukwa 
-/dev/mapper/state-lv_state xfs 10T 941G 9.1T 10% 
-/heritrix/state /dev/nvme1n1p1 ext4 251G 61M 239G 1% /var/lib/docker
+Here's example showing what the mounted volumes looked like on September 29th during the 2020 crawl:
 
-Looking at the gp2 graph on his page: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html - it looks like the gp2 IOPS tops out at 5TB, so using 5TB chunks would maximise speed. 4TB is pretty darn close though.
+    Filesystem Type Size Used Avail Use% Mounted on 
+    /dev/nvme0n1p1 ext4 89G 5.8G 83G 7% / 
+    /dev/nvme2n1p1 ext4 493G 1.4G 466G 1% /heritrix/scratch 
+    /dev/nvme5n1p1 ext4 496G 8.3G 462G 2% /opt/data/cdx 
+    /dev/nvme7n1p1 ext4 4.0T 378G 3.4T 10% /heritrix/kafka 
+    /dev/nvme8n1p1 ext4 9.9T 3.2T 6.2T 35% /heritrix/output 
+    /dev/nvme3n1p1 ext4 494G 602M 468G 1% /ukwa 
+    /dev/mapper/state-lv_state xfs 10T 941G 9.1T 10% 
+    /heritrix/state /dev/nvme1n1p1 ext4 251G 61M 239G 1% /var/lib/docker
 
-Set up the domain name properly, i.e. BL points crawler07.bl.uk to cloud IP address, and it's registered with AWS so reverse lookups work.
+Note that we experimented with using Amazon EFS for the DC 2020 crawl state but found that latency spikes made it a poor match for Heritrix BDB-JE.
 
-Allow access to specific ports via the dedicated gatway server.
+## System Configuration
 
-Custom TCP TCP 9000 194.66.232.85/32 kafka-ui
-Custom TCP TCP 9191 194.66.232.85/32 prometheus
-Custom TCP TCP 9094 194.66.232.85/32 kafka
-SSH TCP 22 194.66.232.85/32 -
-Custom TCP TCP 8443 194.66.232.85/32 -
-Custom TCP TCP 9090 194.66.232.85/32 cdx
-Custom TCP TCP 8484 194.66.232.85/32 h3-jmx
+The server should be running an up-to-date version of CentOS. It should be configured so staff log in as ec2-user and and administration is done via sudo.
 
-node_exporter
+Docker should be installed, and Swarm mode set up, as almost all components run as Docker Stacks.
 
-Federate metrics into Prometheus
+The `nofile` limit should be 102400 and the `nproc` limited unlimited. For this do apply to services launched under Docker, it is necessary to edit `/etc/sysconfig/docker` to use `OPTIONS="--default-ulimit nofile=51200:102400"`.
 
-Check surts and exclusions. 
-Check GeoIP DB (GeoLite2-City.mmdb) is installed and up to date.
+The `node_exporter` service should be installed for monitoring in Prometheus.
 
-move-to-S3
+## Networking
 
-JE cleaner threads
-je.cleaner.threads to 16 (from the default of 1) - note large numbers went very badly causing memory exhaustion
-Bloom filter
-MAX_RETRIES=4
+To comply with regulations, a suitable domain name (e.g. `crawler07.bl.uk`) should be configured to refer to the Elastic IP address of the crawler, properly registered so that reverse lookups work. e.g.
 
-docker service update dc_crawl_cdxserver --log-driver json-file --log-opt max-size=1g
+    14:12 $ dig crawler07.bl.uk
+    ...
+    crawler07.bl.uk.	7198	IN	A	18.130.205.6
+    ...
 
-t3.2xlarge (32GB, 8vcpus, 5Gbe) 
-m5.4xlarge (64GB, 16vcpus, 10Gbe)
-m5.8xlarge with 32 vcpus and 128GB up to 10Gbe
+    14:47 $ dig -x 18.130.205.6
+    ...
+    6.205.130.18.in-addr.arpa. 299	IN	PTR	crawler07.bl.uk.
+    ...
+
+This means website publishers can identify who is crawling them.
+
+While the server is allowed to make outgoing connections, only a single BL IP address should be able to making connections to the server, for staff to administer the system. Specifically, we should allow access to these ports via the dedicated gatway server.
+
+    Custom TCP TCP 9000 194.66.232.85/32 kafka-ui
+    Custom TCP TCP 9191 194.66.232.85/32 prometheus
+    Custom TCP TCP 9094 194.66.232.85/32 kafka
+    SSH TCP 22 194.66.232.85/32 -
+    Custom TCP TCP 8443 194.66.232.85/32 -
+    Custom TCP TCP 9090 194.66.232.85/32 cdx
+    Custom TCP TCP 8484 194.66.232.85/32 h3-jmx
+
+## Monitoring
+
+The metrics exposed by Prometheus should be federated into our central Prometheus service.
+
+_TBA_ Syntax fo this, and integration of `node_exporter` metrics.
 
