@@ -2,13 +2,13 @@
 
 This current approach to the domain crawl on the cloud runs in a very similar way to running on site. The biggest difference is that rather than having a large machine with large disks from the outset, we manage costs and scale by starting with a small EC2 machine with small EBS volumes, and then allow each to grow over time. For example, for DC 2020 we used this sequence of EC2 instances:
 
-- t3.2xlarge (32GB, 8vcpus, 5Gbe) 
-- m5.4xlarge (64GB, 16vcpus, 10Gbe)
-- m5.8xlarge (128GB, 32vcpus, up to 10Gbe)
+- t3.2xlarge (32GB, 8vcpus, 5Gbps) 
+- m5.4xlarge (64GB, 16vcpus, up to 10Gbps)
+- m5.8xlarge (128GB, 32vcpus, 10Gbps)
 
 This progression was based on memory usage. At scale, Heritrix3 requires larger and larger amounts of memory as the crawl state grows in size.  When it starts to struggle, e.g. hanging for long periods while garbage collection takes place, it's time to move to an instance with more RAM.
 
-To avoid any unexpected variation between EC2 instance types, we will stay within the `m5` family in the future, e.g. kicking off using an `m5.2xlarge` instance.
+To avoid any unexpected variation between EC2 instance types, we will stay within the `m5` family in the future, e.g. kicking off using an `m5.2xlarge` instance (32GB, 8vcpus, up to 10Gbps).
 
 ## Storage Drives
 
