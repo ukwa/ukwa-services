@@ -18,7 +18,8 @@ For the disk volumes attached to the drive, they need to be set up using LVM so 
 | `/heritrix/scratch`  | 500GB | `gp2` | Scratch space used by Heritrix when downloading files. |
 | `/opt/data/cdx`      | 500GB | `io1` | Fast disk (at 3000 IOPS) for the OutbackCDX index of what's been crawled.  Scaling to 1TB+ as needed. |
 | `/heritrix/kafka`    | 1TB   | `st1` | Disks for storing Kafka logs (append-only data files). Scaling to 4TB+ as needed. |
-| `/heritrix/output`   | 5TB   | `st1` | Disks for storing crawler output (append-only data files). Scaling up in 5TB chunks as needed. |
+| `/heritrix/output`   | 5TB   | `st1` | Disks for storing crawler output (append-only data files). |
+| `/heritrix/state `   | 10TB  | `st1` | Disks for storing crawler state (append-only data files). Scaling up in 5TB chunks as needed. |
 | `/var/lib/docker`    | 256GB | `gp2` | Reasonably fast disk for storing the Docker container state and logs. |
 
 Note that for `gp2` SSD storage, the available IOPS is related to the volume site (see [the AWS docs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html)). As the CDX service needs fast disk, but is not that large, it makes more sense to use storage with provisioned IOPS. 
@@ -32,8 +33,8 @@ Here's example showing what the mounted volumes looked like on September 29th du
     /dev/nvme7n1p1 ext4 4.0T 378G 3.4T 10% /heritrix/kafka 
     /dev/nvme8n1p1 ext4 9.9T 3.2T 6.2T 35% /heritrix/output 
     /dev/nvme3n1p1 ext4 494G 602M 468G 1% /ukwa 
-    /dev/mapper/state-lv_state xfs 10T 941G 9.1T 10% 
-    /heritrix/state /dev/nvme1n1p1 ext4 251G 61M 239G 1% /var/lib/docker
+    /dev/mapper/state-lv_state xfs 10T 941G 9.1T 10% /heritrix/state 
+    /dev/nvme1n1p1 ext4 251G 61M 239G 1% /var/lib/docker
 
 Note that we experimented with using Amazon EFS for the DC 2020 crawl state but found that latency spikes made it a poor match for Heritrix BDB-JE.
 
