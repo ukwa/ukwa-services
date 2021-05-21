@@ -12,7 +12,7 @@ To avoid any unexpected variation between EC2 instance types, we will stay withi
 
 ## Storage Drives
 
-For the disk volumes attached to the drive, they need to be set up using LVM so that the logical volumes can be grown over time by adding EBS chunks to them. This is particularly important for the state folder, as that tends to grow very large.
+For the disk volumes attached to the drive, they need to be set up so that they can be grown over time.  For smaller volumes, we can just make the EBS volumes larger and ??? However, the state folder needs to be able to grow very large, perhaps 100TB in size. Therefore,  as EBS volumes cannot be larger than 16TiB, we need to combine multiple EBS chunks into a single logical volume.  For this reason, we use LVM and XFS for the state folder.  
 
 | Mount point          | Initial Size  | Type  | Description   |
 | -------------------- | ----- | ----- | ------------- |
