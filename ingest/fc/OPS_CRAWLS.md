@@ -26,24 +26,26 @@ For all Heritrixes in the Docker Stack: log into the Heritrix3 control UI, and p
 
 ### Checkpoint the job(s)
 
-Via the UI, request a checkpoint. If there's not been one for a while, this can be quite slow (tens of minutes). If it works, a banner should flash up with the checkpoint ID, which should be noted so the crawl can be resumed from the right checkpoint. If the checkpointing fails, the logs will need to be checked for errors.
+Via the UI, request a checkpoint. If there's not been one for a while, this can be quite slow (tens of minutes). If it works, a banner should flash up with the checkpoint ID, which should be noted so the crawl can be resumed from the right checkpoint. If the checkpointing fails, the logs will need to be checked for errors, as unless a new checkpoint is succefully completed, it will likely not be valid.
 
-TBA debug notes.
+As an example, under some circumstances the log rotation does not work correctly. This means non-timestamped log files may be missing, which means when the next checkpoint runs, there are errors like:
 
+    $ docker logs --tail 100 fc_crawl_npld-heritrix-worker.1.h21137sr8l31niwsx3m3o7jri
+    ....
     SEVERE: org.archive.crawler.framework.CheckpointService checkpointFailed  Checkpoint failed [Wed May 19 12:47:13 GMT 2021]
     java.io.IOException: Unable to move /heritrix/output/frequent-npld/20210424211346/logs/runtime-errors.log to /heritrix/output/frequent-npld/20210424211346/logs/runtime-erro
     rs.log.cp00025-20210519124709
 
+These errors can be avoided by adding empty files in the right place, e.g.
+
     touch /mnt/gluster/fc/heritrix/output/frequent-npld/20210424211346/logs/runtime-errors.log
 
-    docker logs --tail 100 fc_crawl_npld-heritrix-worker.1.h21137sr8l31niwsx3m3o7jri
+But immediately re-attempting to checkpoint a paused crawl will usually fail with:
 
     Checkpoint not made -- perhaps no progress since last? (see logs)
 
-    INFO: org.archive.crawler.framework.CheckpointService requestCrawlCheckpoint all finishCheckpoint() completed in 0ms [Wed May 19 12:47:13 GMT 2021]
-    INFO: org.archive.crawler.framework.CheckpointService requestCrawlCheckpoint completed checkpoint cp00025-20210519124709 in 3964ms [Wed May 19 12:47:13 GMT 2021]
-    INFO: org.archive.crawler.framework.CheckpointService requestCrawlCheckpoint no progress since last checkpoint; ignoring [Wed May 19 12:50:13 GMT 2021]
-    no progress since last checkpoint; ignoring
+This is because the system will not attempt a new checkpoint if the crawl state has not changed. Therefore, to force a new checkpoint, it is necessary to briefly un-pause the crawl so some progress is made, then re-pause and re-checkpoint.
+
 
 ### Shutdown
 
