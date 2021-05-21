@@ -66,15 +66,16 @@ To comply with regulations, a suitable domain name (e.g. `crawler07.bl.uk`) shou
 
 This means website publishers can identify who is crawling them.
 
-While the server is allowed to make outgoing connections, only a single BL IP address should be able to making connections to the server, for staff to administer the system. Specifically, we should allow access to these ports via the dedicated gatway server.
+While the server is allowed to make outgoing connections, only a single BL IP address should be able to making connections to the server, for staff to administer the system. Specifically, we should allow access to these ports via the dedicated gatway server:
 
     Custom TCP TCP 9000 194.66.232.85/32 kafka-ui
     Custom TCP TCP 9191 194.66.232.85/32 prometheus
     Custom TCP TCP 9094 194.66.232.85/32 kafka
-    SSH TCP 22 194.66.232.85/32 -
+    SSH    TCP       22 194.66.232.85/32 -
     Custom TCP TCP 8443 194.66.232.85/32 -
     Custom TCP TCP 9090 194.66.232.85/32 cdx
     Custom TCP TCP 8484 194.66.232.85/32 h3-jmx
+    Custom TCP TCP 9100 194.66.232.85/32 node_exporter
 
 ## Monitoring
 
@@ -82,3 +83,5 @@ The metrics exposed by Prometheus should be federated into our central Prometheu
 
 _TBA_ Syntax fo this, and integration of `node_exporter` metrics.
 
+
+https://github.com/ukwa/ukwa-monitor/blob/d9e1852b32402a896b06f9b58f1f95eef28f98e1/monitor/prometheus/prometheus.yml-template#L286-L315
