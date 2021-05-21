@@ -22,6 +22,16 @@ Check in UI too. Restart if not showing up.
 
     docker service update --force fc_kafka_ui
     
+    
+Check surts and exclusions. 
+Check GeoIP DB (GeoLite2-City.mmdb) is installed and up to date.
+
+JE cleaner threads
+je.cleaner.threads to 16 (from the default of 1) - note large numbers went very badly causing memory exhaustion
+Bloom filter
+MAX_RETRIES=4
+
+
 
 #### Shutdown
 
