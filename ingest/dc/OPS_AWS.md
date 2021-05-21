@@ -8,6 +8,8 @@ This current approach to the domain crawl on the cloud runs in a very similar wa
 
 This progression was based on memory usage. At scale, Heritrix3 requires larger and larger amounts of memory as the crawl state grows in size.  When it starts to struggle, e.g. hanging for long periods while garbage collection takes place, it's time to move to an instance with more RAM.
 
+To avoid any unexpected variation between EC2 instance types, we will stay within the `m5` family in the future, e.g. kicking off using an `m5.2xlarge` instance.
+
 ## Storage Drives
 
 For the disk volumes attached to the drive, they need to be set up using LVM so that the logical volumes can be grown over time by adding EBS chunks to them. This is particularly important for the state folder, as that tends to grow very large.
