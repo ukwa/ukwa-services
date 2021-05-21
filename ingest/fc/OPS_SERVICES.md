@@ -1,6 +1,10 @@
 Service Operations
 ==================
 
+move-to-S3
+
+## Docker Stacks
+
 ### Launching the Services
 
 
