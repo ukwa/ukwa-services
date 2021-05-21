@@ -24,13 +24,13 @@ services:
       #- "KAFKA_BOOTSTRAP_SERVERS=kafka-1:9092,kafka-2:9092"
       - "WARC_PREFIX=BL-NPLD"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
-      - "MAX_OUTBACKCDX_CONNECTIONS=1200"
+      - "MAX_OUTBACKCDX_CONNECTIONS=600"
       - "SURTS_SOURCE_FILE=/shared/surts.txt"
       - "SURTS_EXCLUDE_SOURCE_FILE=/shared/excluded-surts.txt"
       - "WEBRENDER_ENABLED=false"
-      - "JAVA_OPTS=-Xms30g -Xmx30g -XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -XX:+UseCompressedOops -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8484 -Dcom.sun.management.jmxremote.rmi.port=8484 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=192.168.45.12"
-      - "MAX_TOE_THREADS=1000"
-      - "WARC_WRITER_POOL_SIZE=200"
+      - "JAVA_OPTS=-Xms56g -Xmx56g -XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -XX:+UseCompressedOops -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8484 -Dcom.sun.management.jmxremote.rmi.port=8484 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=192.168.45.12"
+      - "MAX_TOE_THREADS=500"
+      - "WARC_WRITER_POOL_SIZE=100"
       - "RETIRE_QUEUES=true" # Avoid logging all the over-quota URLs
       - "USER_AGENT_PREFIX=bl.uk_lddc_bot" # Use domain crawl user agent
       - "GEOIP_GB_ENABLED=true" # Allow inclusion based on GeoIP lookup
