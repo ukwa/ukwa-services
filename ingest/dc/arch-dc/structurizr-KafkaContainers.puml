@@ -1,0 +1,66 @@
+@startuml
+title DC Kafka Stack - Containers
+
+skinparam {
+  shadowing false
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  PackageBorderColor<<group>> #cccccc
+  PackageFontColor<<group>> #cccccc
+}
+hide stereotype
+top to bottom direction
+
+skinparam rectangle<<9>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<4>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<5>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<1>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<6>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+
+rectangle "==Staff\n<size:10>[Person]</size>" <<1>> as 1
+rectangle "==DC Crawler Stack\n<size:10>[Software System]</size>\n\nCrawls UK web sites and downloads URIs" <<9>> as 9
+
+package "DC Kafka Stack\n[Software System]" <<3>> {
+  skinparam PackageBorderColor<<3>> #444444
+  skinparam PackageFontColor<<3>> #444444
+
+  rectangle "==Kafka\n<size:10>[Container]</size>" <<4>> as 4
+  rectangle "==Kafka UI\n<size:10>[Container]</size>\n\nhttp://crawler07.bl.uk:9000/" <<5>> as 5
+  rectangle "==Zookeeper\n<size:10>[Container]</size>" <<6>> as 6
+}
+
+9 .[#707070,thickness=2].> 4 : "URLs crawled.\n<size:8>[Kafka]</size>"
+4 .[#707070,thickness=2].> 9 : "URLs to crawl.\n<size:8>[Kafka]</size>"
+9 .[#707070,thickness=2].> 1 : "Collect federated metrics"
+1 .[#707070,thickness=2].> 9 : "Manage Crawls\n<size:8>[HTTPS]</size>"
+1 .[#707070,thickness=2].> 5 : "Check Kafka\n<size:8>[HTTPS]</size>"
+4 .[#707070,thickness=2].> 6 : "Zookeeper Coordination"
+4 .[#707070,thickness=2].> 5 : "Kafka Status"
+@enduml

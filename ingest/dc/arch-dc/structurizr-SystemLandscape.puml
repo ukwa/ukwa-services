@@ -1,0 +1,76 @@
+@startuml
+title System Landscape
+
+skinparam {
+  shadowing false
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  PackageBorderColor<<group>> #cccccc
+  PackageFontColor<<group>> #cccccc
+}
+hide stereotype
+top to bottom direction
+
+skinparam rectangle<<32>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam rectangle<<9>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<3>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<28>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam rectangle<<1>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<2>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<31>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+
+rectangle "==Staff\n<size:10>[Person]</size>" <<1>> as 1
+rectangle "==Websites\n<size:10>[Software System]</size>" <<2>> as 2
+rectangle "==EBS Output Volume\n<size:10>[Software System]</size>\n\nStorage of WARCs, logs, etc." <<28>> as 28
+rectangle "==DC Kafka Stack\n<size:10>[Software System]</size>\n\nManages crawl seed URLs and logs" <<3>> as 3
+rectangle "==move-to-s3.py\n<size:10>[Software System]</size>\n\nUpload WARCs and logs to S3" <<31>> as 31
+rectangle "==Amazon S3 Bucket\n<size:10>[Software System]</size>\n\nLong-term storage of crawl results" <<32>> as 32
+rectangle "==DC Crawler Stack\n<size:10>[Software System]</size>\n\nCrawls UK web sites and downloads URIs" <<9>> as 9
+
+9 .[#707070,thickness=2].> 2 : "Download UK web pages.\n<size:8>[HTTP(S)]</size>"
+9 .[#707070,thickness=2].> 3 : "URLs crawled.\n<size:8>[Kafka]</size>"
+3 .[#707070,thickness=2].> 9 : "URLs to crawl.\n<size:8>[Kafka]</size>"
+9 .[#707070,thickness=2].> 1 : "Collect federated metrics"
+9 .[#707070,thickness=2].> 28 : "Output WARCs and crawl logs."
+28 .[#707070,thickness=2].> 31 : "Find WARCs and logs"
+31 .[#707070,thickness=2].> 32 : "Move WARCs and logs to S3"
+1 .[#707070,thickness=2].> 9 : "Manage Crawls\n<size:8>[HTTPS]</size>"
+1 .[#707070,thickness=2].> 3 : "Check Kafka\n<size:8>[HTTPS]</size>"
+@enduml

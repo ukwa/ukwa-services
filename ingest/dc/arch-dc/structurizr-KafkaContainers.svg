@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="329px" preserveAspectRatio="none" style="width:807px;height:329px;background:#FFFFFF;" version="1.1" viewBox="0 0 807 329" width="807px" zoomAndPan="magnify"><defs/><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacing" textLength="249" x="272.99" y="17.4023">DC Kafka Stack - Containers</text><!--MD5=[872d226ae3a7cc5dd7f113c930bc535b]
+cluster DC Kafka Stack\n[Software System]--><polygon fill="#FFFFFF" points="398.98,27.1992,534.98,27.1992,541.98,66.1758,790.98,66.1758,790.98,322.1992,398.98,322.1992,398.98,27.1992" style="stroke:#444444;stroke-width:1.5;"/><line style="stroke:#444444;stroke-width:1.5;" x1="398.98" x2="541.98" y1="66.1758" y2="66.1758"/><text fill="#444444" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="110" x="412.98" y="42.7344">DC Kafka Stack</text><text fill="#444444" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="130" x="402.98" y="59.2227">[Software System]</text><!--MD5=[ca8cb0432c9090f8973c99138b4c3ca0]
+entity 4--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="74" x="513.98" y="78.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="46" x="527.98" y="103.668">Kafka</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="54" x="523.98" y="116.7109">[Container]</text><!--MD5=[fad6a9c1e4f80769a7fea8e2093188d9]
+entity 5--><rect fill="#FFFFFF" height="83.5977" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="219" x="415.48" y="222.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="68" x="490.98" y="247.668">Kafka UI</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="54" x="497.98" y="260.7109">[Container]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="526.98" y="276.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="199" x="425.48" y="292.8438">http://crawler07.bl.uk:9000/</text><!--MD5=[a92bd7649e35c8a5fd4b3e9f57d24e4a]
+entity 6--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="105" x="669.48" y="238.6992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="85" x="679.48" y="264.168">Zookeeper</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="54" x="694.98" y="277.2109">[Container]</text><!--MD5=[13c7745981a6abb6004f7738a8ca5078]
+entity 1--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="59" x="136.48" y="78.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="38" x="146.98" y="103.668">Staff</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="39" x="146.48" y="116.7109">[Person]</text><!--MD5=[d25218acdea247ba6571a34297258ee9]
+entity 9--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="190" x="128.98" y="214.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="139" x="154.48" y="239.668">DC Crawler Stack</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="180.98" y="252.7109">[Software System]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="225.98" y="268.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="166" x="138.98" y="284.8438">Crawls UK web sites and</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109" x="169.48" y="301.332">downloads URIs</text><!--MD5=[93e4baf6a455bc9fc631d5473a5a5e04]
+link 9 to 4--><path d="M239.92,213.9392 C248.73,194.0992 261.69,172.7492 279.98,159.1992 C315.73,132.7092 441.86,115.9992 508.69,108.7992 " fill="none" id="9-to-4" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="513.79,108.2592,504.4175,105.2332,508.818,108.7878,505.2633,113.1883,513.79,108.2592" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="67" x="280.98" y="170.8672">URLs crawled.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="27" x="300.98" y="180.7109">[Kafka]</text><!--MD5=[e86e91016e2d6c468aa6ffe31bf75a9a]
+link 4 to 9--><path d="M522.95,129.3192 C497.98,151.1092 464.28,180.0692 456.98,184.1992 C415.8,207.4692 366.65,225.3892 324.13,238.2392 " fill="none" id="4-to-9" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="319.25,239.6992,329.0215,240.931,324.0372,238.2559,326.7123,233.2716,319.25,239.6992" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="68" x="487.98" y="170.8672">URLs to crawl.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="27" x="508.48" y="180.7109">[Kafka]</text><!--MD5=[0e92f77bfde26f49f7c3a088fa9dc1e5]
+link 9 to 1--><path d="M128.87,247.1292 C92.57,235.8592 54.72,216.7192 32.98,184.1992 C6,143.8492 83.11,120.8892 130.99,110.8492 " fill="none" id="9-to-1" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="136.11,109.7992,126.4919,107.6796,131.211,110.799,128.0916,115.5181,136.11,109.7992" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="85" x="33.98" y="169.8672">Collect federated</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="36" x="59.98" y="181.6445">metrics</text><!--MD5=[6e0bab73843954fb4eaf6ec2d1f323a6]
+link 1 to 9--><path d="M160.56,129.3592 C158.12,145.4092 156.96,166.5492 162.98,184.1992 C165.95,192.9192 170.32,201.4192 175.38,209.4192 " fill="none" id="1-to-9" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="178.25,213.8192,176.6628,204.0991,175.5095,209.6371,169.9715,208.4839,178.25,213.8192" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="75" x="163.98" y="170.8672">Manage Crawls</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="30" x="186.48" y="180.7109">[HTTPS]</text><!--MD5=[45e14ffedb66253ed47de39e4f78fbf8]
+link 1 to 5--><path d="M195.78,109.7592 C233.81,117.0192 300.91,132.5292 352.98,159.1992 C369.04,167.4292 369.96,174.1792 384.98,184.1992 C403.32,196.4392 423.68,208.6492 443.06,219.6892 " fill="none" id="1-to-5" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="447.44,222.1692,441.5851,214.2496,443.0909,219.7024,437.6381,221.2081,447.44,222.1692" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="62" x="385.98" y="170.8672">Check Kafka</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="30" x="401.98" y="180.7109">[HTTPS]</text><!--MD5=[f13c3ab577a688343a149026a232f91b]
+link 4 to 6--><path d="M588.06,123.4892 C604.86,132.9592 624.4,145.3592 639.98,159.1992 C664.96,181.3892 688,211.8992 703.25,234.1292 " fill="none" id="4-to-6" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="706.2,238.4592,704.4359,228.7696,703.3838,234.3278,697.8256,233.2756,706.2,238.4592" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="52" x="666.98" y="169.8672">Zookeeper</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="63" x="662.98" y="181.6445">Coordination</text><!--MD5=[fb7a877824a531edc27ce1774c90edf7]
+link 4 to 5--><path d="M561.65,129.5392 C567.01,145.2792 571.51,166.0292 566.98,184.1992 C564.15,195.5392 559.36,207.0392 553.99,217.6292 " fill="none" id="4-to-5" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="551.67,222.0992,559.3598,215.9456,553.9687,217.6589,552.2554,212.2678,551.67,222.0992" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="62" x="568.98" y="175.8672">Kafka Status</text><!--MD5=[4b7c764b5c54eb55657df8c045fdacc9]
+@startuml
+title DC Kafka Stack - Containers
+
+skinparam {
+  shadowing false
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  PackageBorderColor<<group>> #cccccc
+  PackageFontColor<<group>> #cccccc
+}
+hide stereotype
+top to bottom direction
+
+skinparam rectangle<<9>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<4>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<5>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<1>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<6>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+
+rectangle "==Staff\n<size:10>[Person]</size>" <<1>> as 1
+rectangle "==DC Crawler Stack\n<size:10>[Software System]</size>\n\nCrawls UK web sites and downloads URIs" <<9>> as 9
+
+package "DC Kafka Stack\n[Software System]" <<3>> {
+  skinparam PackageBorderColor<<3>> #444444
+  skinparam PackageFontColor<<3>> #444444
+
+  rectangle "==Kafka\n<size:10>[Container]</size>" <<4>> as 4
+  rectangle "==Kafka UI\n<size:10>[Container]</size>\n\nhttp://crawler07.bl.uk:9000/" <<5>> as 5
+  rectangle "==Zookeeper\n<size:10>[Container]</size>" <<6>> as 6
+}
+
+9 .[#707070,thickness=2].> 4 : "URLs crawled.\n<size:8>[Kafka]</size>"
+4 .[#707070,thickness=2].> 9 : "URLs to crawl.\n<size:8>[Kafka]</size>"
+9 .[#707070,thickness=2].> 1 : "Collect federated metrics"
+1 .[#707070,thickness=2].> 9 : "Manage Crawls\n<size:8>[HTTPS]</size>"
+1 .[#707070,thickness=2].> 5 : "Check Kafka\n<size:8>[HTTPS]</size>"
+4 .[#707070,thickness=2].> 6 : "Zookeeper Coordination"
+4 .[#707070,thickness=2].> 5 : "Kafka Status"
+@enduml
+
+PlantUML version 1.2021.7(Sun May 23 13:40:07 BST 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: GB
+--></g></svg>
