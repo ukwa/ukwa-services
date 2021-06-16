@@ -19,3 +19,7 @@ https://eugeneyan.com/writing/why-airflow-jobs-one-day-late/
     - https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/errors.html
     - https://docs.sentry.io/platforms/python/guides/flask/configuration/options/
 
+
+ssh root@gluster-fuse python3 -u - /mnt/gluster/fc < warcprox_warc_mv.py
+
+
