@@ -12,6 +12,7 @@ from airflow.utils.dates import days_ago
 from airflow.operators.bash import BashOperator
 from airflow.operators.docker_operator import DockerOperator
 from airflow.operators.python import get_current_context
+from airflow.models import Variable, Connection
 
 from _common_ import Config
 
@@ -20,6 +21,9 @@ c = Config()
 
 # These args will get passed on to each operator/task:
 default_args = c.get_default_args_for_access()
+
+# Connection to W3ACT PostgreSQL DB to use:
+access_w3act = Connection.get_connection_from_secrets("access_w3act")
 
 # ----------------------------------------------------------------------------
 # Define common tasks as Operators:
@@ -62,9 +66,9 @@ class W3ACTDumpOperator(DockerOperator):
     catchup=False,
     max_active_runs=1,
     params={
-        'host': c.access_w3act_host,
-        'port': c.access_w3act_port,
-        'pw': c.w3act_password,
+        'host': access_w3act.host,
+        'port': access_w3act.port,
+        'pw': access_w3act.password,
         'dump_name': 'w3act_export',
         'storage_path': c.storage_path,
         'collections_solr': 'http://192.168.45.91:9021/solr/collections',
@@ -168,7 +172,7 @@ mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
         g = Gauge('ukwa_task_workflow_complete', 'Last time this job (workflow) successfully finished', registry=registry)
         g.set_to_current_time()
         # And push:
-        push_to_gateway(c.metrics_push_gateway, job='w3act_export', registry=registry)
+        push_to_gateway(c.push_gateway, job='w3act_export', registry=registry)
 
     stat = push_w3act_data_stats()
 
@@ -190,9 +194,9 @@ mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
     catchup=False,
     max_active_runs=1,
     params={
-        'host': c.access_w3act_host,
-        'port': c.access_w3act_port,
-        'pw': c.w3act_password,
+        'host': access_w3act.host,
+        'port': access_w3act.port,
+        'pw': access_w3act.password,
         'dump_name': 'w3act_dump',
         'tag': c.deployment_context.lower()
     },
@@ -262,9 +266,9 @@ so the access services can download the lastest version.
     catchup=False,
     max_active_runs=1,
     params={
-        'host': c.access_w3act_host,
-        'port': c.access_w3act_port,
-        'pw': c.w3act_password,
+        'host': access_w3act.host,
+        'port': access_w3act.port,
+        'pw': access_w3act.password,
         'dump_name': 'w3act_qa_dump',
         'tag': c.deployment_context.lower()
     },

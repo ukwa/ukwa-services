@@ -22,4 +22,7 @@ https://eugeneyan.com/writing/why-airflow-jobs-one-day-late/
 
 ssh root@gluster-fuse python3 -u - /mnt/gluster/fc < warcprox_warc_mv.py
 
+[root@ingest airflow]# useradd -g docker ingest
+[root@ingest airflow]# id ingest
+uid=1002(ingest) gid=989(docker) groups=989(docker)
 

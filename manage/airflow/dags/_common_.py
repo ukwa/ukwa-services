@@ -4,14 +4,13 @@
 This file holds values and variables that are shared across DAGs.
 """ 
 import os
-from airflow.models import Variable
+from airflow.models import Variable, Connection
 
 class Config():
 
     # Pick up definitions for the deployment context, and secrets:
     deployment_context = os.environ['DEPLOYMENT_CONTEXT']
     storage_path = os.environ['STORAGE_PATH']
-    w3act_password = os.environ['W3ACT_PSQL_PASSWORD'].strip('"') # Strip off any accidental quoting 
 
     # Define the parameters that you might want to change within a given deployment:
     # TODO This can overload the metadata DB when there are a lot of parameters,
@@ -23,9 +22,7 @@ class Config():
     access_hadoop_jobtracker_ip = Variable.get('hadoop_jobtracker_ip')
     access_webhdfs_url = Variable.get('webhdfs_url', 'http://webhdfs.api.wa.bl.uk/')
     access_webhdfs_user = Variable.get('webhdfs_user', 'access')
-    access_w3act_host = Variable.get('access_w3act_host')
-    access_w3act_port = Variable.get('access_w3act_port')
-    metrics_push_gateway = Variable.get('metrics_push_gateway')
+    push_gateway = Variable.get('metrics_push_gateway')
 
     # Define the common parameters for running Docker tasks:
     hadoop_docker_image = 'ukwa/docker-hadoop:hadoop-0.20'
