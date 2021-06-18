@@ -1,0 +1,136 @@
+@startuml
+title Deployment - Live
+
+skinparam {
+  shadowing false
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  PackageBorderColor<<group>> #cccccc
+  PackageFontColor<<group>> #cccccc
+}
+hide stereotype
+left to right direction
+
+skinparam node<<44>> {
+  BackgroundColor #ffffff
+  FontColor #d86613
+  BorderColor #d86613
+  roundCorner 20
+}
+skinparam rectangle<<55>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam node<<41>> {
+  BackgroundColor #ffffff
+  FontColor #232f3e
+  BorderColor #232f3e
+  roundCorner 20
+}
+skinparam node<<57>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #888888
+  roundCorner 20
+}
+skinparam rectangle<<58>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<46>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<48>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam node<<45>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #888888
+  roundCorner 20
+}
+skinparam rectangle<<51>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam node<<42>> {
+  BackgroundColor #ffffff
+  FontColor #147eba
+  BorderColor #147eba
+  roundCorner 20
+}
+skinparam node<<39>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #888888
+  roundCorner 20
+}
+skinparam node<<43>> {
+  BackgroundColor #ffffff
+  FontColor #d86613
+  BorderColor #d86613
+  roundCorner 20
+}
+skinparam rectangle<<40>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<53>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+
+node "BL Access Server\n[Deployment Node]" <<57>> as 57 {
+  rectangle "==BL Staff\n<size:10>[Infrastructure Node: Boston Spa]</size>" <<58>> as 58
+}
+
+node "Public Internet\n[Deployment Node]" <<39>> as 39 {
+  rectangle "==Websites\n<size:10>[Software System]</size>" <<40>> as 40
+}
+
+node "Amazon Web Services\n[Deployment Node]" <<41>> as 41 {
+  node "EU-West-2\n[Deployment Node]" <<42>> as 42 {
+    node "Static IP\n[Deployment Node: Registered as crawler07.bl.uk]" <<43>> as 43 {
+      node "Amazon EC2\n[Deployment Node]" <<44>> as 44 {
+        node "Docker Swarm\n[Deployment Node]" <<45>> as 45 {
+          rectangle "==DC Crawler Stack\n<size:10>[Software System]</size>\n\nCrawls UK web sites and downloads URIs" <<46>> as 46
+          rectangle "==DC Kafka Stack\n<size:10>[Software System]</size>\n\nManages crawl seed URLs and logs" <<48>> as 48
+        }
+
+        rectangle "==EBS Output Volume\n<size:10>[Software System]</size>\n\nStorage of WARCs, logs, etc." <<51>> as 51
+        rectangle "==move-to-s3.py\n<size:10>[Software System]</size>\n\nUpload WARCs and logs to S3" <<53>> as 53
+      }
+
+    }
+
+    rectangle "==Amazon S3 Bucket\n<size:10>[Software System]</size>\n\nLong-term storage of crawl results" <<55>> as 55
+  }
+
+}
+
+46 .[#707070,thickness=2].> 40 : "Download UK web pages.\n<size:8>[HTTP(S)]</size>"
+48 .[#707070,thickness=2].> 46 : "URLs to crawl.\n<size:8>[Kafka]</size>"
+46 .[#707070,thickness=2].> 48 : "URLs crawled.\n<size:8>[Kafka]</size>"
+46 .[#707070,thickness=2].> 51 : "Output WARCs and crawl logs."
+51 .[#707070,thickness=2].> 53 : "Find WARCs and logs"
+53 .[#707070,thickness=2].> 55 : "Move WARCs and logs to S3"
+58 .[#707070,thickness=2].> 44 : "Connects to\n<size:8>[HTTP(S), SSH]</size>"
+@enduml

@@ -1,0 +1,89 @@
+@startuml
+title DC Crawler Stack - Containers
+
+skinparam {
+  shadowing false
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  PackageBorderColor<<group>> #cccccc
+  PackageFontColor<<group>> #cccccc
+}
+hide stereotype
+top to bottom direction
+
+skinparam rectangle<<11>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<3>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<28>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam rectangle<<10>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<12>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<13>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<1>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<2>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+
+rectangle "==Staff\n<size:10>[Person]</size>" <<1>> as 1
+rectangle "==Websites\n<size:10>[Software System]</size>" <<2>> as 2
+rectangle "==DC Kafka Stack\n<size:10>[Software System]</size>\n\nManages crawl seed URLs and logs" <<3>> as 3
+rectangle "==EBS Output Volume\n<size:10>[Software System]</size>\n\nStorage of WARCs, logs, etc." <<28>> as 28
+
+package "DC Crawler Stack\n[Software System]" <<9>> {
+  skinparam PackageBorderColor<<9>> #444444
+  skinparam PackageFontColor<<9>> #444444
+
+  rectangle "==Heritrix3\n<size:10>[Container: Java Spring]</size>\n\nWeb Crawler - https://crawler07.bl.uk:8443/" <<10>> as 10
+  rectangle "==ClamAV\n<size:10>[Container]</size>\n\nScan crawled content for viruses" <<11>> as 11
+  rectangle "==OutbackCDX\n<size:10>[Container: Java]</size>\n\nRecord crawled URLs and outcome - http://crawler07.bl.uk:9090/" <<12>> as 12
+  rectangle "==Prometheus\n<size:10>[Container]</size>\n\nRecord metrics for monitoring and alerts - http://crawler07.bl.uk:9191/" <<13>> as 13
+}
+
+10 .[#707070,thickness=2].> 2 : "Download UK web pages.\n<size:8>[HTTP(S)]</size>"
+10 .[#707070,thickness=2].> 3 : "URLs crawled.\n<size:8>[Kafka]</size>"
+3 .[#707070,thickness=2].> 10 : "URLs to crawl.\n<size:8>[Kafka]</size>"
+10 .[#707070,thickness=2].> 11 : "Scan content for viruses."
+13 .[#707070,thickness=2].> 10 : "Collect crawler metrics"
+13 .[#707070,thickness=2].> 1 : "Collect federated metrics"
+10 .[#707070,thickness=2].> 28 : "Output WARCs and crawl logs."
+1 .[#707070,thickness=2].> 10 : "Manage Crawls\n<size:8>[HTTPS]</size>"
+1 .[#707070,thickness=2].> 3 : "Check Kafka\n<size:8>[HTTPS]</size>"
+@enduml

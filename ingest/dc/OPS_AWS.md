@@ -10,6 +10,12 @@ This progression was based on memory usage. At scale, Heritrix3 requires larger 
 
 To avoid any unexpected variation between EC2 instance types, we will stay within the `m5` family in the future, e.g. kicking off using an `m5.2xlarge` instance (32GB, 8vcpus, up to 10Gbps).
 
+## Overall Architecture
+
+The overall AWS deployment architecture looks like this (although note that for clarity, only the storage drive dedicated to crawler output is shown, see below for more details):
+
+![AWS DC Deployment](arch-dc/structurizr-AmazonWebServicesDeployment.svg)
+
 ## Storage Drives
 
 For the disk volumes attached to the drive, they need to be set up so that they can be grown over time.  For smaller volumes, we can just make the EBS volumes larger and grow the `ext4` filesystems to make use of the space. However, the state folder needs to be able to grow very large, perhaps 100TB in size. Therefore,  as EBS volumes cannot be larger than 16TiB, we need to combine multiple EBS chunks into a single logical volume.  For this reason, we use LVM and XFS for the state folder, as we are comforable managing large volumes using those tools. 

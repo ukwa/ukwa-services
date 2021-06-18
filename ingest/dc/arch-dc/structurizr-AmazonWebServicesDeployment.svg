@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="859px" preserveAspectRatio="none" style="width:1828px;height:859px;background:#FFFFFF;" version="1.1" viewBox="0 0 1828 859" width="1828px" zoomAndPan="magnify"><defs/><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacing" textLength="160" x="827.5" y="17.4023">Deployment - Live</text><!--MD5=[5e7499b61e51c12677a9a3cb9014493f]
+cluster 57--><polygon fill="#FFFFFF" points="16,544.1992,26,534.1992,231,534.1992,231,648.1992,221,658.1992,16,658.1992,16,544.1992" style="stroke:#888888;stroke-width:1.5;"/><line style="stroke:#888888;stroke-width:1.5;" x1="221" x2="231" y1="544.1992" y2="534.1992"/><line style="stroke:#888888;stroke-width:1.5;" x1="16" x2="221" y1="544.1992" y2="544.1992"/><line style="stroke:#888888;stroke-width:1.5;" x1="221" x2="221" y1="544.1992" y2="658.1992"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="119" x="60" y="560.7344">BL Access Server</text><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="139" x="50" y="577.2227">[Deployment Node]</text><!--MD5=[fe13b9cf40c2e42e0f32885fe062e237]
+cluster 39--><polygon fill="#FFFFFF" points="806,738.1992,816,728.1992,1021,728.1992,1021,842.1992,1011,852.1992,806,852.1992,806,738.1992" style="stroke:#888888;stroke-width:1.5;"/><line style="stroke:#888888;stroke-width:1.5;" x1="1011" x2="1021" y1="738.1992" y2="728.1992"/><line style="stroke:#888888;stroke-width:1.5;" x1="806" x2="1011" y1="738.1992" y2="738.1992"/><line style="stroke:#888888;stroke-width:1.5;" x1="1011" x2="1011" y1="738.1992" y2="852.1992"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="106" x="856.5" y="754.7344">Public Internet</text><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="139" x="840" y="771.2227">[Deployment Node]</text><!--MD5=[3a0545b735d515d2263a1cf4db602e83]
+cluster 41--><polygon fill="#FFFFFF" points="323,37.1992,333,27.1992,1811,27.1992,1811,694.1992,1801,704.1992,323,704.1992,323,37.1992" style="stroke:#232F3E;stroke-width:1.5;"/><line style="stroke:#232F3E;stroke-width:1.5;" x1="1801" x2="1811" y1="37.1992" y2="27.1992"/><line style="stroke:#232F3E;stroke-width:1.5;" x1="323" x2="1801" y1="37.1992" y2="37.1992"/><line style="stroke:#232F3E;stroke-width:1.5;" x1="1801" x2="1801" y1="37.1992" y2="704.1992"/><text fill="#232F3E" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="156" x="985" y="53.7344">Amazon Web Services</text><text fill="#232F3E" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="139" x="993.5" y="70.2227">[Deployment Node]</text><!--MD5=[1819480abcc81c2aa1330b62ff02af10]
+cluster 42--><polygon fill="#FFFFFF" points="347,101.1992,357,91.1992,1787,91.1992,1787,670.1992,1777,680.1992,347,680.1992,347,101.1992" style="stroke:#147EBA;stroke-width:1.5;"/><line style="stroke:#147EBA;stroke-width:1.5;" x1="1777" x2="1787" y1="101.1992" y2="91.1992"/><line style="stroke:#147EBA;stroke-width:1.5;" x1="347" x2="1777" y1="101.1992" y2="101.1992"/><line style="stroke:#147EBA;stroke-width:1.5;" x1="1777" x2="1777" y1="101.1992" y2="680.1992"/><text fill="#147EBA" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="80" x="1023" y="117.7344">EU-West-2</text><text fill="#147EBA" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="139" x="993.5" y="134.2227">[Deployment Node]</text><!--MD5=[ce25ddfd507f130ccfe537edd6c22b52]
+cluster 43--><polygon fill="#FFFFFF" points="371,165.1992,381,155.1992,1424,155.1992,1424,646.1992,1414,656.1992,371,656.1992,371,165.1992" style="stroke:#D86613;stroke-width:1.5;"/><line style="stroke:#D86613;stroke-width:1.5;" x1="1414" x2="1424" y1="165.1992" y2="155.1992"/><line style="stroke:#D86613;stroke-width:1.5;" x1="371" x2="1414" y1="165.1992" y2="165.1992"/><line style="stroke:#D86613;stroke-width:1.5;" x1="1414" x2="1414" y1="165.1992" y2="656.1992"/><text fill="#D86613" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="59" x="864" y="181.7344">Static IP</text><text fill="#D86613" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="358" x="714.5" y="198.2227">[Deployment Node: Registered as crawler07.bl.uk]</text><!--MD5=[c3a6b378b0c28ede87fe10965d214753]
+cluster 44--><polygon fill="#FFFFFF" points="403,237.1992,413,227.1992,1392,227.1992,1392,614.1992,1382,624.1992,403,624.1992,403,237.1992" style="stroke:#D86613;stroke-width:1.5;"/><line style="stroke:#D86613;stroke-width:1.5;" x1="1382" x2="1392" y1="237.1992" y2="227.1992"/><line style="stroke:#D86613;stroke-width:1.5;" x1="403" x2="1382" y1="237.1992" y2="237.1992"/><line style="stroke:#D86613;stroke-width:1.5;" x1="1382" x2="1382" y1="237.1992" y2="624.1992"/><text fill="#D86613" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="90" x="848.5" y="253.7344">Amazon EC2</text><text fill="#D86613" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="139" x="824" y="270.2227">[Deployment Node]</text><!--MD5=[20dd00188fdd35b12f0ffded2638ee64]
+cluster 45--><polygon fill="#FFFFFF" points="435,401.1992,445,391.1992,1028,391.1992,1028,574.1992,1018,584.1992,435,584.1992,435,401.1992" style="stroke:#888888;stroke-width:1.5;"/><line style="stroke:#888888;stroke-width:1.5;" x1="1018" x2="1028" y1="401.1992" y2="391.1992"/><line style="stroke:#888888;stroke-width:1.5;" x1="435" x2="1018" y1="401.1992" y2="401.1992"/><line style="stroke:#888888;stroke-width:1.5;" x1="1018" x2="1018" y1="401.1992" y2="584.1992"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="103" x="676" y="417.7344">Docker Swarm</text><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="139" x="658" y="434.2227">[Deployment Node]</text><!--MD5=[b77f1bcdfe8de2ca473730e265daf45f]
+entity 58--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="180" x="33" y="590.6992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="62" x="92" y="616.168">BL Staff</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="160" x="43" y="629.2109">[Infrastructure Node: Boston Spa]</text><!--MD5=[abf5b0e770fa05318d49fc05e1da7dc3]
+entity 40--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="106" x="860" y="784.6992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="72" x="877" y="810.168">Websites</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="870" y="823.2109">[Software System]</text><!--MD5=[16329166e472be2af699f24420d0c64c]
+entity 55--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#3F8624;stroke-width:1.5;" width="212" x="1559" y="291.1992"/><text fill="#3F8624" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="152" x="1589" y="316.668">Amazon S3 Bucket</text><text fill="#3F8624" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="1622" y="329.7109">[Software System]</text><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="1667" y="345.3555"/><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="188" x="1569" y="361.8438">Long-term storage of crawl</text><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="46" x="1642" y="378.332">results</text><!--MD5=[05029f5f3539f060bf3c641bc1524656]
+entity 51--><rect fill="#FFFFFF" height="83.5977" rx="10" ry="10" style="stroke:#3F8624;stroke-width:1.5;" width="212" x="807" y="291.1992"/><text fill="#3F8624" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="159" x="833.5" y="316.668">EBS Output Volume</text><text fill="#3F8624" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="870" y="329.7109">[Software System]</text><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="915" y="345.3555"/><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="192" x="817" y="361.8438">Storage of WARCs, logs, etc.</text><!--MD5=[cb17b9daf45012d0960df784160eb48d]
+entity 53--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="206" x="1162" y="291.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="124" x="1203" y="316.668">move-to-s3.py</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="1222" y="329.7109">[Software System]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="1267" y="345.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="182" x="1172" y="361.8438">Upload WARCs and logs to</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="17" x="1256.5" y="378.332">S3</text><!--MD5=[d3d43cb181f4ea2344ed426852159dc2]
+entity 46--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="190" x="451" y="458.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="139" x="476.5" y="483.668">DC Crawler Stack</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="503" y="496.7109">[Software System]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="548" y="512.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="166" x="461" y="528.8438">Crawls UK web sites and</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109" x="491.5" y="545.332">downloads URIs</text><!--MD5=[c6f51d7726d45d5e6e468333d03a328c]
+entity 48--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="198" x="814" y="458.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="123" x="851.5" y="483.668">DC Kafka Stack</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="870" y="496.7109">[Software System]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="915" y="512.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="174" x="824" y="528.8438">Manages crawl seed URLs</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="59" x="883.5" y="545.332">and logs</text><!--MD5=[756d327866e3bcd1b57373d9060c3fae]
+link 46 to 40--><path d="M635.43,558.2192 C637.32,559.5392 639.18,560.8692 641,562.1992 C691.13,598.8492 821.79,723.2292 881.47,780.6792 " fill="none" id="46-to-40" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="885.3,784.3592,881.5979,775.2326,881.7008,780.8885,876.0449,780.9914,885.3,784.3592" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="88" x="674" y="566.8672">Download UK web</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="32" x="703.5" y="578.6445">pages.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="36" x="701.5" y="588.4883">[HTTP(S)]</text><!--MD5=[c7b77e693139d503992f74e2565ab8aa]
+link 48 to 46--><path d="M813.78,508.1992 C762.05,508.1992 698.75,508.1992 646.78,508.1992 " fill="none" id="48-to-46" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="641.47,508.1992,650.47,512.1992,646.47,508.1992,650.47,504.1992,641.47,508.1992" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="68" x="685.5" y="495.8672">URLs to crawl.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="27" x="706" y="505.7109">[Kafka]</text><!--MD5=[618b0042d94490dc2d65593e4c239960]
+link 46 to 48--><path d="M641.33,534.3092 C651.29,536.3092 661.31,538.0092 671,539.1992 C713.79,544.4692 725.13,543.7592 768,539.1992 C781.25,537.7892 795.07,535.6692 808.68,533.1892 " fill="none" id="46-to-48" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="813.68,532.2592,804.1002,529.9729,808.7643,533.1738,805.5635,537.8379,813.68,532.2592" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="67" x="686" y="526.8672">URLs crawled.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="27" x="706" y="536.7109">[Kafka]</text><!--MD5=[085aed8e2450da9214d275f6ff91c32a]
+link 46 to 51--><path d="M641.47,462.9092 C696.33,436.6092 765.13,403.6092 819.63,377.4892 " fill="none" id="46-to-51" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="824.19,375.2992,814.3456,375.5958,819.6842,377.4666,817.8134,382.8051,824.19,375.2992" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="92" x="672" y="390.8672">Output WARCs and</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="52" x="693.5" y="402.6445">crawl logs.</text><!--MD5=[abd76b3878a5be92afc42e51c027b521]
+link 51 to 53--><path d="M1019.01,335.5992 C1062.54,336.5992 1112.98,337.7492 1156.74,338.7492 " fill="none" id="51-to-53" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="1161.77,338.8592,1152.8638,334.6546,1156.7713,338.745,1152.6809,342.6525,1161.77,338.8592" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="78" x="1050" y="322.8672">Find WARCs and</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="20" x="1080.5" y="334.6445">logs</text><!--MD5=[9557c8268682f75b3df29e413e401e55]
+link 53 to 55--><path d="M1368.24,341.1992 C1425.02,341.1992 1495.71,341.1992 1553.73,341.1992 " fill="none" id="53-to-55" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="1558.95,341.1992,1549.95,337.1992,1553.95,341.1992,1549.95,345.1992,1558.95,341.1992" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="84" x="1441" y="326.8672">Move WARCs and</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="47" x="1461" y="338.6445">logs to S3</text><!--MD5=[492192190279401bc2535fd5299fb381]
+link 58 to 44--><path d="M213.03,616.1992 C243.4325,616.1992 278.9763,616.1992 315.2895,616.1992 C333.4462,616.1992 351.7952,616.1992 369.7901,616.1992 C378.7876,616.1992 387.6966,616.1992 396.4487,616.1992 C398.6367,616.1992 400.8149,616.1992 402.9823,616.1992 " fill="none" id="58-to-44" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="402.9823,616.1992,393.9823,612.1992,397.9823,616.1992,393.9823,620.1992,402.9823,616.1992" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="58" x="248" y="603.8672">Connects to</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="56" x="249" y="613.7109">[HTTP(S), SSH]</text><!--MD5=[40ae86953ff1de4919920c0c373e0b0b]
+@startuml
+title Deployment - Live
+
+skinparam {
+  shadowing false
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  PackageBorderColor<<group>> #cccccc
+  PackageFontColor<<group>> #cccccc
+}
+hide stereotype
+left to right direction
+
+skinparam node<<44>> {
+  BackgroundColor #ffffff
+  FontColor #d86613
+  BorderColor #d86613
+  roundCorner 20
+}
+skinparam rectangle<<55>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam node<<41>> {
+  BackgroundColor #ffffff
+  FontColor #232f3e
+  BorderColor #232f3e
+  roundCorner 20
+}
+skinparam node<<57>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #888888
+  roundCorner 20
+}
+skinparam rectangle<<58>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<46>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<48>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam node<<45>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #888888
+  roundCorner 20
+}
+skinparam rectangle<<51>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam node<<42>> {
+  BackgroundColor #ffffff
+  FontColor #147eba
+  BorderColor #147eba
+  roundCorner 20
+}
+skinparam node<<39>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #888888
+  roundCorner 20
+}
+skinparam node<<43>> {
+  BackgroundColor #ffffff
+  FontColor #d86613
+  BorderColor #d86613
+  roundCorner 20
+}
+skinparam rectangle<<40>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<53>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+
+node "BL Access Server\n[Deployment Node]" <<57>> as 57 {
+  rectangle "==BL Staff\n<size:10>[Infrastructure Node: Boston Spa]</size>" <<58>> as 58
+}
+
+node "Public Internet\n[Deployment Node]" <<39>> as 39 {
+  rectangle "==Websites\n<size:10>[Software System]</size>" <<40>> as 40
+}
+
+node "Amazon Web Services\n[Deployment Node]" <<41>> as 41 {
+  node "EU-West-2\n[Deployment Node]" <<42>> as 42 {
+    node "Static IP\n[Deployment Node: Registered as crawler07.bl.uk]" <<43>> as 43 {
+      node "Amazon EC2\n[Deployment Node]" <<44>> as 44 {
+        node "Docker Swarm\n[Deployment Node]" <<45>> as 45 {
+          rectangle "==DC Crawler Stack\n<size:10>[Software System]</size>\n\nCrawls UK web sites and downloads URIs" <<46>> as 46
+          rectangle "==DC Kafka Stack\n<size:10>[Software System]</size>\n\nManages crawl seed URLs and logs" <<48>> as 48
+        }
+
+        rectangle "==EBS Output Volume\n<size:10>[Software System]</size>\n\nStorage of WARCs, logs, etc." <<51>> as 51
+        rectangle "==move-to-s3.py\n<size:10>[Software System]</size>\n\nUpload WARCs and logs to S3" <<53>> as 53
+      }
+
+    }
+
+    rectangle "==Amazon S3 Bucket\n<size:10>[Software System]</size>\n\nLong-term storage of crawl results" <<55>> as 55
+  }
+
+}
+
+46 .[#707070,thickness=2].> 40 : "Download UK web pages.\n<size:8>[HTTP(S)]</size>"
+48 .[#707070,thickness=2].> 46 : "URLs to crawl.\n<size:8>[Kafka]</size>"
+46 .[#707070,thickness=2].> 48 : "URLs crawled.\n<size:8>[Kafka]</size>"
+46 .[#707070,thickness=2].> 51 : "Output WARCs and crawl logs."
+51 .[#707070,thickness=2].> 53 : "Find WARCs and logs"
+53 .[#707070,thickness=2].> 55 : "Move WARCs and logs to S3"
+58 .[#707070,thickness=2].> 44 : "Connects to\n<size:8>[HTTP(S), SSH]</size>"
+@enduml
+
+PlantUML version 1.2021.7(Sun May 23 13:40:07 BST 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: GB
+--></g></svg>

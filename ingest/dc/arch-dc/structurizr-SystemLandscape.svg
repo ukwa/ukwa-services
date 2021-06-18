@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="1000px" preserveAspectRatio="none" style="width:469px;height:1000px;background:#FFFFFF;" version="1.1" viewBox="0 0 469 1000" width="469px" zoomAndPan="magnify"><defs/><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacing" textLength="159" x="148.5" y="17.4023">System Landscape</text><!--MD5=[13c7745981a6abb6004f7738a8ca5078]
+entity 1--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="59" x="245.5" y="28.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="38" x="256" y="53.668">Staff</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="39" x="255.5" y="66.7109">[Person]</text><!--MD5=[773709cb2207c097691e7e7d3d2cc787]
+entity 2--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="106" x="110" y="556.6992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="72" x="127" y="582.168">Websites</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="120" y="595.2109">[Software System]</text><!--MD5=[b6d0185b0422599d1d13f977d85ea789]
+entity 28--><rect fill="#FFFFFF" height="83.5977" rx="10" ry="10" style="stroke:#3F8624;stroke-width:1.5;" width="212" x="251" y="540.1992"/><text fill="#3F8624" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="159" x="277.5" y="565.668">EBS Output Volume</text><text fill="#3F8624" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="314" y="578.7109">[Software System]</text><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="359" y="594.3555"/><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="192" x="261" y="610.8438">Storage of WARCs, logs, etc.</text><!--MD5=[5721696d2af8d327c8f4e7ea88061d17]
+entity 3--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="198" x="7" y="162.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="123" x="44.5" y="187.668">DC Kafka Stack</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="63" y="200.7109">[Software System]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="108" y="216.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="174" x="17" y="232.8438">Manages crawl seed URLs</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="59" x="76.5" y="249.332">and logs</text><!--MD5=[604c8a276bea794422450a1868c0825f]
+entity 31--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="206" x="254" y="709.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="124" x="295" y="734.668">move-to-s3.py</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="314" y="747.7109">[Software System]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="359" y="763.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="182" x="264" y="779.8438">Upload WARCs and logs to</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="17" x="348.5" y="796.332">S3</text><!--MD5=[eaa66e0d09fd11833c729a4b412cc10a]
+entity 32--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#3F8624;stroke-width:1.5;" width="212" x="251" y="894.1992"/><text fill="#3F8624" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="152" x="281" y="919.668">Amazon S3 Bucket</text><text fill="#3F8624" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="314" y="932.7109">[Software System]</text><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="359" y="948.3555"/><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="188" x="261" y="964.8438">Long-term storage of crawl</text><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="46" x="334" y="981.332">results</text><!--MD5=[d25218acdea247ba6571a34297258ee9]
+entity 9--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="190" x="134" y="345.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="139" x="159.5" y="370.668">DC Crawler Stack</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="186" y="383.7109">[Software System]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="231" y="399.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="166" x="144" y="415.8438">Crawls UK web sites and</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109" x="174.5" y="432.332">downloads URIs</text><!--MD5=[ccb9eb92e35289dd6f195be8ee0b0786]
+link 9 to 2--><path d="M202.83,445.2292 C198.18,454.9992 193.66,465.2992 190,475.1992 C180.74,500.2692 173.5,529.7992 168.86,551.3192 " fill="none" id="9-to-2" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="167.79,556.3392,173.5806,548.3725,168.8337,551.4494,165.7569,546.7025,167.79,556.3392" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="88" x="191" y="485.8672">Download UK web</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="32" x="220.5" y="497.6445">pages.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="36" x="218.5" y="507.4883">[HTTP(S)]</text><!--MD5=[1a7d267dbbaf8b001c961145a191451d]
+link 9 to 3--><path d="M195.64,345.1092 C179.2,320.9192 159.35,291.6992 142.5,266.9092 " fill="none" id="9-to-3" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="139.61,262.6592,141.3585,272.3516,142.4196,266.7952,147.976,267.8563,139.61,262.6592" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="67" x="176" y="302.8672">URLs crawled.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="27" x="196" y="312.7109">[Kafka]</text><!--MD5=[8a69e3c75cf09f4bd844171d774a0572]
+link 3 to 9--><path d="M80.75,262.2592 C75.25,279.8692 73.52,299.2892 83,315.1992 C93.95,333.5692 110.82,347.9292 129.26,359.0592 " fill="none" id="3-to-9" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="133.98,361.8192,128.2182,353.8316,129.6601,359.3016,124.1901,360.7435,133.98,361.8192" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="68" x="84" y="302.8672">URLs to crawl.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="27" x="104.5" y="312.7109">[Kafka]</text><!--MD5=[0e92f77bfde26f49f7c3a088fa9dc1e5]
+link 9 to 1--><path d="M296.41,345.1792 C321.33,322.9692 346.72,294.4392 360,262.1992 C376.93,221.1092 374.59,204.1792 360,162.1992 C349.38,131.6492 326.07,103.2292 306.54,83.2992 " fill="none" id="9-to-1" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="302.69,79.4292,306.207,88.6287,306.2184,82.9719,311.8752,82.9833,302.69,79.4292" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="85" x="373" y="210.3672">Collect federated</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="36" x="399" y="222.1445">metrics</text><!--MD5=[6e0bab73843954fb4eaf6ec2d1f323a6]
+link 1 to 9--><path d="M274.42,79.3392 C272.98,125.8292 268.09,229.5292 252,315.1992 C250.49,323.2192 248.51,331.5992 246.35,339.7692 " fill="none" id="1-to-9" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="244.98,344.8292,251.1822,337.1786,246.2799,340.0011,243.4573,335.0988,244.98,344.8292" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="75" x="272" y="211.3672">Manage Crawls</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="30" x="294.5" y="221.2109">[HTTPS]</text><!--MD5=[4267f53d9f6f1bbd3a552ac23b5ef237]
+link 9 to 28--><path d="M265.58,445.2292 C272.77,455.0892 280.19,465.4292 287,475.1992 C300.71,494.8792 315.41,516.9792 327.78,535.8792 " fill="none" id="9-to-28" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="330.54,540.1092,328.9761,530.3853,327.8095,535.9206,322.2743,534.7541,330.54,540.1092" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="92" x="312" y="490.8672">Output WARCs and</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="52" x="333.5" y="502.6445">crawl logs.</text><!--MD5=[cdba0236f947c0399ac314103ec6934a]
+link 28 to 31--><path d="M357,624.2292 C357,647.9992 357,678.2192 357,703.9392 " fill="none" id="28-to-31" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="357,709.0192,361,700.0192,357,704.0192,353,700.0192,357,709.0192" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="78" x="358" y="664.8672">Find WARCs and</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="20" x="388.5" y="676.6445">logs</text><!--MD5=[9852042c48f98c203f20cb2ecdab3ced]
+link 31 to 32--><path d="M357,809.2392 C357,833.7492 357,863.4892 357,888.7092 " fill="none" id="31-to-32" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="357,894.0192,361,885.0192,357,889.0192,353,885.0192,357,894.0192" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="84" x="358" y="849.8672">Move WARCs and</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="47" x="378" y="861.6445">logs to S3</text><!--MD5=[2d4b753efd65b00afdf467246674cbe5]
+link 1 to 3--><path d="M245.19,69.1592 C226.72,78.9492 203.13,93.0292 185,109.1992 C169.05,123.4192 154.01,141.2092 141.43,157.9292 " fill="none" id="1-to-3" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="138.28,162.1592,146.8607,157.3249,141.264,158.1473,140.4416,152.5505,138.28,162.1592" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="62" x="186" y="119.8672">Check Kafka</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="30" x="202" y="129.7109">[HTTPS]</text><!--MD5=[6b114017db88179a2992284f07b35a4f]
+@startuml
+title System Landscape
+
+skinparam {
+  shadowing false
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  PackageBorderColor<<group>> #cccccc
+  PackageFontColor<<group>> #cccccc
+}
+hide stereotype
+top to bottom direction
+
+skinparam rectangle<<32>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam rectangle<<9>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<3>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<28>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam rectangle<<1>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<2>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<31>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+
+rectangle "==Staff\n<size:10>[Person]</size>" <<1>> as 1
+rectangle "==Websites\n<size:10>[Software System]</size>" <<2>> as 2
+rectangle "==EBS Output Volume\n<size:10>[Software System]</size>\n\nStorage of WARCs, logs, etc." <<28>> as 28
+rectangle "==DC Kafka Stack\n<size:10>[Software System]</size>\n\nManages crawl seed URLs and logs" <<3>> as 3
+rectangle "==move-to-s3.py\n<size:10>[Software System]</size>\n\nUpload WARCs and logs to S3" <<31>> as 31
+rectangle "==Amazon S3 Bucket\n<size:10>[Software System]</size>\n\nLong-term storage of crawl results" <<32>> as 32
+rectangle "==DC Crawler Stack\n<size:10>[Software System]</size>\n\nCrawls UK web sites and downloads URIs" <<9>> as 9
+
+9 .[#707070,thickness=2].> 2 : "Download UK web pages.\n<size:8>[HTTP(S)]</size>"
+9 .[#707070,thickness=2].> 3 : "URLs crawled.\n<size:8>[Kafka]</size>"
+3 .[#707070,thickness=2].> 9 : "URLs to crawl.\n<size:8>[Kafka]</size>"
+9 .[#707070,thickness=2].> 1 : "Collect federated metrics"
+9 .[#707070,thickness=2].> 28 : "Output WARCs and crawl logs."
+28 .[#707070,thickness=2].> 31 : "Find WARCs and logs"
+31 .[#707070,thickness=2].> 32 : "Move WARCs and logs to S3"
+1 .[#707070,thickness=2].> 9 : "Manage Crawls\n<size:8>[HTTPS]</size>"
+1 .[#707070,thickness=2].> 3 : "Check Kafka\n<size:8>[HTTPS]</size>"
+@enduml
+
+PlantUML version 1.2021.7(Sun May 23 13:40:07 BST 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: GB
+--></g></svg>

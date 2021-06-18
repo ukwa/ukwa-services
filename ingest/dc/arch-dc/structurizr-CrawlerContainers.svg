@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="598px" preserveAspectRatio="none" style="width:1132px;height:598px;background:#FFFFFF;" version="1.1" viewBox="0 0 1132 598" width="1132px" zoomAndPan="magnify"><defs/><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacing" textLength="264" x="427.5" y="17.4023">DC Crawler Stack - Containers</text><!--MD5=[c59d18265480e7c954c97653d0982894]
+cluster DC Crawler Stack\n[Software System]--><polygon fill="#FFFFFF" points="609,27.1992,745,27.1992,752,66.1758,1115,66.1758,1115,591.1992,609,591.1992,609,27.1992" style="stroke:#444444;stroke-width:1.5;"/><line style="stroke:#444444;stroke-width:1.5;" x1="609" x2="752" y1="66.1758" y2="66.1758"/><text fill="#444444" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="124" x="616" y="42.7344">DC Crawler Stack</text><text fill="#444444" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="130" x="613" y="59.2227">[Software System]</text><!--MD5=[832467b18690d1dd1b9afbdc6cb3d7bf]
+entity 10--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="226" x="625" y="280.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="71" x="702.5" y="305.668">Heritrix3</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="113" x="681.5" y="318.7109">[Container: Java Spring]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="740" y="334.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="98" x="687" y="350.8438">Web Crawler -</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="206" x="635" y="367.332">https://crawler07.bl.uk:8443/</text><!--MD5=[e25884bd7fe840786d881277a14c5a0e]
+entity 11--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="193" x="641.5" y="475.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="64" x="706" y="500.668">ClamAV</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="54" x="711" y="513.7109">[Container]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="740" y="529.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="169" x="651.5" y="545.8438">Scan crawled content for</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="48" x="714" y="562.332">viruses</text><!--MD5=[2e47fe9ff0124b653d7be087bd1c1ac2]
+entity 12--><rect fill="#FFFFFF" height="116.5742" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="219" x="879.5" y="78.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="104" x="937" y="103.668">OutbackCDX</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="80" x="949" y="116.7109">[Container: Java]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="991" y="132.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="172" x="901" y="148.8438">Record crawled URLs and</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="72" x="951" y="165.332">outcome -</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="199" x="889.5" y="181.8203">http://crawler07.bl.uk:9090/</text><!--MD5=[2cd44814ab46f5e6a99045c6c67d7a1c]
+entity 13--><rect fill="#FFFFFF" height="116.5742" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="219" x="625.5" y="78.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="98" x="686" y="103.668">Prometheus</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="54" x="708" y="116.7109">[Container]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="737" y="132.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="126" x="670" y="148.8438">Record metrics for</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="161" x="652.5" y="165.332">monitoring and alerts -</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="199" x="635.5" y="181.8203">http://crawler07.bl.uk:9191/</text><!--MD5=[13c7745981a6abb6004f7738a8ca5078]
+entity 1--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="59" x="454.5" y="304.6992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="38" x="465" y="330.168">Staff</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="39" x="464.5" y="343.2109">[Person]</text><!--MD5=[773709cb2207c097691e7e7d3d2cc787]
+entity 2--><rect fill="#FFFFFF" height="50.6211" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="106" x="240" y="499.6992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="72" x="257" y="525.168">Websites</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="250" y="538.2109">[Software System]</text><!--MD5=[5721696d2af8d327c8f4e7ea88061d17]
+entity 3--><rect fill="#FFFFFF" height="100.0859" rx="10" ry="10" style="stroke:#B2B2B2;stroke-width:1.5;" width="198" x="7" y="475.1992"/><text fill="#000000" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="123" x="44.5" y="500.668">DC Kafka Stack</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="63" y="513.7109">[Software System]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="108" y="529.3555"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="174" x="17" y="545.8438">Manages crawl seed URLs</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="59" x="76.5" y="562.332">and logs</text><!--MD5=[b6d0185b0422599d1d13f977d85ea789]
+entity 28--><rect fill="#FFFFFF" height="83.5977" rx="10" ry="10" style="stroke:#3F8624;stroke-width:1.5;" width="212" x="381" y="483.1992"/><text fill="#3F8624" font-family="sans-serif" font-size="16" font-weight="bold" lengthAdjust="spacing" textLength="159" x="407.5" y="508.668">EBS Output Volume</text><text fill="#3F8624" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="86" x="444" y="521.7109">[Software System]</text><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="489" y="537.3555"/><text fill="#3F8624" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="192" x="391" y="553.8438">Storage of WARCs, logs, etc.</text><!--MD5=[f744f51b76484d7e96d0393914accd07]
+link 10 to 2--><path d="M624.82,362.4192 C581.43,375.5692 531.84,392.0392 488,410.1992 C430.15,434.1692 416.54,442.7292 363,475.1992 C352.23,481.7292 340.91,489.3092 330.59,496.5392 " fill="none" id="10-to-2" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="326.23,499.6092,335.8934,497.7069,330.3208,496.7342,331.2934,491.1616,326.23,499.6092" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="88" x="489" y="420.8672">Download UK web</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="32" x="518.5" y="432.6445">pages.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="36" x="516.5" y="442.4883">[HTTP(S)]</text><!--MD5=[f0c12fb2ee6f418ed9175d70cdd91fef]
+link 10 to 3--><path d="M625,361.1692 C594.65,368.3392 561.73,375.3092 531,380.1992 C451.5,392.8392 237.73,366.6892 170,410.1992 C148.43,424.0592 133.43,447.8892 123.41,470.1792 " fill="none" id="10-to-3" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="121.35,474.9092,128.6144,468.2588,123.3488,470.3261,121.2815,465.0606,121.35,474.9092" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="67" x="171" y="426.8672">URLs crawled.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="27" x="191" y="436.7109">[Kafka]</text><!--MD5=[d3a05f96976f7ff488a0fb1709f0db1e]
+link 3 to 10--><path d="M189.4,475.0892 C231.96,452.0592 285.33,426.2292 336,410.1992 C419.6,383.7492 444.93,396.9792 531,380.1992 C559.87,374.5692 590.81,367.6992 619.74,360.9092 " fill="none" id="3-to-10" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="624.74,359.7292,615.0631,357.8969,619.8729,360.8744,616.8954,365.6842,624.74,359.7292" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="68" x="337" y="426.8672">URLs to crawl.</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="27" x="357.5" y="436.7109">[Kafka]</text><!--MD5=[ec143eb54b8ec3c64add95129ee53470]
+link 10 to 11--><path d="M738,380.3992 C738,407.7392 738,441.7992 738,469.9092 " fill="none" id="10-to-11" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="738,475.0892,742,466.0892,738,470.0892,734,466.0892,738,475.0892" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="79" x="739" y="425.8672">Scan content for</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="37" x="761.5" y="437.6445">viruses.</text><!--MD5=[6a33468aa8219509d3042a79ca44925f]
+link 13 to 10--><path d="M735.9,195.4192 C736.3,220.6092 736.76,249.9892 737.15,274.7892 " fill="none" id="13-to-10" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="737.23,280.0092,741.0751,270.942,737.1443,275.01,733.0763,271.0791,737.23,280.0092" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="73" x="737" y="235.8672">Collect crawler</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="36" x="757" y="247.6445">metrics</text><!--MD5=[9aa95017a0a0d2231e4928c6183a0896]
+link 13 to 1--><path d="M659.35,195.4192 C612.33,231.2892 554.16,275.6692 518.06,303.2092 " fill="none" id="13-to-1" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="513.77,306.4892,523.3508,304.2073,517.7442,303.4551,518.4963,297.8485,513.77,306.4892" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="85" x="618" y="235.8672">Collect federated</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="36" x="644" y="247.6445">metrics</text><!--MD5=[fcedf129e8492a8b7cee8a9645897a4f]
+link 10 to 28--><path d="M672.33,380.3292 C659.27,390.1792 645.67,400.4892 633,410.1992 C603.2,433.0392 570.21,458.7592 543.14,479.9792 " fill="none" id="10-to-28" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="539.19,483.0792,548.7385,480.6656,543.1221,479.9907,543.797,474.3743,539.19,483.0792" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="92" x="634" y="425.8672">Output WARCs and</text><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="52" x="655.5" y="437.6445">crawl logs.</text><!--MD5=[cf71e73aa871f04ee0628c7068a1cefe]
+link 1 to 10--><path d="M513.63,330.1992 C540,330.1992 580.35,330.1992 619.6,330.1992 " fill="none" id="1-to-10" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="624.88,330.1992,615.88,326.1992,619.88,330.1992,615.88,334.1992,624.88,330.1992" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="75" x="531.75" y="314.8672">Manage Crawls</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="30" x="554.25" y="324.7109">[HTTPS]</text><!--MD5=[2d4b753efd65b00afdf467246674cbe5]
+link 1 to 3--><path d="M454.4,332.0992 C367.44,335.4392 115.72,350.2092 66,410.1992 C51.75,427.3892 56.27,449.9992 66.41,470.5392 " fill="none" id="1-to-3" style="stroke:#707070;stroke-width:2.0;stroke-dasharray:7.0,7.0;"/><polygon fill="#707070" points="68.8,475.1592,68.2146,465.3278,66.5013,470.7189,61.1102,469.0056,68.8,475.1592" style="stroke:#707070;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="62" x="67" y="426.8672">Check Kafka</text><text fill="#000000" font-family="sans-serif" font-size="8" lengthAdjust="spacing" textLength="30" x="83" y="436.7109">[HTTPS]</text><!--MD5=[f7bd840ed23acf7430a9cb09b4839cd2]
+@startuml
+title DC Crawler Stack - Containers
+
+skinparam {
+  shadowing false
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  PackageBorderColor<<group>> #cccccc
+  PackageFontColor<<group>> #cccccc
+}
+hide stereotype
+top to bottom direction
+
+skinparam rectangle<<11>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<3>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<28>> {
+  BackgroundColor #ffffff
+  FontColor #3f8624
+  BorderColor #3f8624
+  roundCorner 20
+}
+skinparam rectangle<<10>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<12>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<13>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<1>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+skinparam rectangle<<2>> {
+  BackgroundColor #ffffff
+  FontColor #000000
+  BorderColor #b2b2b2
+  roundCorner 20
+}
+
+rectangle "==Staff\n<size:10>[Person]</size>" <<1>> as 1
+rectangle "==Websites\n<size:10>[Software System]</size>" <<2>> as 2
+rectangle "==DC Kafka Stack\n<size:10>[Software System]</size>\n\nManages crawl seed URLs and logs" <<3>> as 3
+rectangle "==EBS Output Volume\n<size:10>[Software System]</size>\n\nStorage of WARCs, logs, etc." <<28>> as 28
+
+package "DC Crawler Stack\n[Software System]" <<9>> {
+  skinparam PackageBorderColor<<9>> #444444
+  skinparam PackageFontColor<<9>> #444444
+
+  rectangle "==Heritrix3\n<size:10>[Container: Java Spring]</size>\n\nWeb Crawler - https://crawler07.bl.uk:8443/" <<10>> as 10
+  rectangle "==ClamAV\n<size:10>[Container]</size>\n\nScan crawled content for viruses" <<11>> as 11
+  rectangle "==OutbackCDX\n<size:10>[Container: Java]</size>\n\nRecord crawled URLs and outcome - http://crawler07.bl.uk:9090/" <<12>> as 12
+  rectangle "==Prometheus\n<size:10>[Container]</size>\n\nRecord metrics for monitoring and alerts - http://crawler07.bl.uk:9191/" <<13>> as 13
+}
+
+10 .[#707070,thickness=2].> 2 : "Download UK web pages.\n<size:8>[HTTP(S)]</size>"
+10 .[#707070,thickness=2].> 3 : "URLs crawled.\n<size:8>[Kafka]</size>"
+3 .[#707070,thickness=2].> 10 : "URLs to crawl.\n<size:8>[Kafka]</size>"
+10 .[#707070,thickness=2].> 11 : "Scan content for viruses."
+13 .[#707070,thickness=2].> 10 : "Collect crawler metrics"
+13 .[#707070,thickness=2].> 1 : "Collect federated metrics"
+10 .[#707070,thickness=2].> 28 : "Output WARCs and crawl logs."
+1 .[#707070,thickness=2].> 10 : "Manage Crawls\n<size:8>[HTTPS]</size>"
+1 .[#707070,thickness=2].> 3 : "Check Kafka\n<size:8>[HTTPS]</size>"
+@enduml
+
+PlantUML version 1.2021.7(Sun May 23 13:40:07 BST 2021)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: GB
+--></g></svg>
