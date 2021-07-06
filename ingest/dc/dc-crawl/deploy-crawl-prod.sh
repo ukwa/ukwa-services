@@ -4,9 +4,11 @@ export CURRENT_UID=$(id -u):$(id -g)
 
 echo "Will run as ${CURRENT_UID},,,"
 
-mkdir -p /heritrix/output/prometheus/config
+sudo mkdir -p /heritrix/output/prometheus/config
+sudo mkdir -p /heritrix/output/prometheus/data
+sudo chown -R ec2-user /heritrix/output
+
 cp prometheus/config/* /heritrix/output/prometheus/config
-mkdir -p /heritrix/output/prometheus/data
 
 mkdir -p ./shared
 
