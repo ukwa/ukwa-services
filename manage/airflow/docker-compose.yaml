@@ -58,8 +58,8 @@ x-airflow-common:
   volumes:
     - "./dags:/opt/airflow/dags"
     - "./plugins:/opt/airflow/plugins"
-    - "${STORAGE_PATH}/logs:/opt/airflow/logs"
-    - "${STORAGE_PATH}:/storage"
+    - "${STORAGE_PATH}/airflow/logs:/opt/airflow/logs"
+    - "${STORAGE_PATH}/airflow:/storage"
     - "/var/run/docker.sock:/var/run/docker.sock"
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on:
@@ -74,11 +74,11 @@ services:
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
     volumes:
-      - "${STORAGE_PATH}/postgres:/var/lib/postgresql/data"
+      - "${STORAGE_PATH}/airflow/postgres:/var/lib/postgresql/data"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
-      interval: 5s
-      retries: 5
+      interval: 10s
+      retries: 20
 
   redis:
     image: redis:latest

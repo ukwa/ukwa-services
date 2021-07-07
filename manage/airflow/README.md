@@ -20,4 +20,6 @@ https://eugeneyan.com/writing/why-airflow-jobs-one-day-late/
     - https://docs.sentry.io/platforms/python/guides/flask/configuration/options/
 
 
+Idea...
 
+ssh root@gluster-fuse python3 -u - /mnt/gluster/fc < warcprox_warc_mv.py
