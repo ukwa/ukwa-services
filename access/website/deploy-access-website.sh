@@ -60,7 +60,7 @@ export WEB_RENDER_TMP=${STORAGE_PATH_WEBSITE}/webrender-tmp
 mkdir -p ${WEB_RENDER_TMP}
 
 # ensure data owned by user
-chown -R ${CURRENT_UID} ${STORAGE_PATH_WEBSITE}
+sudo chown -R ${CURRENT_UID} ${STORAGE_PATH_WEBSITE}
 
 # Launch the common configuration with these environment variable:
 # n.b. first config file sets PWD

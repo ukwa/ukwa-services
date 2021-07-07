@@ -101,6 +101,11 @@ services:
      - "HTTPS_PROXY=https://explorer.bl.uk:3127" # This is needed because we're talking to the live public API (we should have an internal one)
      - "PYTHONPATH=/app"
 
+  metabase:
+    image: metabase/metabase:latest
+    ports:
+      - 3001:3000
+
 networks:
   # Make network attachable so tasks can be run:
   default:
