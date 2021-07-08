@@ -1,0 +1,7 @@
+{
+  "fc": {
+    "title": "Frequent Crawl",
+    "topic": "fc.crawled",
+    "broker": "192.168.45.34:9094"
+  }
+}

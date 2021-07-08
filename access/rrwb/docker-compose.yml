@@ -8,18 +8,24 @@ services:
   # Reading Room Wayback configuration per LDL:
   # -------------------------------------------------------------
   pywb-bl:
-    image: ukwa/ukwa-pywb:2.4.0-beta
+    image: ukwa/ukwa-pywb:2.5.x-beta
+    #image: webrecorder/pywb:2.4.0
     environment:
       - "DEBUG=True"
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       - "REDIS_URL=redis://redis:6379/0"
+      - "TLDEXTRACT_CACHE_TIMEOUT=0.1"
+      - "TLDEXTRACT_CACHE=/ukwa_pywb/_tldextract.cache"
     volumes:
       - ./pywb/config.yaml:/webarchive/config.yaml
-      - rr-access-acl:/ukwa_pywb/acl/
+      - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+      - ./tmp-py-cache:/root/.cache/
     depends_on:
       - redis
+    cap_add:
+      - SYS_PTRACE
     ports:
       - "8111:8080"
 
@@ -40,13 +46,6 @@ services:
 
     depends_on:
       - pywb
-
-
-volumes:
-  # Where the access block list is held:
-  rr-access-acl:
-    external:
-      name: access_data_w3act_export
 
 
 #logging:

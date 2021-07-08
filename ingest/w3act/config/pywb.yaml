@@ -1,0 +1,54 @@
+INDEX:   &INDEX ${UKWA_INDEX}
+ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
+
+collections:
+    # QA Access under /archive/
+    archive:
+        index:
+          type: cdx
+          api_url: *INDEX
+          replay_url: ""
+          # Up the limit used when querying for the closest match
+          # (putting this here doesn't seem to change anything)
+          closest_limit: 1000
+        archive_paths: *ARCHIVE
+
+        # up the query limit:
+        query_limit: 100000
+
+    # QA Access to crawl-time data
+    crawler:
+        index: cdx+http://crawldb-fc.api.wa.bl.uk/fc
+        archive_paths:
+          - http://192.168.45.34:8001/by-filename/
+
+        # up the query limit:
+        query_limit: 100000
+
+proxy:
+    # collection for proxy mode
+    coll: archive
+    ca_name: UKWA QA pywb HTTPS Proxy CA
+    ca_file_cache: ./pywb-ca.pem
+    use_banner: false
+    enable_banner: false # More recent syntax for upcoming versions
+    enable_content_rewrite: false
+
+
+# redirect to exact url behavior
+#redirect_to_exact: false
+# This seems to cause a lot of problems, perhaps in combination with warc/revisit records?
+redirect_to_exact: true
+
+# enable memento
+enable_memento: true
+
+# enable experimental Memento Prefer
+enable_prefer: true
+
+# Locale setup
+locales_root_dir: ./i18n/translations/
+locales:
+  - en
+  - cy
+

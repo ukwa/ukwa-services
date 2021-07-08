@@ -12,24 +12,24 @@ if [[ ${ENVIRON} == 'prod' ]]; then
 	export SERVER_NAME=www.webarchive.org.uk
 	export DEPLOYMENT_TAG=prod
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/prod1/website
-	export STORAGE_PATH=/mnt/nfs/data/prod1/access_data
+	export STORAGE_PATH_SHARED=/mnt/nfs/data/prod1/airflow/data_exports
 	export CONFIG_PATH=/mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/pywb
-        source /mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/app_secret.env
+    source /mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/app_secret.env
 elif [[ ${ENVIRON} == 'beta' ]]; then
 	export SERVER_NAME=beta.webarchive.org.uk
 	export DEPLOYMENT_TAG=beta
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
-	export STORAGE_PATH=/mnt/nfs/data/access_data
+	export STORAGE_PATH_SHARED=/mnt/nfs/data/airflow/data_exports
 	export CONFIG_PATH=/mnt/nfs/access/config/gitlab/ukwa-services-env/access/pywb
-        source /mnt/nfs/access/config/gitlab/ukwa-services-env/access/app_secret.env
+    source /mnt/nfs/access/config/gitlab/ukwa-services-env/access/app_secret.env
 else
 	# dev vars
 	export SERVER_NAME=dev.webarchive.org.uk
 	export DEPLOYMENT_TAG=dev
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
-	export STORAGE_PATH=/mnt/nfs/data/access_data
+	export STORAGE_PATH_SHARED=/mnt/nfs/data/airflow/data_exports
 	export CONFIG_PATH=/mnt/nfs/config/gitlab/ukwa-services-env/access/pywb
-        source /mnt/nfs/config/gitlab/ukwa-services-env/access/app_secret.env
+    source /mnt/nfs/config/gitlab/ukwa-services-env/dev.env
 fi
 
 # Common configuration
@@ -49,6 +49,9 @@ export KAFKA_BROKER="192.168.45.15:9094"
 # Set up folders needed by different components
 mkdir -p ${STORAGE_PATH_WEBSITE}/shine-postgres-data
 mkdir -p ${STORAGE_PATH_WEBSITE}/cache
+mkdir -p ${STORAGE_PATH_WEBSITE}/fc_analysis
+mkdir -p ${STORAGE_PATH_WEBSITE}/collections_solr_cores
+mkdir -p ${STORAGE_PATH_WEBSITE}/collections_solr_logs
 mkdir -p ${STORAGE_PATH_WEBSITE}/iiif_cache
 chmod a+w ${STORAGE_PATH_WEBSITE}/iiif_cache # IIIF server runs as specific container user
 
@@ -57,8 +60,8 @@ export WEB_RENDER_TMP=${STORAGE_PATH_WEBSITE}/webrender-tmp
 mkdir -p ${WEB_RENDER_TMP}
 
 # ensure data owned by user
-chown -R ${CURRENT_UID} ${STORAGE_PATH_WEBSITE}
+sudo chown -R ${CURRENT_UID} ${STORAGE_PATH_WEBSITE}
 
 # Launch the common configuration with these environment variable:
 # n.b. first config file sets PWD
-docker stack deploy -c docker-compose.yml -c ../docker-compose.shared.yml access_website
+docker stack deploy -c docker-compose.yml access_website
