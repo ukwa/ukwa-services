@@ -7,9 +7,9 @@ services:
 # -----------------------------------------------------------
 
   robot:
-    image: ukwa/docker-robot-framework:main
+    image: ukwa/robot-framework:main
     environment: 
-      - "HOST=${HOST}"
+      - "HOST=${TEST_HOST}"
       - "PUSH_GATEWAY=${PUSH_GATEWAY}"
       - "PROMETHEUS_JOB_NAME=${PROMETHEUS_JOB_NAME}"
       - "HTTP_PROXY=${HTTP_PROXY}"
