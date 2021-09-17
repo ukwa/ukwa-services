@@ -4,7 +4,7 @@ Library    Collections
 Library    RequestsLibrary
 
 # Set up a session for this whole sequence of tests:
-Suite Setup     Create Session    act_api    %{HOST}
+Suite Setup     Create Session    act_api    %{HOST}   disable_warnings=1
 
 *** Test Cases ***
 Log into API
