@@ -1,6 +1,9 @@
 global:
   scrape_interval:     1m
   evaluation_interval: 1m
+  external_labels:
+    system: 'fc'
+    system_name: 'frequent-crawler'
 
 scrape_configs:
 

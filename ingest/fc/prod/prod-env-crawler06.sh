@@ -9,7 +9,10 @@ export H3_UID=$(id -u)
 
 # CrawlDB FC (OutbackCDX)
 # n.b. DNS name would need BL nameservers:
+# cdx2
 export CDXSERVER_ENDPOINT=http://192.168.45.8:8081/fc
+# cdx1
+#export CDXSERVER_ENDPOINT=http://192.168.45.7:8081/fc
 # Oddly slow via API service...
 #export CDXSERVER_ENDPOINT=http://crawldb-fc.api.wa.bl.uk/fc
 
