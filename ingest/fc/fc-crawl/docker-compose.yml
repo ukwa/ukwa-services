@@ -18,6 +18,7 @@ services:
       - "WARC_PREFIX=BL-NPLD"
       - "WEBRENDER_WARC_PREFIX=BL-NPLD-WEBRENDER"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
+      - "REDIS_ENDPOINT=redis://redis-npld:6379"
     volumes:
       - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
       - "${TMP_STORAGE_PATH}/heritrix/npld/state:/heritrix/state"
@@ -28,6 +29,7 @@ services:
     depends_on:
       - clamd
       - webrender
+      - redis-npld
     networks:
       - default
       - kafka
@@ -48,6 +50,7 @@ services:
       - "WARC_PREFIX=BL-BYPM"
       - "WEBRENDER_WARC_PREFIX=BL-BYPM-WEBRENDER"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
+      - "REDIS_ENDPOINT=redis://redis-bypm:6379"
     volumes:
       - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
       - "${TMP_STORAGE_PATH}/heritrix/bypm/state:/heritrix/state"
@@ -58,6 +61,7 @@ services:
     depends_on:
       - clamd
       - webrender
+      - redis-bypm
     networks:
       - default
       - kafka
@@ -100,8 +104,9 @@ services:
   # PhantomJS web page rendering service
   webrender:
     image: ukwa/webrender-puppeteer:2.1.0
-    ports:
-      - 8010:8010
+    # Can't use this with dnsrr
+    #ports:
+    #  - 8010:8010
     environment:
       - "HTTP_PROXY=http://warcprox:8000"
       - "WARCPROX_PROXY=true"
@@ -125,6 +130,38 @@ services:
       - default
       - kafka
 
+
+  # ----------------------------------------------
+  # Redis Frontier support services
+  # ----------------------------------------------
+
+
+  # Redis for the external frontier
+  redis-npld:
+    image: redis:6
+    command: "redis-server --appendonly yes"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "${STORAGE_PATH}/redis-npld-data:/data"
+
+  redis-bypm:
+    image: redis:6
+    command: "redis-server --appendonly yes"
+    ports:
+      - "6378:6379"
+    volumes:
+      - "${STORAGE_PATH}/redis-bypm-data:/data"
+
+  # Redis Browser      
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+    - "REDIS_HOSTS=redis-npld:redis-npld:6379,redis-bypm:redis-bypm:6379"
+    ports:
+    - "8081:8081"
+    depends_on:
+    - redis
 
 
   # ----------------------------------------------
