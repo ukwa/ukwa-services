@@ -15,5 +15,5 @@ export CDXSERVER_ENDPOINT=http://192.168.45.8:8081/fc
 # Oddly slow via API service...
 #export CDXSERVER_ENDPOINT=http://crawldb-fc.api.wa.bl.uk/fc
 
-export HERITRIX_VERSION=2.7.8
+export HERITRIX_VERSION=2.9.0
 
