@@ -100,8 +100,9 @@ services:
   # PhantomJS web page rendering service
   webrender:
     image: ukwa/webrender-puppeteer:2.1.0
-    ports:
-      - 8010:8010
+    # Can't use this with dnsrr
+    #ports:
+    #  - 8010:8010
     environment:
       - "HTTP_PROXY=http://warcprox:8000"
       - "WARCPROX_PROXY=true"
