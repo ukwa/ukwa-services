@@ -1,11 +1,10 @@
 export CRAWL_HOST_LAN_IP=192.168.45.34
 export CRAWL_HOST_WAN_IP=194.66.232.88
 export WB_HOST=crawler06.bl.uk
-
-export TMP_STORAGE_PATH=/mnt/localraid6/fc/tmp
-export STORAGE_PATH=/mnt/gluster/fc
-
 export H3_UID=$(id -u)
+
+export STORAGE_PATH=/mnt/gluster/fc
+export TMP_STORAGE_PATH=/mnt/localraid6/fc/tmp
 
 # CrawlDB FC (OutbackCDX)
 # n.b. DNS name would need BL nameservers:
