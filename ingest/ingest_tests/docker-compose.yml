@@ -15,8 +15,8 @@ services:
       - "PROMETHEUS_JOB_NAME=${PROMETHEUS_JOB_NAME}"
       - "HTTP_PROXY=${HTTP_PROXY}"
       - "HTTPS_PROXY=${HTTPS_PROXY}"
-      - "USERNAME=${W3ACT_USERNAME}"
-      - "PASSWORD=${W3ACT_PASSWORD}"
+      - "W3ACT_USERNAME=${W3ACT_USERNAME}"
+      - "W3ACT_PASSWORD=${W3ACT_PASSWORD}"
     volumes:
       - ./tests:/tests:ro
       - ./tests_destructive:/tests_destructive:ro
