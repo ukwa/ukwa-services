@@ -17,5 +17,9 @@ And now run the tests:
 
 Which runs the tests and reports to the console, rather than running them as a background service (as `deploy-ingest-tests.sh` would).
 
+Using Docker avoids having to install dependencies. If using Docker is not an option, you could set up a Python virtual environent and install `robotframework-requests` and `robotframework-browser`, the run the tests like this:
+
+    robot --outputdir /results /tests
+
 Once the tests have run, the results of the tests will be in the `results` folder. This is very detailed, and the system will capture screenshots when things go wrong, so this can all be very useful for determining the cause of test failure.
 
