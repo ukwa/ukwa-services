@@ -10,6 +10,6 @@ else
 fi
 
 
-source ./prod-env-${ENV_TAG}.sh
+source ./env-${ENV_TAG}.sh
 
 docker stack deploy -c ../fc-wb/docker-compose.yml fc_wb

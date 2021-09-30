@@ -35,7 +35,7 @@ services:
 
   # W3ACT
   w3act:
-    image: ukwa/w3act:latest
+    image: ukwa/w3act:2.3.3
     command: /w3act/bin/w3act -J-Xmx6g -J-XX:+ExitOnOutOfMemoryError -Dconfig.file=/w3act/conf/docker.conf -Dpidfile.path=/dev/null -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1898 -Dcom.sun.management.jmxremote.rmi.port=1898 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=${JMX_HOSTNAME}
     environment:
       - "APPLICATION_NAVBAR_COLOR=${APPLICATION_NAVBAR_COLOR}"
@@ -98,13 +98,15 @@ services:
     image: ukwa/ukwa-notebook-apps
     command: "--base_url=/act/nbapps/ --no-browser --template=lab --debug /app"
     environment:
-     - "HTTPS_PROXY=https://explorer.bl.uk:3127" # This is needed because we're talking to the live public API (we should have an internal one)
+     - "HTTPS_PROXY=http://explorer.bl.uk:3127" # This is needed because we're talking to the live public API (we should have an internal one)
      - "PYTHONPATH=/app"
-
-  metabase:
-    image: metabase/metabase:latest
     ports:
-      - 3001:3000
+      - 8866:8866
+
+  #metabase:
+  #  image: metabase/metabase:latest
+  #  ports:
+  #    - 3001:3000
 
 networks:
   # Make network attachable so tasks can be run:

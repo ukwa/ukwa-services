@@ -1,0 +1,29 @@
+version: '3.2'
+
+services:
+
+# -----------------------------------------------------------
+# Automated test engine - test services from 'outside'
+# -----------------------------------------------------------
+
+  robot:
+    image: ukwa/robot-framework:main
+    environment: 
+      - "HOST=${TEST_HOST}"
+      - "PUSH_GATEWAY=${PUSH_GATEWAY}"
+      - "PROMETHEUS_JOB_NAME=${PROMETHEUS_JOB_NAME}"
+      - "HTTP_PROXY=${HTTP_PROXY}"
+      - "HTTPS_PROXY=${HTTPS_PROXY}"
+      - "USERNAME=${W3ACT_USERNAME}"
+      - "PASSWORD=${W3ACT_PASSWORD}"
+    volumes:
+      - ./tests:/tests:ro
+      - ./results:/results:rw
+    deploy:
+      restart_policy:
+        # Run once:
+        condition: on-failure
+        # If it fails, run every hour:
+        delay: 60m
+
+

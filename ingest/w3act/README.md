@@ -37,6 +37,8 @@ First, create a backup of the existing Postgres database data on the existing ho
 
 Copy the output dump file to the deployment platform. At UKWA we regularly back up our Postgres database onto our Hadoop storage platform, so this can be downloaded via the script [download-db-dump.sh](scripts/postgres/download-db-dump.sh) (this needs amending to the correct date before executing).
 
+ALSO RSYNC OPTION
+
 ### Start Postgres
 Before populating the new service, we need to make sure that the database is running, but not W3ACT itself, as in some cases components like W3ACT will attempt to set up the database on start up. To make this simpler, we use `docker-compose` to spin up the database alone, rather than running the whole stack.
 
@@ -55,10 +57,60 @@ To test that the Postgres data population has worked successfully, run:
 ## Integration with BL services
 PII/eBooks etc. TBA
 
+ebooks mount point
+ejournals not in use
+accessible PII
+dls-sips-submitted
+
+## Proxy chain
+
+- www.webarchive.org.uk 
+- act.api.wa.bl.uk
+- prod1.n45.wa.bl.uk:9000
+
+With HTTP 1.1. support and deployment location set at point of entrry.
+
+```
+        location /act {
+                # Web Socket support:
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "Upgrade";
+                proxy_set_header Host $host;
+
+                # Let downstream services know how they are deployed:
+                proxy_set_header        X-Forwarded-Proto       $scheme;
+                proxy_set_header        X-Forwarded-Host        $host;
+                proxy_set_header        X-Forwarded-Port        $server_port;
+                proxy_set_header        X-Forwarded-For         $remote_addr;
+                proxy_set_header        X-Real-IP               $remote_addr;
+
+                proxy_pass             http://act.api.wa.bl.uk/act;
+        }
+```
+
+```
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "Upgrade";
+```
+
+## Release
+
+Tag this repo ingest-w3act-20210930 
+
+## Downstream clients and exports
+
+Luigi needed changes to tasks and configuration to cover:
+
+- Backup to HDFS (where Luigi Access gets it from)
+- Document Harvester
+
 
 ## The database backup task
 Every day, the W3ACT database should be backed-up to HDFS, and the service deployment cannot be considered complete unless this is in place. See [`ukwa-services/manage/tasks`](../../manage/tasks/) for details.
 
+Updated in `BackupProductionW3ACTPostgres`
 
 ## The service validation task
 _In the future, we will have a suite of Robot Framework acceptance tests that will run daily (overnight) and report whether the services are running as expected._

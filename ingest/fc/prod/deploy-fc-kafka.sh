@@ -10,7 +10,7 @@ else
 fi
 
 
-source ./prod-env-${ENV_TAG}.sh
+source ./env-${ENV_TAG}.sh
 
 mkdir -p ${STORAGE_PATH}/zookeeper/data
 mkdir -p ${STORAGE_PATH}/zookeeper/datalog
