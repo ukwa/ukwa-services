@@ -11,6 +11,7 @@ sudo mkdir -p /heritrix/output/prometheus/config
 sudo mkdir -p /heritrix/output/prometheus/data
 
 # Ensure Heritrix user group can write to output folder:
+echo "Ensure file ownership and permissions are correct..."
 sudo chown -R ec2-user:1001 /heritrix/output
 sudo chown -R ec2-user:1001 /heritrix/scratch
 sudo chown -R ec2-user:1001 /heritrix/state
