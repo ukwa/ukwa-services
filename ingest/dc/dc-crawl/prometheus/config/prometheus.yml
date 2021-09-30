@@ -22,9 +22,9 @@ scrape_configs:
     static_configs:
       - targets: ['prometheus:9090']
 
-  - job_name: 'aws_node_exporter'
+  - job_name: 'aws-dc_node_exporter'
     static_configs:
-    - targets: ['ip-172-31-29-0:9100']
+    - targets: ['ip-172-31-26-103:9100']
 
   - job_name: 'kafka'
     static_configs:

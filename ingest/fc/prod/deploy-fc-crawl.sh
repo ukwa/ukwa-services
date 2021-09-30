@@ -11,7 +11,7 @@ else
 fi
 
 
-source ./prod-env-${ENV_TAG}.sh
+source ./env-${ENV_TAG}.sh
 
 echo Using UID $H3_UID for Heritrix
 

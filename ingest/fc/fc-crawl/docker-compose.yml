@@ -5,7 +5,7 @@ services:
   # UKWA Heritrix for NPLD
   npld-heritrix-worker:
     user: ${H3_UID}
-    image: ukwa/heritrix-worker:${HERITRIX_VERSION}
+    image: ukwa/heritrix:${HERITRIX_VERSION}
     hostname: "npld-heritrix3-worker-{{.Task.Slot}}"
     ports:
       - 8443:8443
@@ -35,7 +35,7 @@ services:
   # UKWA Heritrix for NPLD
   bypm-heritrix-worker:
     user: ${H3_UID}
-    image: ukwa/heritrix-worker:${HERITRIX_VERSION}
+    image: ukwa/heritrix:${HERITRIX_VERSION}
     hostname: "bypm-heritrix3-worker-{{.Task.Slot}}"
     ports:
       - 9443:8443
@@ -75,7 +75,7 @@ services:
 
   # The WARChiving proxy itself
   warcprox:
-    image: ukwa/warcprox:2.4.17
+    image: ukwa/warcprox:2.4.17.1
     command: "warcprox -b 0.0.0.0 -d /output/warcs --base32 --gzip --rollover-idle-time 600 --dedup-db-file /dev/null --stats-db-file /dev/null --quiet --plugin warcprox-plugins.listeners.UpdateOutbackCDX --plugin warcprox-plugins.listeners.KafkaCaptureFeed --max-threads 1000 --queue-size 1000"
     environment:
       - "KAFKA_BOOTSTRAP_SERVERS=kafka:9092"
@@ -84,12 +84,13 @@ services:
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
     volumes:
       - "${STORAGE_PATH}/heritrix/wren:/output/warcs"
+    ulimits:
+      nproc: 2000  # See https://github.com/internetarchive/warcprox/blob/2.x/warcprox/warcproxy.py#L413
     deploy:
       replicas: 1
     networks:
       - default
       - kafka
-      - webrender
 
 
   # ----------------------------------------------
@@ -98,28 +99,32 @@ services:
 
   # PhantomJS web page rendering service
   webrender:
-    image: ukwa/webrender-api:1.0.15
+    image: ukwa/webrender-puppeteer:2.1.0
+    # Can't use this with dnsrr
     #ports:
     #  - 8010:8010
     environment:
-      - "WARCPROX=warcprox:8000"
+      - "HTTP_PROXY=http://warcprox:8000"
+      - "WARCPROX_PROXY=true"
       - "LC_ALL=en_US.utf8"
-      - "WEB_RENDER_TMP=/tmp/webrender"
-      - "DOCKER_NETWORK=fc_crawl_webrender_network"
-      - "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.14"
-    #  - "DOCKER_TIMEOUT=900"
+      - "PORT=8010"
+      - "NODE_ENV=production"
+      - "PUPPETEER_CLUSTER_SIZE=64"
+      - "USER_AGENT_ADDITIONAL=bl.uk_ldfc_renderbot/@VERSION@ (+https://www.bl.uk/legal-deposit/web-archiving)"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # For launching containerised renderers
-      - /tmp/webrender:/tmp/webrender
-      - "./webrender-gunicorn.ini:/webrender/gunicorn.ini" # Override render server configuration
+      - "${STORAGE_PATH}/heritrix/wren:/output/warcs"
+    ulimits:
+      nproc: 10240 # Those browsers need a lot of processes and threads
     deploy:
+      # Use this to avoid the Ingress network, as it appears to forcibly reset long-running connections.
+      endpoint_mode: dnsrr
+      # Note that using dnsrr means we can't use the ingress network for load balancing, and any load balancing has to be done explicitly.
       replicas: 1
-      endpoint_mode: dnsrr # Use this to avoid the Ingress network, as it appears to forcibly reset long-running connections.
     depends_on:
       - warcprox
     networks:
       - default
-      - webrender
+      - kafka
 
 
 
@@ -153,10 +158,6 @@ networks:
   default:
     driver: overlay
     attachable: true
-  # Dedicated webrender subnet (defined externally so it's large enough):
-  webrender:
-    external: true
-    name: fc_crawl_webrender_network
   # Link to Kafka service:
   kafka:
     external: true
