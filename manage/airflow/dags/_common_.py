@@ -11,13 +11,19 @@ class Config():
     # Pick up definitions for the deployment context, and any secrets:
     deployment_context = os.environ['DEPLOYMENT_CONTEXT']
     storage_path = os.environ['STORAGE_PATH']
+    hadoop_namenode_ip = os.environ['HADOOP_NAMENODE_IP']
+    hadoop_jobtracker_ip = os.environ['HADOOP_JOBTRACKER_IP']
 
-    # Define the parameters that you might want to change within a given deployment:
-    hadoop_namenode_ip = Variable.get('hadoop_namenode_ip')
-    hadoop_jobtracker_ip = Variable.get('hadoop_jobtracker_ip')
-    webhdfs_url = Variable.get('webhdfs_url', 'http://webhdfs.api.wa.bl.uk/')
-    webhdfs_access_user = Variable.get('webhdfs_user', 'access')
-    push_gateway = Variable.get('metrics_push_gateway')
+    # TODO Switch to using the connection form:  hadoop fs -fs hdfs://192.168.1.103:54310/ -lsr . 
+    # Maybe not, as this can't be done for job tracking.
+    # But storing the Hadoop details a Connections does make more sense either way.
+
+    # Define the connection parameters, e.. you might want to change within a given deployment:
+    wh_conn = Connection.get_connection_from_secrets("hadoop_020_webhdfs")
+    webhdfs_access_url = f"http://{wh_conn.host}:{wh_conn.port}"
+    webhdfs_access_user = wh_conn.login
+    pg_conn = Connection.get_connection_from_secrets("metrics_push_gateway")
+    push_gateway = f"{pg_conn.host}:{pg_conn.port}"
 
     # Define the common parameters for running Docker tasks:
     hadoop_docker_image = 'ukwa/docker-hadoop:hadoop-0.20'
@@ -37,6 +43,8 @@ class Config():
                 'jobtracker': self.hadoop_jobtracker_ip
             },
             'volumes': ['%s:/storage' % self.storage_path ],
-            'auto_remove': False, # True is a bit aggressive and stops Airflow grabbing logs.
+            'email_on_failure': True,
+            'email': ['Andrew.Jackson@bl.uk'],
+            'auto_remove': False, # True is a bit aggressive and stops Airflow grabbing container logs.
             'do_xcom_push': False, # This is not currently working with DockerOperators so defaulting to off for now.
         }   

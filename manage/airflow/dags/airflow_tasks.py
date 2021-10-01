@@ -10,9 +10,16 @@ from airflow.decorators import dag, task
 from airflow.operators.python import get_current_context
 from airflow.utils.dates import days_ago
 
-default_args = {
-    'user': 'airflow',
-}
+from _common_ import Config
+
+# Pick up shared configuration:
+c = Config()
+
+# These args will get passed on to each operator/task:
+default_args = c.get_default_args()
+
+# Override the user, so this runs as the Airflow user:
+default_args['user'] = 'airflow'
 
 @dag(
     default_args=default_args, 

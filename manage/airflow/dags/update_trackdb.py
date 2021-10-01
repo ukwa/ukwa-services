@@ -24,11 +24,11 @@ default_args = c.get_default_args()
 trackdb = Connection.get_connection_from_secrets("trackdb")
 
 # Use a function to generate parameterised DAGs:
-def generate_update_dag(path, schedule_interval):
+def generate_update_dag(path, schedule_interval, args):
     dag_id = 'update_trackdb%s' % path.replace('/','_')
     with DAG(
         dag_id=dag_id,
-        default_args=default_args, 
+        default_args=args, 
         schedule_interval=schedule_interval, 
         start_date=days_ago(1),
         max_active_runs=1,
@@ -48,7 +48,7 @@ f"""
 
 This recursively lists the `{path}` folder of HDFS and updates TrackDB with information about those files. 
 
-**TODO** The user that scans HDFS should have _read-only_ access to _EVERYTHING_.
+**TODO** The user that scans HDFS should _ONLY_ have _read-only_ access, but be able to see _EVERYTHING_.
 
 Configuration:
 
@@ -83,7 +83,7 @@ How to check it's working:
         jsonl_to_trackdb = DockerOperator(
             task_id='jsonl_to_trackdb',
             image=c.ukwa_task_image,
-            command='trackdb import -v -t {{ params.trackdb_url }} files {{ params.lsr_jsonl }}',
+            command='trackdb import -t {{ params.trackdb_url }} files {{ params.lsr_jsonl }}',
         )
 
         lsr >> lsr_to_jsonl >> jsonl_to_trackdb
@@ -91,5 +91,5 @@ How to check it's working:
         globals()[dag_id] = update_trackdb_dag
 
 # Create DAGs for each path and schedule:
-generate_update_dag('/heritrix/output', '@hourly')
-generate_update_dag('/', '@daily')
+generate_update_dag('/heritrix/output', '@hourly', default_args)
+generate_update_dag('/', '@daily', default_args)
