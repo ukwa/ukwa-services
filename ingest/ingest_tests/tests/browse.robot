@@ -12,8 +12,8 @@ Visit W3ACT, Not Logged In
 
 Log In
     Go To    %{HOST}/act/login
-    Fill Secret    input#email    %USERNAME
-    Fill Secret    input#password    %PASSWORD
+    Fill Secret    input#email    %W3ACT_USERNAME
+    Fill Secret    input#password    %W3ACT_PASSWORD
     Click    button#submit
     Get Text     h1    ==    About
 
