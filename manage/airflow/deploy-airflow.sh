@@ -25,7 +25,7 @@ else
 fi
 
 # Set up general Airflow configs (may be overridden in CONTEXT_ENV_FILE):
-export AIRFLOW_IMAGE_NAME=ukwa/airflow:2.1.0
+export AIRFLOW_IMAGE_NAME=ukwa/airflow:2.1.4
 export AIRFLOW__WEBSERVER__INSTANCE_NAME=${ENVIRON}
 
 # Pull in the rest of the environment variables:

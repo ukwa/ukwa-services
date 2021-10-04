@@ -15,6 +15,8 @@ from airflow.operators.python import get_current_context
 from airflow.operators.docker_operator import DockerOperator
 from airflow.utils.dates import days_ago
 
+from docker.types import Mount
+
 from _common_ import Config
 
 # Pick up shared configuration:
@@ -60,7 +62,9 @@ How to check it's working:
         image=c.ukwa_task_image,
         command='store -v warctidy',
         user=0, # Run as root due to file permissions
-        volumes=['/mnt/gluster/fc:/mnt/gluster/fc'],
+        mounts= [
+            Mount( source='/mnt/gluster/fc', target='/mnt/gluster/fc', type='bind' )
+        ],
         environment={
             'PUSH_GATEWAY': c.push_gateway,
         },

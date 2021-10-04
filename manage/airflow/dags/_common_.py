@@ -5,6 +5,7 @@ This file holds values and variables that are shared across DAGs.
 """ 
 import os
 from airflow.models import Variable, Connection
+from docker.types import Mount
 
 class Config():
 
@@ -42,7 +43,9 @@ class Config():
                 'namenode': self.hadoop_namenode_ip,
                 'jobtracker': self.hadoop_jobtracker_ip
             },
-            'volumes': ['%s:/storage' % self.storage_path ],
+            'mounts': [
+                Mount( source=self.storage_path, target='/storage', type='bind' )
+                 ],
             'email_on_failure': True,
             'email': ['Andrew.Jackson@bl.uk'],
             'auto_remove': False, # True is a bit aggressive and stops Airflow grabbing container logs.
