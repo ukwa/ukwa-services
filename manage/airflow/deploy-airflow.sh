@@ -37,8 +37,11 @@ set +a
 # Storage:
 echo Setup ${STORAGE_PATH} ...
 
+# Storage locations for Airflow itself:
 mkdir -p ${STORAGE_PATH}/airflow/logs
 mkdir -p ${STORAGE_PATH}/airflow/postgres
+# Storage location for data exported from e.g. W3ACT, like access lists used for playback
+mkdir -p ${STORAGE_PATH}/data_exports
 
 sudo chmod -R a+rwx ${STORAGE_PATH}
 

@@ -88,7 +88,7 @@ This dumps the W3ACT database and extracts useful data from it. This includes:
     - `blocks.aclj` downloaded from GitLab.
 - [Solr Collections]({dag1.params['collections_solr']}/select?q=*:*&wt=json&indent=on) for the website (Topics & Themes)
 - Metadata used for full-text indexing (`allows.txt`, `annotations.json`)
-- **TBA:** Crawl feeds, _nevercrawl_ block list.
+- Crawl feeds and block lists (`crawl_feed_bypm.jsonl`, `crawl_feed_npld.jsonl`, `never_crawl.surts`)
 
 These are necessary pre-requisites for access processes, like indexing and playback.
 
@@ -96,28 +96,22 @@ Configuration:
 
 * Exports data from W3ACT DB at `{dag1.params['host']}:{dag1.params['port']}`.
 * Outputs temporary files to `/storage/` which is held under `{c.storage_path}` on the host machine.
-* Files use dump name `{dag1.params['dump_name']}` to distinguish this data dump from others.
+* Uses dump name `{dag1.params['dump_name']}` to distinguish this data dump from others.
 * Outputs results to `/storage/data_exports` which is held under `{c.storage_path}` on the host machine.
 * Updates the Topics & Themes Solr collection at `{dag1.params['collections_solr']}`.
 * Updates [this Prometheus Push Gateway](http://{c.push_gateway}) with `w3act_export` line count metrics.
 
-To Add:
+How to check it's working:
 
-* `list-urls -f nevercrawl --include-hidden --include-expired -F surts crawl_never.surts`
-* `crawl-feed -d /mnt/nfs/data/airflow/w3act_export/ -F jsonl -f all -t bypm --include-hidden crawl_bypm.jsonl`
-* `crawl-feed -F jsonl -f all -t npld --include-hidden crawl_feed.jsonl`
+* All export files indicated above are present and up-to-date in the `{c.storage_path}` folder on the host machine. 
+* The [`ukwa_record_count` metrics are up to date in Prometheus](http://monitor-prometheus.api.wa.bl.uk/graph?g0.expr=ukwa_record_count&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=2d).
+
 
 """
 
     # Shared operator definitions:
     cleanup = W3ACTDumpCleanupOperator()
     dump = W3ACTDumpOperator()
-
-    mkd = DockerOperator(
-        task_id='make_dir',
-        image=c.w3act_task_image,
-        command='bash -c "mkdir -p /storage/data_exports && chmod a+rwx /storage/data_exports"',
-    )
 
     aclj = DockerOperator(
         task_id='generate_allows_aclj',
@@ -135,6 +129,24 @@ To Add:
         task_id='generate_solr_indexer_annotations',
         image=c.w3act_task_image,
         command='w3act gen-annotations -d /storage/{{ params.dump_name }} /storage/data_exports/annotations.json.new',
+    )
+
+    cfld = DockerOperator(
+        task_id='generate_npld_crawl_feed',
+        image=c.w3act_task_image,
+        command='w3act crawl-feed -d /storage/{{ params.dump_name }} -F jsonl -f all -t npld --include-hidden /storage/data_exports/crawl_feed_npld.jsonl.new',
+    )
+
+    cfby = DockerOperator(
+        task_id='generate_by_permission_crawl_feed',
+        image=c.w3act_task_image,
+        command='w3act crawl-feed -d /storage/{{ params.dump_name }} -F jsonl -f all -t bypm --include-hidden /storage/data_exports/crawl_feed_bypm.jsonl.new',
+    )
+
+    never = DockerOperator(
+        task_id='generate_never_crawl_list',
+        image=c.w3act_task_image,
+        command='w3act list-urls -d /storage/{{ params.dump_name }} -f nevercrawl --include-hidden --include-expired -F surts /storage/data_exports/never_crawl.surts.new',
     )
 
     blk = DockerOperator(
@@ -156,7 +168,10 @@ To Add:
 mv -f /storage/data_exports/annotations.json.new /storage/data_exports/annotations.json &&
 mv -f /storage/data_exports/allows.txt.new /storage/data_exports/allows.txt &&
 mv -f /storage/data_exports/allows.aclj.new /storage/data_exports/allows.aclj &&
-mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
+mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj &&
+mv -f /storage/data_exports/never_crawl.surts.new /storage/data_exports/never_crawl.surts &&
+mv -f /storage/data_exports/crawl_feed_npld.jsonl.new /storage/data_exports/crawl_feed_npld.jsonl &&
+mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/crawl_feed_bypm.jsonl"
         """,
     )
 
@@ -178,6 +193,9 @@ mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
         make_line_gauge(g, '/storage/data_exports/allows.aclj', 'allows.aclj')
         make_line_gauge(g, '/storage/data_exports/blocks.aclj', 'blocks.aclj')
         make_line_gauge(g, '/storage/data_exports/annotations.json', 'annotations.json')
+        make_line_gauge(g, '/storage/data_exports/never_crawl.surts', 'never_crawl.surts')
+        make_line_gauge(g, '/storage/data_exports/crawl_feed_npld.jsonl', 'crawl_feed_npld.jsonl')
+        make_line_gauge(g, '/storage/data_exports/crawl_feed_bypm.jsonl', 'crawl_feed_npld.jsonl')
 
         #context = get_current_context()
  
@@ -190,7 +208,7 @@ mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj"
     stat = push_w3act_data_stats()
 
     # Define workflow dependencies:
-    cleanup >> dump >> mkd >> [ acl, aclj, ann, blk ] >> mvs >> socol >> stat
+    cleanup >> dump >> [ acl, aclj, ann, blk, cfld, cfby, never ] >> mvs >> socol >> stat
 
 
 # ----------------------------------------------------------------------------
@@ -223,7 +241,7 @@ Configuration:
 
 * Exports data from W3ACT DB at `{dag2.params['host']}:{dag2.params['port']}`.
 * Outputs temporary files to `/storage/` which is held under `{c.storage_path}` on the host machine.
-* Files use dump name `{dag2.params['dump_name']}` to distinguish this data dump from others.
+* Uses dump name `{dag2.params['dump_name']}` to distinguish this data dump from others.
 * Backup are placed on HDFS at:
     * `{ dag2.params['hdfs_path'] }/w3act-db-csv.zip`
     * `{ dag2.params['hdfs_path'] }/w3act_dump.sql`
@@ -308,7 +326,7 @@ Configuration:
 
 * Exports data from W3ACT DB at `{dag3.params['host']}:{dag3.params['port']}`.
 * Outputs temporary files to `/storage/` which is held under `{c.storage_path}` on the host machine.
-* Files use dump name `{dag3.params['dump_name']}` to distinguish this data dump from others.
+* Uses dump name `{dag3.params['dump_name']}` to distinguish this data dump from others.
 * Sends full reports to `{dag3.params['full_report_email']}`.
 * Sends summary reports to `{dag3.params['summary_report_email']}`.
 
