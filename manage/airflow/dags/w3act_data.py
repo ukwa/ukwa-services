@@ -10,7 +10,7 @@ from airflow.decorators import task
 from airflow.utils.decorators import apply_defaults
 from airflow.utils.dates import days_ago
 from airflow.operators.bash import BashOperator
-from airflow.operators.ssh_operator import SSHOperator
+from airflow.providers.ssh.operators.ssh import SSHOperator
 from airflow.operators.docker_operator import DockerOperator
 from airflow.operators.python import get_current_context
 from airflow.models import Variable, Connection, DAG
@@ -188,15 +188,15 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
         """,
     )
 
-    #acls_deploy = SSHOperator(
-    #    task_id='deploy_updated_acls',
-    #    remote_host='access',
-    #    command="""bash -c "
-    #    cd /root/gitlab/wayback_excludes_update/
-    #    git pull origin master
-    #    "
-    #    """,
-    #)
+    acls_deploy = SSHOperator(
+        task_id='deploy_updated_acls',
+        ssh_conn_id='access_ssh',
+        command="""bash -c "
+        cd /root/gitlab/wayback_excludes_update/
+        git pull origin master
+        "
+        """,
+    )
 
     @task()
     def push_w3act_data_stats():
@@ -231,7 +231,7 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
     stat = push_w3act_data_stats()
 
     # Define workflow dependencies:
-    cleanup >> dump >> [ acl, aclj, ann, cfld, cfby, never ] >> mvs >> [ socol, stat, acls_git ]
+    cleanup >> dump >> [ acl, aclj, ann, cfld, cfby, never ] >> mvs >> [ socol, stat, acls_git ] >> acls_deploy
 
 
 # ----------------------------------------------------------------------------
