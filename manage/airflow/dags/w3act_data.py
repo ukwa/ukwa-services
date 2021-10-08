@@ -10,6 +10,7 @@ from airflow.decorators import task
 from airflow.utils.decorators import apply_defaults
 from airflow.utils.dates import days_ago
 from airflow.operators.bash import BashOperator
+from airflow.operators.ssh_operator import SSHOperator
 from airflow.operators.docker_operator import DockerOperator
 from airflow.operators.python import get_current_context
 from airflow.models import Variable, Connection, DAG
@@ -28,6 +29,9 @@ access_w3act = Connection.get_connection_from_secrets("access_w3act")
 # Which Collections Solr to update:
 collections_solr = Connection.get_connection_from_secrets("access_collections_solr")
 
+# Connection to commit to GitLab Wayback ACLs (including access token in it)
+gitlab_wayback_acl_remote = Connection.get_connection_from_secrets("gitlab_wayback_acl_remote")
+
 # ----------------------------------------------------------------------------
 # Define common tasks as Operators:
 # ----------------------------------------------------------------------------
@@ -38,7 +42,7 @@ class W3ACTDumpCleanupOperator(DockerOperator):
             super().__init__(
                 task_id = 'cleanup_db_folder',
                 image = c.w3act_task_image,
-                command = 'rm -fr /storage/{{ params.dump_name }} /storage`/{{ params.dump_name }}.sql',
+                command = 'rm -fr /storage/{{ params.dump_name }} /storage/{{ params.dump_name }}.sql',
                 **kwargs)
 
 class W3ACTDumpOperator(DockerOperator):
@@ -75,6 +79,7 @@ with DAG(
         'dump_name': 'w3act_export',
         'storage_path': c.storage_path,
         'collections_solr': collections_solr.get_uri(),
+        'gitlab_wayback_acl_remote': gitlab_wayback_acl_remote.get_uri().replace('%2F','/'), # GitLab does not like the slash in the path being escaped.
     },
     tags=['access', 'w3act'],
 ) as dag1:
@@ -116,13 +121,13 @@ How to check it's working:
     aclj = DockerOperator(
         task_id='generate_allows_aclj',
         image=c.w3act_task_image,
-        command='w3act gen-oa-acl -d /storage/{{ params.dump_name }} /storage/data_exports/allows.aclj.new',
+        command='w3act gen-oa-acl -d /storage/{{ params.dump_name }} /storage/wayback_acls/oukwa/acl/allows.aclj.new',
     )
 
     acl = DockerOperator(
         task_id='generate_allows_acl',
         image=c.w3act_task_image,
-        command='w3act gen-oa-acl -d /storage/{{ params.dump_name }} --format surts /storage/data_exports/allows.txt.new',
+        command='w3act gen-oa-acl -d /storage/{{ params.dump_name }} --format surts /storage/wayback_acls/oukwa/acl/allows.txt.new',
     )
 
     ann = DockerOperator(
@@ -149,12 +154,6 @@ How to check it's working:
         command='w3act list-urls -d /storage/{{ params.dump_name }} -f nevercrawl --include-hidden --include-expired -F surts /storage/data_exports/never_crawl.surts.new',
     )
 
-    blk = DockerOperator(
-        task_id='download_blocks_from_gitlab',
-        image=c.ukwa_task_image,
-        command='curl -o /storage/data_exports/blocks.aclj.new "http://git.wa.bl.uk/bl-services/wayback_excludes_update/-/raw/master/oukwa/acl/blocks.aclj"', 
-    )
-
     socol = DockerOperator(
         task_id='update_collections_solr',
         image=c.w3act_task_image,
@@ -165,15 +164,39 @@ How to check it's working:
         task_id='atomic_update',
         image=c.w3act_task_image,
         command="""bash -c "
+mv -f /storage/wayback_acls/oukwa/acl/allows.aclj.new /storage/wayback_acls/oukwa/acl/allows.aclj &&
+mv -f /storage/wayback_acls/oukwa/acl/allows.txt.new /storage/wayback_acls/oukwa/acl/allows.txt &&
 mv -f /storage/data_exports/annotations.json.new /storage/data_exports/annotations.json &&
-mv -f /storage/data_exports/allows.txt.new /storage/data_exports/allows.txt &&
-mv -f /storage/data_exports/allows.aclj.new /storage/data_exports/allows.aclj &&
-mv -f /storage/data_exports/blocks.aclj.new /storage/data_exports/blocks.aclj &&
 mv -f /storage/data_exports/never_crawl.surts.new /storage/data_exports/never_crawl.surts &&
 mv -f /storage/data_exports/crawl_feed_npld.jsonl.new /storage/data_exports/crawl_feed_npld.jsonl &&
 mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/crawl_feed_bypm.jsonl"
         """,
     )
+
+    acls_git = DockerOperator(
+        task_id='commit_wayback_acls_to_git',
+        image=c.ukwa_task_image, # Any image with git installed should be fine
+        command="""bash -c "
+        cd /storage/wayback_acls
+        git config user.email '{{ var.value.alert_email_address }}'
+        git config user.email
+        git config user.name 'Airflow W3ACT Export Task'
+        git commit -m 'Automated update from Airflow at {{ ts }} by {{ task_instance_key_str }}.' -a
+        git pull origin master
+        git push {{ params.gitlab_wayback_acl_remote }} master
+        "
+        """,
+    )
+
+    #acls_deploy = SSHOperator(
+    #    task_id='deploy_updated_acls',
+    #    remote_host='access',
+    #    command="""bash -c "
+    #    cd /root/gitlab/wayback_excludes_update/
+    #    git pull origin master
+    #    "
+    #    """,
+    #)
 
     @task()
     def push_w3act_data_stats():
@@ -189,13 +212,13 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
                     lines += 1
             g.labels(kind=kind).set(lines)
         # Files to record:
-        make_line_gauge(g, '/storage/data_exports/allows.txt', 'allows.txt')
-        make_line_gauge(g, '/storage/data_exports/allows.aclj', 'allows.aclj')
-        make_line_gauge(g, '/storage/data_exports/blocks.aclj', 'blocks.aclj')
+        make_line_gauge(g, '/storage/wayback_acls/oukwa/acl/allows.txt', 'allows.txt')
+        make_line_gauge(g, '/storage/wayback_acls/oukwa/acl/allows.aclj', 'allows.aclj')
+        make_line_gauge(g, '/storage/wayback_acls/oukwa/acl/blocks.aclj', 'blocks.aclj')
         make_line_gauge(g, '/storage/data_exports/annotations.json', 'annotations.json')
         make_line_gauge(g, '/storage/data_exports/never_crawl.surts', 'never_crawl.surts')
         make_line_gauge(g, '/storage/data_exports/crawl_feed_npld.jsonl', 'crawl_feed_npld.jsonl')
-        make_line_gauge(g, '/storage/data_exports/crawl_feed_bypm.jsonl', 'crawl_feed_npld.jsonl')
+        make_line_gauge(g, '/storage/data_exports/crawl_feed_bypm.jsonl', 'crawl_feed_bypm.jsonl')
 
         #context = get_current_context()
  
@@ -208,7 +231,7 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
     stat = push_w3act_data_stats()
 
     # Define workflow dependencies:
-    cleanup >> dump >> [ acl, aclj, ann, blk, cfld, cfby, never ] >> mvs >> socol >> stat
+    cleanup >> dump >> [ acl, aclj, ann, cfld, cfby, never ] >> mvs >> [ socol, stat, acls_git ]
 
 
 # ----------------------------------------------------------------------------

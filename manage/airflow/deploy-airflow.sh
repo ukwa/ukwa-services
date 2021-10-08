@@ -42,6 +42,8 @@ mkdir -p ${STORAGE_PATH}/airflow/logs
 mkdir -p ${STORAGE_PATH}/airflow/postgres
 # Storage location for data exported from e.g. W3ACT, like access lists used for playback
 mkdir -p ${STORAGE_PATH}/data_exports
+# Clone the Git repo used to store access-control lists
+git clone http://git.wa.bl.uk/bl-services/wayback_excludes_update.git ${STORAGE_PATH}/wayback_acls
 
 sudo chmod -R a+rwx ${STORAGE_PATH}
 

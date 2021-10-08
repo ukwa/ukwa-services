@@ -28,8 +28,8 @@ class Config():
 
     # Define the common parameters for running Docker tasks:
     hadoop_docker_image = 'ukwa/docker-hadoop:hadoop-0.20'
-    ukwa_task_image = 'ukwa/ukwa-manage:latest'
-    w3act_task_image = 'ukwa/python-w3act:latest'
+    ukwa_task_image = 'ukwa/ukwa-manage:master'
+    w3act_task_image = 'ukwa/python-w3act:master'
     postgres_image = 'postgres:9.6.2'
 
     # Get a copy of the default arguments:
@@ -47,7 +47,9 @@ class Config():
                 Mount( source=self.storage_path, target='/storage', type='bind' )
                  ],
             'email_on_failure': True,
-            'email': ['Andrew.Jackson@bl.uk'],
+            'email': [
+                    Variable.get('alert_email_address')
+                ],
             'auto_remove': False, # True is a bit aggressive and stops Airflow grabbing container logs.
             'do_xcom_push': False, # This is not currently working with DockerOperators so defaulting to off for now.
         }   
