@@ -6,7 +6,7 @@ Disallow: /en/ukwa/search
 Disallow: /cy/ukwa/search
 Disallow: /gd/ukwa/search
 Disallow: /datasets/
-Disallow: /shine/
+Disallow: /shine/search
 
 # Allow Twitterbot so social cards work:
 User-agent: Twitterbot

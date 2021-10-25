@@ -59,7 +59,4 @@ services:
     image: selenium/hub:3.141.59-zinc
     ports:
       - "4444:4444"
-    depends_on:
-      - firefox
-      - chrome
 

@@ -1,0 +1,9 @@
+version: '3'
+services:
+  outbackcdx:
+    image: nlagovau/outbackcdx:0.11.0
+    command: "java -Xmx8g -jar /outbackcdx.jar -d /cdx-data -b 0.0.0.0 -p 8080 -t 5000"
+    ports:
+      - "8080:8080"
+    volumes:
+      - /mnt/nfs/data/cdx:/cdx-data
