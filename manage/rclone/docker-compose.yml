@@ -3,7 +3,8 @@ version: '3.7'
 services:
   rclone:
     image: rclone/rclone
-    command: "rcd --rc-web-gui --rc-addr=:5572 --rc-enable-metrics --rc-web-gui-no-open-browser"
+    #command: "rcd --rc-web-gui --rc-addr=:5572 --rc-enable-metrics --rc-web-gui-no-open-browser --rc-user=ingest --rc-pass=ingest"
+    command: "copy --max-age 24h --no-traverse /mnt/gluster/fc/heritrix/output hadoop3:/heritrix/output"
     environment:
       - "HTTPS_PROXY=http://explorer.bl.uk:3127"
     user: "1002:1002"
