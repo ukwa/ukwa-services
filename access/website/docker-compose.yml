@@ -30,7 +30,7 @@ services:
   # -------------------------------------------------------------
   ukwa-ui:
     #image: ukwa/ukwa-ui:v1.3.4
-    image: min2ha/ukwa-ui:xss-solution
+    image:  min2ha/ukwa-ui:new_feature_categories
     command: java -Djava.security.egd=file:/dev/./urandom -jar /ukwa-ui.war --spring.config.location=file:/application.properties
     environment:
      - "OFF_SITE_URL=/wayback/archive/"
@@ -182,7 +182,7 @@ services:
 
   # Collections index for Topics & Themes of the UKWA UI
   collections_solr:
-    image: ukwa/ukwa-ui-collections-solr:1.1.1
+    image: ukwa/ukwa-ui-collections-solr:1.2.0
     user: "${CURRENT_UID}"
     volumes:
         - "${STORAGE_PATH_WEBSITE}/collections_solr_cores:/opt/solr/server/solr/mycores"
