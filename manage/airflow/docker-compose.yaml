@@ -61,8 +61,6 @@ x-airflow-common:
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true' # Permit non-JSON data to be passed between operators
     DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT} # DEV/BETA/PROD/etc.
     STORAGE_PATH: ${STORAGE_PATH}
-    HADOOP_NAMENODE_IP: ${HADOOP_NAMENODE_IP}
-    HADOOP_JOBTRACKER_IP: ${HADOOP_JOBTRACKER_IP}
   volumes:
     - "./dags:/opt/airflow/dags"
     - "./plugins:/opt/airflow/plugins"

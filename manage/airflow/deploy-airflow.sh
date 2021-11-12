@@ -11,8 +11,8 @@ fi
 
 if [[ ${ENVIRON} == 'dev' ]]; then
 	export CONTEXT_ENV_FILE=/mnt/nfs/config/gitlab/ukwa-services-env/dev.env
-	# Additional config for this enviroment:
-	export AIRFLOW__WEBSERVER__NAVBAR_COLOR="purple"
+	# Additional config for this enviroment (purple like ACT but made paler so it's usable):
+	export AIRFLOW__WEBSERVER__NAVBAR_COLOR="#ff80ff"
 	# BETA
 	#export AIRFLOW__WEBSERVER__NAVBAR_COLOR="darkred"
 elif [[ ${ENVIRON} == 'ingest' ]]; then
@@ -27,6 +27,8 @@ fi
 # Set up general Airflow configs (may be overridden in CONTEXT_ENV_FILE):
 export AIRFLOW_IMAGE_NAME=ukwa/airflow:2.1.4
 export AIRFLOW__WEBSERVER__INSTANCE_NAME=${ENVIRON}
+
+export AIRFLOW__SMTP__SMTP_STARTTLS=False
 
 # Pull in the rest of the environment variables:
 echo Reading $CONTEXT_ENV_FILE
@@ -43,7 +45,16 @@ mkdir -p ${STORAGE_PATH}/airflow/postgres
 # Storage location for data exported from e.g. W3ACT, like access lists used for playback
 mkdir -p ${STORAGE_PATH}/data_exports
 # Clone the Git repo used to store access-control lists
-git clone http://git.wa.bl.uk/bl-services/wayback_excludes_update.git ${STORAGE_PATH}/wayback_acls
+GIT_URL=http://git.wa.bl.uk/bl-services/wayback_excludes_update.git 
+FOLDER=${STORAGE_PATH}/wayback_acls
+if [ ! -d "$FOLDER" ] ; then
+    git clone $GIT_URL $FOLDER
+else
+    cd "$FOLDER"
+    git pull $GIT_URL
+    cd -
+fi
+
 
 sudo chmod -R a+rwx ${STORAGE_PATH}
 

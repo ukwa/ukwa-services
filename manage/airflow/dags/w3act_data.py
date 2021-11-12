@@ -30,7 +30,14 @@ access_w3act = Connection.get_connection_from_secrets("access_w3act")
 collections_solr = Connection.get_connection_from_secrets("access_collections_solr")
 
 # Connection to commit to GitLab Wayback ACLs (including access token in it)
-gitlab_wayback_acl_remote = Connection.get_connection_from_secrets("gitlab_wayback_acl_remote")
+try:
+    gitlab_wayback_acl_remote = Connection.get_connection_from_secrets("gitlab_wayback_acl_remote")
+    # GitLab does not like the slash in the path being escaped:
+    gitlab_wayback_acl_remote = gitlab_wayback_acl_remote.get_uri().replace('%2F','/')
+except Exception as e:
+    print("WARNING! no gitlab_wayback_acl_remote found!")
+    print(e)
+    gitlab_wayback_acl_remote = None
 
 # ----------------------------------------------------------------------------
 # Define common tasks as Operators:
@@ -79,7 +86,7 @@ with DAG(
         'dump_name': 'w3act_export',
         'storage_path': c.storage_path,
         'collections_solr': collections_solr.get_uri(),
-        'gitlab_wayback_acl_remote': gitlab_wayback_acl_remote.get_uri().replace('%2F','/'), # GitLab does not like the slash in the path being escaped.
+        'gitlab_wayback_acl_remote': gitlab_wayback_acl_remote,
     },
     tags=['access', 'w3act'],
 ) as dag1:
@@ -105,6 +112,7 @@ Configuration:
 * Outputs results to `/storage/data_exports` which is held under `{c.storage_path}` on the host machine.
 * Updates the Topics & Themes Solr collection at `{dag1.params['collections_solr']}`.
 * Updates [this Prometheus Push Gateway](http://{c.push_gateway}) with `w3act_export` line count metrics.
+* Updates GitLab at `{dag1.params['gitlab_wayback_acl_remote']}`
 
 How to check it's working:
 
