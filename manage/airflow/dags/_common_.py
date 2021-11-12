@@ -12,14 +12,9 @@ class Config():
     # Pick up definitions for the deployment context, and any secrets:
     deployment_context = os.environ['DEPLOYMENT_CONTEXT']
     storage_path = os.environ['STORAGE_PATH']
-    hadoop_namenode_ip = os.environ['HADOOP_NAMENODE_IP']
-    hadoop_jobtracker_ip = os.environ['HADOOP_JOBTRACKER_IP']
 
-    # TODO Switch to using the connection form:  hadoop fs -fs hdfs://192.168.1.103:54310/ -lsr . 
-    # Maybe not, as this can't be done for job tracking.
-    # But storing the Hadoop details a Connections does make more sense either way.
-
-    # Define the connection parameters, e.. you might want to change within a given deployment:
+    # Define the connection parameters, e.g. you might want to change within a given deployment:
+    # FIXME Do we need the webhdfs here?
     wh_conn = Connection.get_connection_from_secrets("hadoop_020_webhdfs")
     webhdfs_access_url = f"http://{wh_conn.host}:{wh_conn.port}"
     webhdfs_access_user = wh_conn.login
@@ -27,7 +22,7 @@ class Config():
     push_gateway = f"{pg_conn.host}:{pg_conn.port}"
 
     # Define the common parameters for running Docker tasks:
-    hadoop_docker_image = 'ukwa/docker-hadoop:hadoop-0.20'
+    hadoop_docker_image = 'ukwa/docker-hadoop:hadoop-3'
     ukwa_task_image = 'ukwa/ukwa-manage:master'
     w3act_task_image = 'ukwa/python-w3act:master'
     postgres_image = 'postgres:9.6.2'
@@ -40,8 +35,10 @@ class Config():
             'retries': 3,
             # Shared configuration for all Docker tasks:
             'extra_hosts': {
-                'namenode': self.hadoop_namenode_ip,
-                'jobtracker': self.hadoop_jobtracker_ip
+                'h020nn': '192.168.1.103',
+                'h020jt': '192.168.1.104',
+                'h3nn' : '192.168.45.181',
+                'h3rm' : '192.168.45.182'
             },
             'mounts': [
                 Mount( source=self.storage_path, target='/storage', type='bind' )
@@ -52,4 +49,5 @@ class Config():
                 ],
             'auto_remove': False, # True is a bit aggressive and stops Airflow grabbing container logs.
             'do_xcom_push': False, # This is not currently working with DockerOperators so defaulting to off for now.
+            'mount_tmp_dir': False, # Not supported by docker-in-docker tasks
         }   
