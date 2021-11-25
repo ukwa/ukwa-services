@@ -8,7 +8,9 @@ DockerOperator work fine but must return 1 on errors to get picked up. Presumabl
 
 ### Setting up the required connections and variables
 
-Importing setup works like:
+First, get the relevant connections and variables JSON files from the ukwa-services-env repository. Place them on the storage location shared with the Airflow Docker containers, so they can be seen at `/storage/
+
+The, the importing setup works like this (using `dev` as an example):
 
 ```
 ./run-airflow-cmd.sh airflow variables import /storage/dev-variables.json
