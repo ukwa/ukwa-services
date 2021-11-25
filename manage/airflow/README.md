@@ -17,7 +17,9 @@ The, the importing setup works like this (using `dev` as an example):
 ./run-airflow-cmd.sh airflow connections import /storage/dev-connections.json
 ```
 
+Some of these connections use SSH, and refer to the required SSH keypairs from `gitlab/ukwa-services-env/airflow/ssh`. These should be copied to `${STORAGE_PATH}/ssh` to match the settings in the `connections.json` configuration file. This will allow jobs to run that rely on SSH connections to other services.
 
+### Monitoring with Prometheus
 http://dev1.n45.wa.bl.uk:5050/admin/metrics/
 
 
