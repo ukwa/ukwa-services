@@ -18,7 +18,8 @@
 
 # Basic Airflow cluster configuration for CeleryExecutor with Redis and PostgreSQL.
 #
-# WARNING: This configuration is for local development. Do not use it in a production deployment.
+# Based on the example supplied by the Airflow project, tweaked for production.
+# See https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html
 #
 # This configuration supports basic configuration using environment variables or an .env file
 # The following variables are supported:
@@ -138,7 +139,4 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
-
-volumes:
-  postgres-db-volume:
 

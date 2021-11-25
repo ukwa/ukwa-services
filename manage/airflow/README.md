@@ -2,9 +2,19 @@
 
 useradd -u 50000 -G docker airflow
 
-./deploy-airflow.sh /home/anj/gitlab/ukwa-services-env/dev.env
+./deploy-airflow.sh dev
 
 DockerOperator work fine but must return 1 on errors to get picked up. Presumably stderr gets logged and stdout is for XCom and should return JSON.
+
+### Setting up the required connections and variables
+
+Importing setup works like:
+
+```
+./run-airflow-cmd.sh airflow variables import /storage/dev-variables.json
+./run-airflow-cmd.sh airflow connections import /storage/dev-connections.json
+```
+
 
 http://dev1.n45.wa.bl.uk:5050/admin/metrics/
 
