@@ -1,44 +1,42 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euxo pipefail
 
-# read script environ argument
-ENVIRON=$1
-if ! [[ ${ENVIRON} =~ dev|beta|prod|ingest ]]; then
-        echo "ERROR: Script $0 requires environment argument (dev|beta|prod|ingest)"
-        exit
-fi
-
-if [[ ${ENVIRON} == 'dev' ]]; then
-	export CONTEXT_ENV_FILE=/mnt/nfs/config/gitlab/ukwa-services-env/dev.env
-	# Additional config for this enviroment (purple like ACT but made paler so it's usable):
-	export AIRFLOW__WEBSERVER__NAVBAR_COLOR="#ff80ff"
-	# BETA
-	#export AIRFLOW__WEBSERVER__NAVBAR_COLOR="darkred"
-elif [[ ${ENVIRON} == 'ingest' ]]; then
-	export CONTEXT_ENV_FILE=/root/gitlab/ukwa-services-env/ingest.env
-	export AIRFLOW__WEBSERVER__INSTANCE_NAME="Airflow (Production/Ingest)"
-else
-        export PUSH_GATEWAY=monitor.wa.bl.uk:9091
-	echo "ERROR - not yet configured!"
+# read script environ argument, check, and read envars
+CONTEXT_ENV_FILE=$1
+if ! [[ -f ${CONTEXT_ENV_FILE} ]]; then
+	echo "ERROR: Script $0 argument [${CONTEXT_ENV_FILE}] missing"
 	exit
 fi
 
-# Set up general Airflow configs (may be overridden in CONTEXT_ENV_FILE):
-export AIRFLOW_IMAGE_NAME=ukwa/airflow:2.1.4
-export AIRFLOW__WEBSERVER__INSTANCE_NAME=${ENVIRON}
-
-export AIRFLOW__SMTP__SMTP_STARTTLS=False
-
-# Pull in the rest of the environment variables:
-echo Reading $CONTEXT_ENV_FILE
 set -a # automatically export all variables
 source ${CONTEXT_ENV_FILE}
 set +a
 
+if ! [[ ${DEPLOYMENT_CONTEXT} =~ DEV|BETA|PROD|INGEST ]]; then
+        echo "ERROR: Script $0 DEPLOYMENT_CONTEXT envar not (DEV|BETA|PROD|INGEST)"
+        exit
+fi
+
+
+#if [[ ${ENVIRON} == 'dev' ]]; then
+#	export CONTEXT_ENV_FILE=/mnt/nfs/config/gitlab/ukwa-services-env/dev.env
+#	# Additional config for this enviroment (purple like ACT but made paler so it's usable):
+#	export AIRFLOW__WEBSERVER__NAVBAR_COLOR="#ff80ff"
+#	# BETA
+#	#export AIRFLOW__WEBSERVER__NAVBAR_COLOR="darkred"
+#elif [[ ${ENVIRON} == 'ingest' ]]; then
+#	export CONTEXT_ENV_FILE=/root/gitlab/ukwa-services-env/ingest.env
+#	export AIRFLOW__WEBSERVER__INSTANCE_NAME="Airflow (Production/Ingest)"
+#else
+#        export PUSH_GATEWAY=monitor.wa.bl.uk:9091
+#	echo "ERROR - not yet configured!"
+#	exit
+#fi
+
+
 # Storage:
 echo Setup ${STORAGE_PATH} ...
-
 # Storage locations for Airflow itself:
 mkdir -p ${STORAGE_PATH}/airflow/logs
 mkdir -p ${STORAGE_PATH}/airflow/postgres
@@ -55,9 +53,5 @@ else
     cd -
 fi
 
-
-sudo chmod -R a+rwx ${STORAGE_PATH}
-
-export STORAGE_PATH MANAGE_SENTRY_DSN AIRFLOW_UID AIRFLOW_GID
-
+# deploy container
 docker stack deploy -c docker-compose.yaml airflow
