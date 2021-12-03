@@ -37,8 +37,7 @@ class Config():
             'extra_hosts': {
                 'h020nn': '192.168.1.103',
                 'h020jt': '192.168.1.104',
-                'h3nn' : '192.168.45.181',
-                'h3rm' : '192.168.45.182'
+                # Note that H3 config uses proper domain names like h3rm.wa.bl.uk
             },
             'mounts': [
                 Mount( source=self.storage_path, target='/storage', type='bind' )

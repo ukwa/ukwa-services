@@ -22,6 +22,7 @@ default_args = c.get_default_args()
 
 # Connection to W3ACT PostgreSQL DB to use:
 trackdb = Connection.get_connection_from_secrets("trackdb")
+trackdb_url = trackdb.get_uri().replace('%2F','/')
 
 # Use a function to generate parameterised DAGs:
 def generate_update_dag(path, hadoop_service, schedule_interval, args):
@@ -37,7 +38,7 @@ def generate_update_dag(path, hadoop_service, schedule_interval, args):
             'path': path,
             'lsr_txt': '/storage/hadoop_lsr_%s.txt' % dag_id,
             'lsr_jsonl': '/storage/hadoop_lsr_%s.jsonl' % dag_id,
-            'trackdb_url': trackdb.get_uri(),
+            'trackdb_url': trackdb_url,
             'hadoop_service': hadoop_service
         },
         tags=['trackdb', 'manage']
@@ -55,15 +56,15 @@ Configuration:
 
 * The Hadoop service being scanned is: `{hadoop_service}`
 * The HDFS path to scan is: `{ update_trackdb_dag.params['path']}`
-* This task is configured to update the TrackDB at: `{ update_trackdb_dag.params['trackdb_url'] }`
 * Intermediate task output files will be stored on the host server under the `{c.storage_path}` folder, mounted as `/storage` in Docker containers. 
-* The output files are:
+* The intermediate output files are:
     * Text format HDFS file listing: `{ update_trackdb_dag.params['lsr_txt'] }`
     * Converted JSONLines HDFS listing: `{ update_trackdb_dag.params['lsr_jsonl'] }`
+* This task is configured to update the TrackDB at: `{ update_trackdb_dag.params['trackdb_url'] }`
 
 How to check it's working:
 
-* The TrackDB should have up-to-date results for the configured path and Hadoop service, visible via [this reverse-chronological query]({trackdb.get_uri()}/select?q=file_path_s:{escaped_path}* AND hdfs_service_id_s:{hadoop_service}&sort=timestamp_dt+desc).
+* The TrackDB should have up-to-date results for the configured path and Hadoop service, visible via [this reverse-chronological query]({trackdb_url}/select?q=file_path_s:{escaped_path}* AND hdfs_service_id_s:{hadoop_service}&sort=timestamp_dt+desc).
 
 """
 
@@ -83,6 +84,7 @@ How to check it's working:
                 task_id='list_hadoop_fs',
                 image=c.hadoop_docker_image,
                 command='bash -c "/usr/local/hadoop/bin/hadoop fs -lsr {{ params.path }} > {{ params.lsr_txt }}; true"',
+                # Note that H3 automatically picks up the right config dir
             )
 
         lsr_to_jsonl = DockerOperator(
