@@ -22,9 +22,9 @@ class Config():
     push_gateway = f"{pg_conn.host}:{pg_conn.port}"
 
     # Define the common parameters for running Docker tasks:
-    hadoop_docker_image = 'ukwa/docker-hadoop:hadoop-3'
-    ukwa_task_image = 'ukwa/ukwa-manage:master'
-    w3act_task_image = 'ukwa/python-w3act:master'
+    hadoop_docker_image = 'ukwa/docker-hadoop:2.0.0'
+    ukwa_task_image = 'ukwa/ukwa-manage:2.0.0'
+    w3act_task_image = 'ukwa/python-w3act:2.0.0'
     postgres_image = 'postgres:9.6.2'
 
     # Get a copy of the default arguments:
