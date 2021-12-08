@@ -12,14 +12,14 @@ if [[ ${ENVIRON} == 'prod' ]]; then
 	export SERVER_NAME=www.webarchive.org.uk
 	export DEPLOYMENT_TAG=prod
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/prod1/website
-	export STORAGE_PATH_SHARED=/mnt/nfs/data/prod1/airflow/data_exports
+	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/acl
 	export CONFIG_PATH=/mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/pywb
     source /mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/app_secret.env
 elif [[ ${ENVIRON} == 'beta' ]]; then
 	export SERVER_NAME=beta.webarchive.org.uk
 	export DEPLOYMENT_TAG=beta
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
-	export STORAGE_PATH_SHARED=/mnt/nfs/data/airflow/data_exports
+	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/aclTHIS_NEEDS_UPDATING_APPROPRIATELY
 	export CONFIG_PATH=/mnt/nfs/access/config/gitlab/ukwa-services-env/access/pywb
     source /mnt/nfs/access/config/gitlab/ukwa-services-env/access/app_secret.env
 else
@@ -27,7 +27,7 @@ else
 	export SERVER_NAME=dev.webarchive.org.uk
 	export DEPLOYMENT_TAG=dev
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
-	export STORAGE_PATH_SHARED=/mnt/nfs/data/airflow/data_exports
+	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/aclTHIS_NEEDS_UPDATING_APPROPRIATELY
 	export CONFIG_PATH=/mnt/nfs/config/gitlab/ukwa-services-env/access/pywb
     source /mnt/nfs/config/gitlab/ukwa-services-env/dev.env
 fi
