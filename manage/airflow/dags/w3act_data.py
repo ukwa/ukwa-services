@@ -116,7 +116,7 @@ Configuration:
 * Pull those updated access lists from GitHub to where they are used for access.
     * Currently, this involves SSHing into access to execute the `git pull`.
     * Once the website stack is running on the local Swarm, this can be done locally.
-    * **TODO** Move this update into a separate workflow, so these two processes are decoupled and can be managed independently.
+    * **TODO** Move access updates (solr+acl) into a separate workflow, so they are decoupled and can be managed independently.
 
 How to check it's working:
 
