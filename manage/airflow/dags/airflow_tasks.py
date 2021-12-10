@@ -2,6 +2,9 @@
 ## airflow_tasks.py
 
 Tasks managing Airflow itself.
+
+Not in use at present.
+
 """
 import json
 from subprocess import check_output
@@ -29,7 +32,7 @@ default_args['user'] = 'airflow'
     catchup=False,
     tags=['manage', 'airflow']
 )
-def x_airflow_pause_all_dags():
+def airflow_pause_all_dags():
     """
 ### Pause All DAGs
 
@@ -60,4 +63,5 @@ be unpaused manually as appropriate for the situation..
 
     pauser = pause_all_dags()
 
-pause_all = x_airflow_pause_all_dags()
+# Commenting out to take this out of commission for now, as I'm not sure we need it:
+#pause_all = airflow_pause_all_dags()

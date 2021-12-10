@@ -112,13 +112,22 @@ Configuration:
 * Outputs results to `/storage/data_exports` which is held under `{c.storage_path}` on the host machine.
 * Updates the Topics & Themes Solr collection at `{dag1.params['collections_solr']}`.
 * Updates [this Prometheus Push Gateway](http://{c.push_gateway}) with `w3act_export` line count metrics.
-* Updates GitLab at `{dag1.params['gitlab_wayback_acl_remote']}`
+* Pushes update access lists to GitLab at `{dag1.params['gitlab_wayback_acl_remote']}`.
+* Pull those updated access lists from GitHub to where they are used for access.
+    * Currently, this involves SSHing into access to execute the `git pull`.
+    * Once the website stack is running on the local Swarm, this can be done locally.
+    * **TODO** Move this update into a separate workflow, so these two processes are decoupled and can be managed independently.
 
 How to check it's working:
 
 * All export files indicated above are present and up-to-date in the `{c.storage_path}` folder on the host machine. 
 * The [`ukwa_record_count` metrics are up to date in Prometheus](http://monitor-prometheus.api.wa.bl.uk/graph?g0.expr=ukwa_record_count&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=2d).
+* Access lists up-to-date in GitLab.
 
+Tool container versions:
+
+ * W3ACT Task Image: `{c.w3act_task_image}`
+ * UKWA Manage Task Image: `{c.ukwa_task_image}`
 
 """
 
@@ -273,15 +282,21 @@ Configuration:
 * Exports data from W3ACT DB at `{dag2.params['host']}:{dag2.params['port']}`.
 * Outputs temporary files to `/storage/` which is held under `{c.storage_path}` on the host machine.
 * Uses dump name `{dag2.params['dump_name']}` to distinguish this data dump from others.
-* Backup are placed on HDFS at:
-    * `{ dag2.params['hdfs_path'] }/w3act-db-csv.zip`
-    * `{ dag2.params['hdfs_path'] }/w3act_dump.sql`
+* Backup are placed on HDFS as files with timestamps appended:
+    * `{ dag2.params['hdfs_path'] }/w3act-db-csv-############.zip`
+    * `{ dag2.params['hdfs_path'] }/w3act-dump-############.sql`
 * Older backups are moved aside and given dated file suffixes corresponding to the date they were renamed.
 
 How to check it's working:
 
 * Look in [the `{ dag2.params['hdfs_path'] }` folder](http://hdfs.api.wa.bl.uk/webhdfs/v1{ dag2.params['hdfs_path'] }?op=LISTSTATUS&user.name=access)
 * Check file sizes, names and dates are as expected.
+
+Tool container versions:
+
+ * W3ACT Task Image: `{c.w3act_task_image}`
+ * UKWA Manage Task Image: `{c.ukwa_task_image}`
+ * PostgreSQL Task Image: `{c.postgres_image}`
 
     """
 
@@ -300,7 +315,7 @@ How to check it's working:
     upload_csv = DockerOperator(
         task_id='upload_csv_to_hdfs',
         image=c.ukwa_task_image,
-        command='store -u ingest put --backup-and-replace /storage/{{ params.dump_name }}.zip {{ params.hdfs_path }}/w3act-db-csv.zip',
+        command='store -u ingest h020 put --backup-and-replace /storage/{{ params.dump_name }}.zip {{ params.hdfs_path }}/w3act-db-csv-{{ ts_nodash }}.zip',
     )
 
     # Also make a SQL dump
@@ -317,7 +332,7 @@ How to check it's working:
     upload_sql = DockerOperator(
         task_id='upload_sql_to_hdfs',
         image=c.ukwa_task_image,
-        command='store -u ingest put --backup-and-replace /storage/{{ params.dump_name }}.sql {{ params.hdfs_path }}/w3act_dump.sql',
+        command='store -u ingest h020 put --backup-and-replace /storage/{{ params.dump_name }}.sql {{ params.hdfs_path }}/w3act-dump-{{ ts_nodash }}.sql',
     )
 
     # CSV upload goes...
@@ -360,6 +375,11 @@ Configuration:
 * Uses dump name `{dag3.params['dump_name']}` to distinguish this data dump from others.
 * Sends full reports to `{dag3.params['full_report_email']}`.
 * Sends summary reports to `{dag3.params['summary_report_email']}`.
+
+Tool container versions:
+
+ * W3ACT Task Image: `{c.w3act_task_image}`
+ * UKWA Manage Task Image: `{c.ukwa_task_image}`
 
     """
 

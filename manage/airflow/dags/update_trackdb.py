@@ -66,6 +66,11 @@ How to check it's working:
 
 * The TrackDB should have up-to-date results for the configured path and Hadoop service, visible via [this reverse-chronological query]({trackdb_url}/select?q=file_path_s:{escaped_path}* AND hdfs_service_id_s:{hadoop_service}&sort=timestamp_dt+desc).
 
+Tool container versions:
+
+ * Hadoop Task Image: `{c.hadoop_docker_image}`
+ * UKWA Manage Task Image: `{c.ukwa_task_image}`
+
 """
 
         # List HDFS location using Hadoop lsr command.

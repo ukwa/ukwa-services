@@ -1,5 +1,5 @@
 """
-## warc_tidy.py
+## crawler_tidy_up.py
 
 Tasks for tidying up WARCs
 """
@@ -38,13 +38,15 @@ with DAG(
     dag.doc_md = f"""
 ### Tidy-up WARCs and logs from crawlers
 
-This task performs some work to tidy up the WARCs and logs from the crawler.  It
+This task performs some work to tidy up the WARCs and logs from the crawler.
 
-* Moves WARCs from warcprox (the `/heritrix/wren` folder) into the right place in the `/heritrix/output` folders.
-* **TBA** 'Closes' WARCs that are .open, if they are older than a few days.
-* Checks all the expected log files are present, e.g. crawl.log.
-* Replaces missing log files with empty files, so the crawler can checkpoint successfully.
-* Records the size of the crawl logs in Prometheus so we can tell if they stop growing (metrics are `ukwa_crawler_log_size_bytes`, `ukwa_crawler_log_touch_seconds`).
+* Runs the `tidy_logs` command, as defined [here](https://github.com/ukwa/ukwa-manage/blob/master/lib/store/tidy_logs.py), which:
+    * Checks all the expected log files are present, e.g. `crawl.log`.
+    * Replaces missing log files with empty files, so the crawler can checkpoint successfully.
+    * Records the size of the crawl logs in Prometheus so we can tell if they stop growing (metrics are `ukwa_crawler_log_size_bytes`, `ukwa_crawler_log_touch_seconds`).
+* Runs the `tidy_warcs` command, as defined [here](https://github.com/ukwa/ukwa-manage/blob/master/lib/store/tidy_warcs.py), which:
+    * Moves WARCs from warcprox (which are output to the `/heritrix/wren` folder) into the right place in the `/heritrix/output` folders.
+    * **TBA** 'Closes' WARCs that are .open, if they are older than a few days.
 
 Configuration:
 
@@ -53,12 +55,18 @@ Configuration:
 
 How to check it's working:
 
-* Task Instance logs show how many WARCs were moved.
-* Prometheus updated via Push Gateway with e.g. `ukwa_files_moved_total_count{{kind='warcprox-warcs'}}` counts.
-    * Look for job results in [the push gateway configured for this task](http://{c.push_gateway}).
+* The Task Instance logs in Airflow will show e.g. how many WARCs were moved.
+* Check for metrics in Prometheus (updated via Push Gateway):
+    * Look for job result metrics in [the push gateway configured for this task](http://{c.push_gateway}), e.g.:
+        * `ukwa_files_moved_total_count{{kind='warcprox-warcs'}}`
+        * `ukwa_crawler_log_size_bytes`
     * For example results from Prometheus in production, see e.g.:
-        * [ukwa_files_moved_total_count](http://monitor-prometheus.api.wa.bl.uk/graph?g0.expr=ukwa_files_moved_total_count{{kind%3D"warcprox-warcs"}}&g0.tab=0&g0.stacked=0&g0.range_input=1w).
-        * [ukwa_crawler_log_size_bytes](http://monitor-prometheus.api.wa.bl.uk/graph?g0.expr=ukwa_crawler_log_size_bytes&g0.tab=0&g0.stacked=0&g0.range_input=1w).
+        * [Count of WARCS moved](http://monitor-prometheus.api.wa.bl.uk/graph?g0.expr=ukwa_files_moved_total_count{{kind%3D"warcprox-warcs"}}&g0.tab=0&g0.stacked=0&g0.range_input=1w).
+        * [Size (in bytes) of crawler log files](http://monitor-prometheus.api.wa.bl.uk/graph?g0.expr=ukwa_crawler_log_size_bytes&g0.tab=0&g0.stacked=0&g0.range_input=1w).
+
+Tool container versions:
+
+ * UKWA Manage Task Image: `{c.ukwa_task_image}`
 
 """ 
 

@@ -1,15 +1,18 @@
 """
+### Airflow Cleanup
 
-From: https://github.com/teamclairvoyant/airflow-maintenance-dags/tree/master/db-cleanup
+This is an off-the-shelf task for managing cleanup of old tasks and logs within Airflow. It doesn't interact with anything else.
+
+From: <https://github.com/teamclairvoyant/airflow-maintenance-dags/tree/master/db-cleanup>
 
 A maintenance workflow that you can deploy into Airflow to periodically clean
 out the DagRun, TaskInstance, Log, XCom, Job DB and SlaMiss entries to avoid
 having too much data in your Airflow MetaStore.
 
-airflow trigger_dag --conf '[curly-braces]"maxDBEntryAgeInDays":30[curly-braces]' airflow-db-cleanup
+    airflow trigger_dag --conf '[curly-braces]"maxDBEntryAgeInDays":30[curly-braces]' airflow-db-cleanup
 
---conf options:
-    maxDBEntryAgeInDays:<INT> - Optional
+    --conf options:
+        maxDBEntryAgeInDays:<INT> - Optional
 
 """
 import airflow
