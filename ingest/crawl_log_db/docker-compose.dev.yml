@@ -3,8 +3,11 @@ version: '3.7'
 
 services:
   solrcloud:
-    image: solr:8.7
+    image: solr:8.11
     #command: solr -f -cloud
+    environment:
+     - "SOLR_HEAP=2g"
+     - "JAVA_OPTS=-Dlog4j2.formatMsgNoLookups=true"
     entrypoint:
       - bash
       - "-c"
