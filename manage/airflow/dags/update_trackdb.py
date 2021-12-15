@@ -78,16 +78,14 @@ Tool container versions:
             lsr = DockerOperator(
                 task_id='list_hadoop_fs',
                 image=c.hadoop_docker_image,
-                command='bash -c "/usr/local/hadoop-0.20.2-cdh3u6/bin/hadoop fs -lsr {{ params.path }} > {{ params.lsr_txt }}; true"',
-                environment={
-                    'HADOOP_CONF_DIR': '/usr/local/hadoop-0.20.2-cdh3u6/etc/hadoop'
-                }
+                entrypoint='/entrypoint-h020.sh', # < This overrides the setup and uses H020
+                command='bash -c "hadoop fs -lsr {{ params.path }} > {{ params.lsr_txt }}; true"',
             )
         else:
             lsr = DockerOperator(
                 task_id='list_hadoop_fs',
                 image=c.hadoop_docker_image,
-                command='bash -c "/usr/local/hadoop/bin/hadoop fs -lsr {{ params.path }} > {{ params.lsr_txt }}; true"',
+                command='bash -c "hadoop fs -lsr {{ params.path }} > {{ params.lsr_txt }}; true"',
                 # Note that H3 automatically picks up the right config dir
             )
 
