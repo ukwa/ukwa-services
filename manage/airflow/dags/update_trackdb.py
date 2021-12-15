@@ -20,9 +20,8 @@ c = Config()
 # These args will get passed on to each operator/task:
 default_args = c.get_default_args()
 
-# Connection to W3ACT PostgreSQL DB to use:
-trackdb = Connection.get_connection_from_secrets("trackdb")
-trackdb_url = trackdb.get_uri().replace('%2F','/')
+# Connection to TrackDB to use:
+trackdb_url = c.get_trackdb_url()
 
 # Use a function to generate parameterised DAGs:
 def generate_update_dag(path, hadoop_service, schedule_interval, args):
