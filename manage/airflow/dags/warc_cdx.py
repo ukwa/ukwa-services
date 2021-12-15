@@ -57,7 +57,8 @@ def generate_cdx_dag(hadoop_service):
             'hadoop_service' : hadoop_service,
             'trackdb_url' : trackdb_url,
             'cdx_service' : f"http://{cdx_host}",
-            'cdx_collection': cdx_col
+            'cdx_collection': cdx_col,
+            'batch_size': c.hadoop_job_warc_batch_size,
         },
         tags=['access', 'index', 'cdx']
     ) as dag:
@@ -69,13 +70,17 @@ def generate_cdx_dag(hadoop_service):
     Configuration:
 
     * Reads and updates TrackDB at `{dag.params['trackdb_url']}`
-    * Processes WARCS on Hadoop `{dag.params['hadoop_service']}`
+    * Processes WARCS on Hadoop `{dag.params['hadoop_service']}` in batches of `{dag.params['batch_size']}`
     * Updates CDX collection `{dag.params['cdx_collection']}` on CDX service `{dag.params['cdx_service']}`
     * The push gateway is configured to be `{c.push_gateway}`.
 
 
     How to check it's working, you can:
 
+    * Check the number of WARCs marked as indexed in TrackDB has increased:
+        * [For Webrecorder WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:webrecorder AND hdfs_service_id_s:{hadoop_service})
+        * [For Frequent WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:frequent AND hdfs_service_id_s:{hadoop_service})
+        * [For Domain WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:domain AND hdfs_service_id_s:{hadoop_service})
     * Check for various Prometheus metrics via the Push Gateway:
         * For Webrecorder WARCs:
             * `ukwa_task_event_timestamp{{job="cdx-index-{dag.params['hadoop_service']}-webrecorder", status="success"}}`
@@ -86,10 +91,6 @@ def generate_cdx_dag(hadoop_service):
         * For Domain Crawl WARCs:
             * `ukwa_task_event_timestamp{{job="cdx-index-{dag.params['hadoop_service']}-domain", status="success"}}`
             * `ukwa_task_total_sent_record_count{{job="cdx-index-{dag.params['hadoop_service']}-domain", status="success"}}`
-    * The number of WARCs marked as indexed in TrackTB should increase:
-        * [For Webrecorder WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:webrecorder AND hdfs_service_id_s:{hadoop_service})
-        * [For Frequent WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:frequent AND hdfs_service_id_s:{hadoop_service})
-        * [For Domain WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:domain AND hdfs_service_id_s:{hadoop_service})
 
     Tool container versions:
 
@@ -106,7 +107,7 @@ def generate_cdx_dag(hadoop_service):
             'MRJOB_CONF': mrjob_conf,
             'PUSH_GATEWAY': c.push_gateway,
         },
-            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S webrecorder -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B 2',
+            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S webrecorder -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }}',
         ) 
 
         cdx_fc = DockerOperator(
@@ -118,7 +119,7 @@ def generate_cdx_dag(hadoop_service):
             'MRJOB_CONF': mrjob_conf,
             'PUSH_GATEWAY': c.push_gateway,
         },
-            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S frequent -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B 2',
+            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S frequent -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }}',
         ) 
 
         cdx_dc = DockerOperator(
@@ -130,7 +131,7 @@ def generate_cdx_dag(hadoop_service):
             'MRJOB_CONF': mrjob_conf,
             'PUSH_GATEWAY': c.push_gateway,
         },
-            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S domain -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B 2',
+            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S domain -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }}',
         )
 
         cdx_wr >> cdx_fc >> cdx_dc

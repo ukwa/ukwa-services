@@ -21,6 +21,9 @@ class Config():
     pg_conn = Connection.get_connection_from_secrets("metrics_push_gateway")
     push_gateway = f"{pg_conn.host}:{pg_conn.port}"
 
+    # Pick up some variables
+    hadoop_job_warc_batch_size = Variable.get('hadoop_job_warc_batch_size')
+
     # Define the common parameters for running Docker tasks:
     w3act_task_image = 'ukwa/python-w3act:2.0.0'
     #ukwa_task_image = 'ukwa/ukwa-manage:2.0.1'
