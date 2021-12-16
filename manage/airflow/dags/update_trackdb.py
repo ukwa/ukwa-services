@@ -35,8 +35,8 @@ def generate_update_dag(path, hadoop_service, schedule_interval, args):
         catchup=False,
         params= {
             'path': path,
-            'lsr_txt': '/storage/hadoop_lsr_%s.txt' % dag_id,
-            'lsr_jsonl': '/storage/hadoop_lsr_%s.jsonl' % dag_id,
+            'lsr_txt': f'/storage/hadoop_lsr/{dag_id}.txt',
+            'lsr_jsonl': f'/storage/hadoop_lsr/{dag_id}.jsonl',
             'trackdb_url': trackdb_url,
             'hadoop_service': hadoop_service
         },

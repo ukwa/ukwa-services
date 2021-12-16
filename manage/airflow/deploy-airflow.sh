@@ -41,7 +41,10 @@ echo Setup ${STORAGE_PATH} ...
 mkdir -p ${STORAGE_PATH}/airflow/logs
 mkdir -p ${STORAGE_PATH}/airflow/postgres
 # Storage location for data exported from e.g. W3ACT, like access lists used for playback
+mkdir -p ${STORAGE_PATH}/hadoop_lsr
 mkdir -p ${STORAGE_PATH}/data_exports
+echo "Directory ${STORAGE_PATH}/hadoop_lsr should be owned by user 1000"
+echo "Directory ${STORAGE_PATH} (recursive) should be in group airflow"
 # Clone the Git repo used to store access-control lists
 GIT_URL=http://git.wa.bl.uk/bl-services/wayback_excludes_update.git 
 FOLDER=${STORAGE_PATH}/wayback_acls
