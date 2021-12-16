@@ -40,7 +40,7 @@ def generate_update_dag(path, hadoop_service, schedule_interval, args):
             'trackdb_url': trackdb_url,
             'hadoop_service': hadoop_service
         },
-        tags=['trackdb', 'manage']
+        tags=['trackdb', 'manage', hadoop_service]
     ) as update_trackdb_dag:
         escaped_path = path.replace('/','\/')
         update_trackdb_dag.doc_md = \

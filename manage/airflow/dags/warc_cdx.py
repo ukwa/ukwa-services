@@ -60,7 +60,7 @@ def generate_cdx_dag(hadoop_service):
             'cdx_collection': cdx_col,
             'batch_size': c.hadoop_job_warc_batch_size,
         },
-        tags=['access', 'index', 'cdx']
+        tags=['access', 'index', 'cdx', hadoop_service]
     ) as dag:
         dag.doc_md = f"""
     ### Index Hadoop {hadoop_service} WARCs into CDX
