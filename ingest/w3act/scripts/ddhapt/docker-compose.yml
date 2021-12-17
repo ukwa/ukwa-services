@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+
+  dbmate:
+    image: amacneil/dbmate
+    command: up
+    environment:
+      - "DATABASE_URL=postgres://ddhapt:ddhapt@dev1.n45.wa.bl.uk:5435/ddhapt?sslmode=disable"
+    volumes:
+      - ./db:/db
+    restart: never

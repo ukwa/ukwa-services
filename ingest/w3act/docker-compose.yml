@@ -12,15 +12,34 @@ services:
 
   # PyWB for QA
   pywb:
-    image: ukwa/ukwa-pywb:2.5.x-beta
+    image: ukwa/ukwa-pywb:2.6.2.1
     environment:
       UKWA_INDEX: "http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429&filter=!mimetype:warc/revisit"
-      UKWA_ARCHIVE: "webhdfs://hdfs.api.wa.bl.uk"
+      UKWA_ARCHIVE: "webhdfs://warc-server:8000/by-filename/"
       WEBHDFS_USER: "access"
     ports:
       - "7070:8080"
     volumes:
       - ./config/pywb.yaml:/webarchive/config.yaml
+
+  # Internal WARC server that can pull from multiple clusters and local disk
+  warc-server:
+    image: ukwa/warc-server:1.0.0
+    # Alternative command for debugging:
+    #command: "gunicorn --log-level debug --error-logfile - --access-logfile - --bind 0.0.0.0:8000 --workers 5 --worker-class gthread --threads 20 warc_server:app"
+    ports:
+      - 8001:8000
+    environment:
+      - "WARC_PATHS=/heritrix/output,/heritrix/wren"
+      - "TRACKDB_URL=http://solr8.api.wa.bl.uk/solr/tracking"
+      # Alternative TrackDB for testing:
+      #- "TRACKDB_URL=http://trackdb.dapi.wa.bl.uk/solr/tracking"
+      #- "TRACKDB_FETCH_LIMIT=100000"
+      # Default WebHDFS service used if there's no access_url_s in TrackDB (user is 'access'):
+      - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
+    volumes:
+      - "/mnt/gluster/fc/heritrix/output:/heritrix/output"
+      - "/mnt/gluster/fc/heritrix/wren:/heritrix/wren"
 
   # PDF to HTML service
   pdf2htmlex:
@@ -82,6 +101,19 @@ services:
       - "${W3ACT_DUMPS_DIR}:/tmp"
 
   # -------------------------------------------------------------
+  # Additional database for DDHAPT
+  # -------------------------------------------------------------
+  ddhapt-postgres:
+    image: postgres:14.1
+    environment:
+      - "POSTGRES_USER=ddhapt"
+      - "POSTGRES_PASSWORD=${DDHAPT_PSQL_PASSWORD}"
+    ports:
+      - "5435:5432"
+    volumes:
+      - "${DDHAPT_PSQL_DIR}:/var/lib/postgresql/data"
+
+  # -------------------------------------------------------------
   # Crawl log viewer
   # -------------------------------------------------------------
   crawl-log-viewer:
@@ -103,10 +135,25 @@ services:
     ports:
       - 8866:8866
 
-  #metabase:
-  #  image: metabase/metabase:latest
-  #  ports:
-  #    - 3001:3000
+  metabase:
+    image: metabase/metabase:latest
+    environment: 
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 5432
+      MB_DB_USER: metabase
+      MB_DB_PASS: metabase
+      MB_DB_HOST: metabase-postgres
+    ports:
+      - 3001:3000
+
+  metabase-postgres:
+    image: postgres:14.1
+    environment:
+      - "POSTGRES_USER=metabase"
+      - "POSTGRES_PASSWORD=${METABASE_PSQL_PASSWORD}"
+    volumes:
+      - "${METABASE_PSQL_DIR}:/var/lib/postgresql/data"
 
 networks:
   # Make network attachable so tasks can be run:
