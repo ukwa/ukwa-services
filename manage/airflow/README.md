@@ -1,6 +1,9 @@
 
+The stack is intended to be deployed as a dedicated user under a specific UID:
 
-useradd -u 50000 -G docker airflow
+    useradd -u 50000 -G docker airflow
+
+The folder `${STORAGE_PATH}/hadoop_lsr` needs to be owned by the uid 1000 (intended to map to the 'access' user)
 
 ./deploy-airflow.sh dev
 

@@ -3,14 +3,16 @@ version: "3.2"
 services:
  # Database to put tracking/stats/etc.
   trackdb:
-    image: solr:8.4-slim
+    image: solr:8.11-slim
+    user: "8983:8983"
     ports:
      - "8983:8983"
     environment:
      - "SOLR_HEAP=2g"
+     - "JAVA_OPTS=-Dlog4j2.formatMsgNoLookups=true"
+     - "SOLR_OPTS=-Dlog4j2.formatMsgNoLookups=true"
     volumes:
-#      - ${DATA_TRACKDB}:/var/solr
-      - /mnt/nfs/data/trackdb:/var/solr
+      - ${DATA_TRACKDB}:/var/solr
     entrypoint:
 #      - docker-entrypoint.sh
       - solr-precreate

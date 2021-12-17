@@ -21,10 +21,13 @@ class Config():
     pg_conn = Connection.get_connection_from_secrets("metrics_push_gateway")
     push_gateway = f"{pg_conn.host}:{pg_conn.port}"
 
+    # Pick up some variables
+    hadoop_job_warc_batch_size = Variable.get('hadoop_job_warc_batch_size')
+
     # Define the common parameters for running Docker tasks:
     w3act_task_image = 'ukwa/python-w3act:2.0.0'
-    ukwa_task_image = 'ukwa/ukwa-manage:2.0.1'
-    hadoop_docker_image = 'ukwa/docker-hadoop:2.0.0'
+    ukwa_task_image = 'ukwa/ukwa-manage:2.1.0'
+    hadoop_docker_image = 'ukwa/docker-hadoop:2.1.2'
     postgres_image = 'postgres:9.6.2'
 
     # Get a copy of the default arguments:
@@ -35,12 +38,12 @@ class Config():
             'retries': 3,
             # Shared configuration for all Docker tasks:
             'extra_hosts': {
-                'h020nn': '192.168.1.103',
-                'h020jt': '192.168.1.104',
+                'namenode': '192.168.1.103',
+                'jobtracker': '192.168.1.104',
                 # Note that H3 config uses proper domain names like h3rm.wa.bl.uk
             },
             'mounts': [
-                Mount( source=self.storage_path, target='/storage', type='bind' )
+                Mount( source=self.storage_path, target='/storage', type='bind' ),
                  ],
             'email_on_failure': True,
             'email': [
@@ -50,3 +53,14 @@ class Config():
             'do_xcom_push': False, # This is not currently working with DockerOperators so defaulting to off for now.
             'mount_tmp_dir': False, # Not supported by docker-in-docker tasks
         }   
+
+
+    def get_trackdb_url(self):
+        # Connection to TrackDB to use:
+        trackdb = Connection.get_connection_from_secrets("trackdb")
+        trackdb_url = trackdb.get_uri().replace('%2F','/')
+        return trackdb_url
+
+    def get_access_cdx_url(self):
+        return Connection.get_connection_from_secrets("access_cdx").get_uri()
+
