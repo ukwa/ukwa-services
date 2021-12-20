@@ -3,8 +3,8 @@
 # read script environ argument
 ENVIRON=$1
 if ! [[ ${ENVIRON} =~ dev|beta|prod ]]; then
-        echo "ERROR: Script $0 requires environment argument (dev|beta|prod)"
-        exit
+	echo "ERROR: Script $0 requires environment argument (dev|beta|prod)"
+	exit
 fi
 
 # Set up environment variables
@@ -14,14 +14,16 @@ if [[ ${ENVIRON} == 'prod' ]]; then
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/prod1/website
 	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/acl
 	export CONFIG_PATH=/mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/pywb
-    source /mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/app_secret.env
+	source /mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/prod.env
+
 elif [[ ${ENVIRON} == 'beta' ]]; then
 	export SERVER_NAME=beta.webarchive.org.uk
 	export DEPLOYMENT_TAG=beta
-	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
+	export STORAGE_PATH_WEBSITE=/mnt/gluster/beta/ingest/data/website
 	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/aclTHIS_NEEDS_UPDATING_APPROPRIATELY
-	export CONFIG_PATH=/mnt/nfs/access/config/gitlab/ukwa-services-env/access/pywb
-    source /mnt/nfs/access/config/gitlab/ukwa-services-env/access/app_secret.env
+	export CONFIG_PATH=/home/ingest/gitlab/ukwa-services-env/access/pywb
+	export STORAGE_PATH_SHARED=/mnt/gluster/beta/ingest/data/airflow/data_exports
+	source /home/ingest/gitlab/ukwa-services-env/beta.env
 else
 	# dev vars
 	export SERVER_NAME=dev.webarchive.org.uk
@@ -29,7 +31,7 @@ else
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
 	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/acl/
 	export CONFIG_PATH=/mnt/nfs/config/gitlab/ukwa-services-env/access/pywb
-    source /mnt/nfs/config/gitlab/ukwa-services-env/dev.env
+	source /mnt/nfs/config/gitlab/ukwa-services-env/dev.env
 fi
 
 # Common configuration
@@ -60,7 +62,7 @@ export WEB_RENDER_TMP=${STORAGE_PATH_WEBSITE}/webrender-tmp
 mkdir -p ${WEB_RENDER_TMP}
 
 # ensure data owned by user
-sudo chown -R ${CURRENT_UID} ${STORAGE_PATH_WEBSITE}
+#sudo chown -R ${CURRENT_UID} ${STORAGE_PATH_WEBSITE}
 
 # Launch the common configuration with these environment variable:
 # n.b. first config file sets PWD
