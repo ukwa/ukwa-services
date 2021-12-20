@@ -46,7 +46,7 @@ This task performs some work to tidy up the WARCs and logs from the crawler.
     * Records the size of the crawl logs in Prometheus so we can tell if they stop growing (metrics are `ukwa_crawler_log_size_bytes`, `ukwa_crawler_log_touch_seconds`).
 * Runs the `tidy_warcs` command, as defined [here](https://github.com/ukwa/ukwa-manage/blob/master/lib/store/tidy_warcs.py), which:
     * Moves WARCs from warcprox (which are output to the `/heritrix/wren` folder) into the right place in the `/heritrix/output` folders.
-    * **TBA** 'Closes' WARCs that are .open, if they are older than a few days.
+    * **TBA** 'Closes' WARCs that are .open, if they are older than a few days. See [#88](https://github.com/ukwa/ukwa-manage/issues/88).
 
 Configuration:
 

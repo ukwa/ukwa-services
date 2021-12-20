@@ -95,7 +95,7 @@ services:
       - "POSTGRES_USER=w3act"
       - "POSTGRES_PASSWORD=${W3ACT_PSQL_PASSWORD}"
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "5432:5432"
     volumes:
       - "${W3ACT_PSQL_DIR}:/var/lib/postgresql/data"
       - "${W3ACT_DUMPS_DIR}:/tmp"
