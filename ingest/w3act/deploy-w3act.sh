@@ -21,7 +21,6 @@ fi
 # Set up the persistent data locations:
 export W3ACT_PSQL_DIR=$W3ACT_STORAGE/postgresql
 export W3ACT_DUMPS_DIR=$W3ACT_STORAGE/postgresql-dumps
-export DDHAPT_SIPS_SUBMITTED_DIR=$W3ACT_STORAGE/dls-sips-submitted
 
 # DDHAPT Database
 export DDHAPT_PSQL_DIR=$W3ACT_STORAGE/ddhapt
