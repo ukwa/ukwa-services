@@ -30,7 +30,7 @@ services:
   # -------------------------------------------------------------
   ukwa-ui:
     #image: ukwa/ukwa-ui:v1.3.4
-    image:  min2ha/ukwa-ui:new_feature_categories
+    image:  min2ha/ukwa-ui:new_feature_categories_anj
     command: java -Djava.security.egd=file:/dev/./urandom -jar /ukwa-ui.war --spring.config.location=file:/application.properties
     environment:
      - "OFF_SITE_URL=/wayback/archive/"
@@ -55,7 +55,8 @@ services:
   # OA Wayback configuration:
   # -------------------------------------------------------------
   pywb:
-    image: ukwa/ukwa-pywb:2.6.2.1
+    #image: ukwa/ukwa-pywb:2.6.2.1
+    image: ukwa/ukwa-pywb:2.5.x-beta
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
@@ -71,7 +72,8 @@ services:
 
   # An embedded, bannerless OA Wayback to render screenshots:
   pywb-nobanner:
-    image: ukwa/ukwa-pywb:2.6.2.1
+    #image: ukwa/ukwa-pywb:2.6.2.1
+    image: ukwa/ukwa-pywb:2.5.x-beta
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"

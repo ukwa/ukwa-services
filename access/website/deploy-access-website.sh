@@ -27,7 +27,7 @@ else
 	export SERVER_NAME=dev.webarchive.org.uk
 	export DEPLOYMENT_TAG=dev
 	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
-	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/aclTHIS_NEEDS_UPDATING_APPROPRIATELY
+	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/acl/
 	export CONFIG_PATH=/mnt/nfs/config/gitlab/ukwa-services-env/access/pywb
     source /mnt/nfs/config/gitlab/ukwa-services-env/dev.env
 fi
