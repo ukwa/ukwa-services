@@ -12,7 +12,8 @@ services:
 
   # PyWB for QA
   pywb:
-    image: ukwa/ukwa-pywb:2.6.2.1
+    #image: ukwa/ukwa-pywb:2.6.2.1
+    image: ukwa/ukwa-pywb:2.5.x-beta
     environment:
       UKWA_INDEX: "http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429&filter=!mimetype:warc/revisit"
       UKWA_ARCHIVE: "webhdfs://warc-server:8000/by-filename/"
