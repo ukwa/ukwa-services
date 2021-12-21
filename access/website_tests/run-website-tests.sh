@@ -33,5 +33,5 @@ export PROMETHEUS_JOB_NAME=access_website_rf_tests_${ENVIRON}
 echo Running tests using HOST = $HOST
 echo WARNING! Tests will fail if the HOST variable has a trailing slash!
 
-docker-compose run robot
+docker-compose up robot 
 
