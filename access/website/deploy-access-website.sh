@@ -11,10 +11,10 @@ fi
 if [[ ${ENVIRON} == 'prod' ]]; then
 	export SERVER_NAME=www.webarchive.org.uk
 	export DEPLOYMENT_TAG=prod
-	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/prod1/website
-	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/acl
-	export CONFIG_PATH=/mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/access/pywb
-	source /mnt/nfs/prod1/access/config/gitlab/ukwa-services-env/prod.env
+	export STORAGE_PATH_WEBSITE=/mnt/nfs/prod1/access/data/website
+	export PWYB_ACL_PATH=/mnt/nfs/prod1/access/gitlab/wayback_excludes_update/oukwa/acl
+	export CONFIG_PATH=/mnt/nfs/prod1/access/gitlab/ukwa-services-env/access/pywb
+	source /mnt/nfs/prod1/access/gitlab/ukwa-services-env/prod.env
 
 elif [[ ${ENVIRON} == 'beta' ]]; then
 	export SERVER_NAME=beta.webarchive.org.uk
