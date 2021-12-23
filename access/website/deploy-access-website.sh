@@ -20,7 +20,7 @@ elif [[ ${ENVIRON} == 'beta' ]]; then
 	export SERVER_NAME=beta.webarchive.org.uk
 	export DEPLOYMENT_TAG=beta
 	export STORAGE_PATH_WEBSITE=/mnt/gluster/beta/ingest/data/website
-	export PWYB_ACL_PATH=/mnt/nfs/config/gitlab/wayback_excludes_update/oukwa/aclTHIS_NEEDS_UPDATING_APPROPRIATELY
+	export PWYB_ACL_PATH=/home/ingest/gitlab/wayback_excludes_update/oukwa/acl
 	export CONFIG_PATH=/home/ingest/gitlab/ukwa-services-env/access/pywb
 	export STORAGE_PATH_SHARED=/mnt/gluster/beta/ingest/data/airflow/data_exports
 	source /home/ingest/gitlab/ukwa-services-env/beta.env
