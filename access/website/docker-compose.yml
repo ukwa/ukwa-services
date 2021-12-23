@@ -55,8 +55,8 @@ services:
   # OA Wayback configuration:
   # -------------------------------------------------------------
   pywb:
-    #image: ukwa/ukwa-pywb:2.6.2.1
-    image: ukwa/ukwa-pywb:2.5.x-beta
+    image: ukwa/ukwa-pywb:2.6.3
+    #image: ukwa/ukwa-pywb:2.5.x-beta
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
@@ -72,8 +72,8 @@ services:
 
   # An embedded, bannerless OA Wayback to render screenshots:
   pywb-nobanner:
-    #image: ukwa/ukwa-pywb:2.6.2.1
-    image: ukwa/ukwa-pywb:2.5.x-beta
+    image: ukwa/ukwa-pywb:2.6.3
+    #image: ukwa/ukwa-pywb:2.5.x-beta
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"

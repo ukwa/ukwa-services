@@ -12,6 +12,9 @@ if [[ ${ENVIRON} == 'dev' ]]; then
         source ~/gitlab/ukwa-services-env/access/website/dev.env
         export HOST=https://dev:${DEV_WEBSITE_PW}@dev.webarchive.org.uk
         export PUSH_GATEWAY=monitor-pushgateway.dapi.wa.bl.uk:80
+elif [[ ${ENVIRON} == 'prod' ]]; then
+        export HOST=http://prod1.n45.wa.bl.uk
+        export PUSH_GATEWAY=monitor-pushgateway.api.wa.bl.uk:80
 else
         export PUSH_GATEWAY=monitor.wa.bl.uk:9091
 	echo "ERROR"
