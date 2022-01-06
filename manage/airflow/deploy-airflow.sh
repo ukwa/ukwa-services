@@ -56,5 +56,9 @@ else
     cd -
 fi
 
+# And make sure the ownership is right:
+echo "Please chown $FOLDER so it's owned by the access user, e.g."
+echo "sudo chown -R access:access $FOLDER"
+
 # deploy container
 docker stack deploy -c docker-compose.yaml airflow
