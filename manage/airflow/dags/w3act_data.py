@@ -358,8 +358,8 @@ with DAG(
         'port': access_w3act.port,
         'pw': access_w3act.password,
         'dump_name': 'w3act_qa_dump',
-        'full_report_email': 'Andrew.Jackson@bl.uk',
-        'summary_report_email': 'Andrew.Jackson@bl.uk',
+        'full_report_email': Variable.get('w3act_qa_full_report_email_address'),
+        'summary_report_email': Variable.get('w3act_qa_summary_report_email_address'),
     },
     tags=['ingest', 'w3act']
 ) as dag3:
