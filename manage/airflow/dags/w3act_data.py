@@ -181,7 +181,7 @@ Tool container versions:
         task_id='atomic_update',
         image=c.w3act_task_image,
         # Using -e to make sure errors are reported:
-        command="""bash -e -c "
+        command="""bash -e -x -c "
 mv -f /storage/wayback_acls/oukwa/acl/allows.aclj.new /storage/wayback_acls/oukwa/acl/allows.aclj &&
 mv -f /storage/wayback_acls/oukwa/acl/allows.txt.new /storage/wayback_acls/oukwa/acl/allows.txt &&
 mv -f /storage/data_exports/annotations.json.new /storage/data_exports/annotations.json &&
@@ -195,14 +195,16 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
         task_id='commit_wayback_acls_to_git',
         image=c.ukwa_task_image, # Any image with git installed should be fine
         # Using -e to make sure errors are reported:
-        command="""bash -e -c "
+        command="""bash -e -x -c "
         cd /storage/wayback_acls
         git config user.email '{{ var.value.alert_email_address }}'
         git config user.email
         git config user.name 'Airflow W3ACT Export Task'
-        git commit -m 'Automated update from Airflow at {{ ts }} by {{ task_instance_key_str }}.' -a
         git pull origin master
-        git push {{ params.gitlab_wayback_acl_remote }} master
+        if [[ `git status --porcelain` ]]; then
+          git commit -m 'Automated update from Airflow at {{ ts }} by {{ task_instance_key_str }}.' -a
+          git push {{ params.gitlab_wayback_acl_remote }} master
+        fi
         "
         """,
     )
@@ -211,7 +213,7 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
         task_id='deploy_updated_acls',
         ssh_conn_id='access_ssh',
         # Using -e to make sure errors are reported:
-        command="""bash -e -c "
+        command="""bash -e -x -c "
         cd /root/gitlab/wayback_excludes_update/
         git pull origin master
         "
