@@ -349,7 +349,7 @@ with DAG(
     'w3act_qa_checks',
     description='Run some QA checks over W3ACT.',
     default_args=default_args, 
-    schedule_interval='0 8 * * *', 
+    schedule_interval='0 8 * * Mon', 
     start_date=days_ago(1),
     catchup=False,
     max_active_runs=1,
