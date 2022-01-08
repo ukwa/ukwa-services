@@ -67,6 +67,13 @@ services:
       - ./config/pywb/config.yaml:/webarchive/config.yaml
       # Used to store the access control lists used by the pywb services.
       - "${PWYB_ACL_PATH}:/ukwa_pywb/acl/"
+    deploy:
+      # If we don't place a limit on resources it just consumes all RAM rather than cleaning up:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: '2G'
+
 
 
   # An embedded, bannerless OA Wayback to render screenshots:
@@ -82,6 +89,12 @@ services:
       - ./config/pywb/empty-banner.js:/ukwa_pywb/static/default_banner.js
       - "${PWYB_ACL_PATH}:/ukwa_pywb/acl/"
       - "${CONFIG_PATH}/pywb-ca.pem:/certs/pywb-ca.pem"
+    deploy:
+      # If we don't place a limit on resources it just consumes all RAM rather than cleaning up:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: '2G'
 
   # Internal WARC server that can pull from multiple clusters and local disk
   warc-server:
