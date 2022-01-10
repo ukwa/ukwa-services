@@ -18,8 +18,9 @@ elif [[ ${ENVIRON} == 'beta' ]]; then
         export PUSH_GATEWAY=monitor-pushgateway.bapi.wa.bl.uk:80
 elif [[ ${ENVIRON} == 'prod' ]]; then
 	# Set up the www.webarchive.org.uk vars
-        #export HOST=https://www.webarchive.org.uk
-        export HOST=http://prod1.n45.wa.bl.uk
+        export HOST=https://www.webarchive.org.uk
+        #export HOST=http://website.api.wa.bl.uk
+        #export HOST=http://prod1.n45.wa.bl.uk
         export PUSH_GATEWAY=monitor-pushgateway.api.wa.bl.uk:80
 else
         export PUSH_GATEWAY=monitor.wa.bl.uk:9091
