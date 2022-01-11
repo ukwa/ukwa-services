@@ -44,22 +44,26 @@ except Exception as e:
 # ----------------------------------------------------------------------------
 
 class W3ACTDumpCleanupOperator(DockerOperator):
-        @apply_defaults
-        def __init__(self,**kwargs) -> None:
-            super().__init__(
-                task_id = 'cleanup_db_folder',
-                image = c.w3act_task_image,
-                command = 'rm -fr /storage/{{ params.dump_name }} /storage/{{ params.dump_name }}.sql',
-                **kwargs)
+    ui_color = '#ffeeee'
+    
+    @apply_defaults
+    def __init__(self,**kwargs) -> None:
+        super().__init__(
+            task_id = 'cleanup_db_folder',
+            image = c.w3act_task_image,
+            command = 'rm -fr /storage/{{ params.dump_name }} /storage/{{ params.dump_name }}.sql',
+            **kwargs)
 
 class W3ACTDumpOperator(DockerOperator):
-        @apply_defaults
-        def __init__(self, **kwargs) -> None:
-            super().__init__(
-                task_id = 'dump_w3act',
-                image = c.w3act_task_image,
-                command = 'w3act get-csv -d /storage/{{ params.dump_name }} -H {{ params.host }} -P {{ params.port }} -p {{ params.pw }}',
-                **kwargs)
+    ui_color = '#ffeeee'
+
+    @apply_defaults
+    def __init__(self, **kwargs) -> None:
+        super().__init__(
+            task_id = 'dump_w3act',
+            image = c.w3act_task_image,
+            command = 'w3act get-csv -d /storage/{{ params.dump_name }} -H {{ params.host }} -P {{ params.port }} -p {{ params.pw }}',
+            **kwargs)
 
 
 # ----------------------------------------------------------------------------
@@ -113,9 +117,9 @@ Configuration:
 * Updates the Topics & Themes Solr collection at `{dag1.params['collections_solr']}`.
 * Updates [this Prometheus Push Gateway](http://{c.push_gateway}) with `w3act_export` line count metrics.
 * Pushes update access lists to GitLab at `{dag1.params['gitlab_wayback_acl_remote']}`.
+    * This step is skipped if the `gitlab_wayback_acl_remote` connection URL is not set.
+    * That connection should only be set in production.
 * Pull those updated access lists from GitHub to where they are used for access.
-    * Currently, this involves SSHing into access to execute the `git pull`.
-    * Once the website stack is running on the local Swarm, this can be done locally.
     * **TODO** Move access updates (solr+acl) into a separate workflow, so they are decoupled and can be managed independently.
 
 How to check it's working:
@@ -191,35 +195,6 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
         """,
     )
 
-    acls_git = DockerOperator(
-        task_id='commit_wayback_acls_to_git',
-        image=c.ukwa_task_image, # Any image with git installed should be fine
-        # Using -e to make sure errors are reported:
-        command="""bash -e -x -c "
-        cd /storage/wayback_acls
-        git config user.email '{{ var.value.alert_email_address }}'
-        git config user.email
-        git config user.name 'Airflow W3ACT Export Task'
-        git pull origin master
-        if [[ `git status --porcelain` ]]; then
-          git commit -m 'Automated update from Airflow at {{ ts }} by {{ task_instance_key_str }}.' -a
-          git push {{ params.gitlab_wayback_acl_remote }} master
-        fi
-        "
-        """,
-    )
-
-    acls_deploy = SSHOperator(
-        task_id='deploy_updated_acls',
-        ssh_conn_id='access_ssh',
-        # Using -e to make sure errors are reported:
-        command="""bash -e -x -c "
-        cd /root/gitlab/wayback_excludes_update/
-        git pull origin master
-        "
-        """,
-    )
-
     @task()
     def push_w3act_data_stats():
         from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
@@ -253,7 +228,30 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
     stat = push_w3act_data_stats()
 
     # Define workflow dependencies:
-    cleanup >> dump >> [ acl, aclj, ann, cfld, cfby, never ] >> mvs >> [ socol, stat, acls_git ] >> acls_deploy
+    cleanup >> dump >> [ acl, aclj, ann, cfld, cfby, never ] >> mvs >> [ socol, stat ]
+
+    # Add optional dependency based on whether the GitLab remote is set:
+    if gitlab_wayback_acl_remote:
+        acls_git = DockerOperator(
+            task_id='commit_wayback_acls_to_git',
+            image=c.ukwa_task_image, # Any image with git installed should be fine
+            # Using -e to make sure errors are reported:
+            command="""bash -e -x -c "
+            cd /storage/wayback_acls
+            git config user.email '{{ var.value.alert_email_address }}'
+            git config user.email
+            git config user.name 'Airflow W3ACT Export Task'
+            git pull origin master
+            if [[ `git status --porcelain` ]]; then
+            git commit -m 'Automated update from Airflow at {{ ts }} by {{ task_instance_key_str }}.' -a
+            git push {{ params.gitlab_wayback_acl_remote }} master
+            fi
+            "
+            """,
+        )
+
+        mvs >> acls_git
+
 
 
 # ----------------------------------------------------------------------------
