@@ -29,6 +29,7 @@ class Config():
     ukwa_task_image = 'ukwa/ukwa-manage:2.2.1'
     hadoop_docker_image = 'ukwa/docker-hadoop:2.1.2'
     postgres_image = 'postgres:9.6.2'
+    rclone_image = 'rclone/rclone'
 
     # Get a copy of the default arguments:
     def get_default_args(self):
