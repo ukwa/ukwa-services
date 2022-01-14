@@ -76,7 +76,7 @@ services:
   # The WARChiving proxy itself
   warcprox:
     image: ukwa/warcprox:2.4.17.1
-    command: "warcprox -b 0.0.0.0 -d /output/warcs --base32 --gzip --rollover-idle-time 600 --dedup-db-file /output/warcs/_warcprox_dedup_db.sqlite --stats-db-file /dev/null --quiet --plugin warcprox-plugins.listeners.UpdateOutbackCDX --plugin warcprox-plugins.listeners.KafkaCaptureFeed --max-threads 1000 --queue-size 1000"
+    command: "warcprox -b 0.0.0.0 -d /output/warcs --base32 --gzip --rollover-idle-time 600 --dedup-db-file /host/warcprox_dedup_db.sqlite --stats-db-file /dev/null --quiet --plugin warcprox-plugins.listeners.UpdateOutbackCDX --plugin warcprox-plugins.listeners.KafkaCaptureFeed --max-threads 1000 --queue-size 1000"
     environment:
       - "KAFKA_BOOTSTRAP_SERVERS=kafka:9092"
       - "KAFKA_CRAWLED_TOPIC=fc.crawled"
@@ -84,6 +84,7 @@ services:
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
     volumes:
       - "${STORAGE_PATH}/heritrix/wren:/output/warcs"
+      - "/mnt/localraid6/fc/warcprox:/host" # FAST disk for dedup db
     ulimits:
       nproc: 2000  # See https://github.com/internetarchive/warcprox/blob/2.x/warcprox/warcproxy.py#L413
     deploy:
