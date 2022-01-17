@@ -3,54 +3,69 @@ version: "3.2"
 
 services:
 
-  # Our slightly-modified version of HttpFS:
+  # Running HttpFS with UKWA configuration:
+  #
+  # Running as httpfsadmin user in the container works, but:
+  # "Unauthorized connection for super-user: httpfsadmin from IP /192.168.45.91"
+  # i.e. the main config would need changing to allow this.
+  #
   worker:
-    image: ukwa/httpfs:cdh3u5-v2
-    user: tomcat
+    image: ukwa/docker-hadoop:2.1.4
+    user: httpfsadmin
+    hostname: h3httpfs1
+    command: "hdfs httpfs"
+    ports:
+      - "14000:14000"
     volumes:
-      - ./etc/hadoop:/etc/hadoop
-    environment:
-      - "SERVICE_PORTS=14000" # This is required so the dockercloud/haproxy knows what port to use
+    # These volumes should really be set up in the Docker container:
+       - "./temp:/usr/local/hadoop/temp"
+       - "./logs:/usr/local/hadoop/logs"
+    #environment:
+      #- "SERVICE_PORTS=14000" # This is required so the dockercloud/haproxy knows what port to use
       # Additional options only needed for debugging:
       #- "CATALINA_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.port=9090 -Dcom.sun.management.jmxremote.rmi.port=9090 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.local.only=false" # Needs? -Djava.rmi.server.hostname=192.168.99.100 ???
-    networks:
-      - httpfsnet
-    extra_hosts:
-      - "namenode:192.168.1.103"
-    deploy:
-      replicas: 3
+    #networks:
+    #  - httpfsnet
+    #deploy:
+    #  replicas: 3
 
   # HAProxy load balancer
-  lb:
-    image: dockercloud/haproxy:1.6.7
-    ports:
-      - "14000:80"
-      - "1937:1936" # For monitoring/stats
-    environment:
-      - "BALANCE=roundrobin"
-      - "TIMEOUT=connect 30s, client 10m, server 10m"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - httpfsnet
-    deploy: # There needs to be just one of these, located on a manager node so it can talk to Docker:
-      replicas: 1
-      placement:
-        constraints:
-          - node.role == manager
+  #
+  #
+  # This all needs replacing with:
+  #
+  # https://www.haproxy.com/blog/haproxy-on-docker-swarm-load-balancing-and-dns-service-discovery/
+  # https://www.haproxy.com/blog/haproxy-exposes-a-prometheus-metrics-endpoint/
+#   lb:
+#     image: dockercloud/haproxy:1.6.7
+#     ports:
+#       - "14000:80"
+#       - "1937:1936" # For monitoring/stats
+#     environment:
+#       - "BALANCE=roundrobin"
+#       - "TIMEOUT=connect 30s, client 10m, server 10m"
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#     networks:
+#       - httpfsnet
+#     deploy: # There needs to be just one of these, located on a manager node so it can talk to Docker:
+#       replicas: 1
+#       placement:
+#         constraints:
+#           - node.role == manager
 
-  # Expose HAProxy stats in a form suitable for Prometheus:
-  metrics:
-    image: quay.io/prometheus/haproxy-exporter:v0.10.0
-    ports:
-      - '19101:9101'
-    command:
-      - "--haproxy.scrape-uri=http://stats:stats@lb:1936/;csv"
-    networks:
-      - httpfsnet
+#   # Expose HAProxy stats in a form suitable for Prometheus:
+#   metrics:
+#     image: quay.io/prometheus/haproxy-exporter:v0.10.0
+#     ports:
+#       - '19101:9101'
+#     command:
+#       - "--haproxy.scrape-uri=http://stats:stats@lb:1936/;csv"
+#     networks:
+#       - httpfsnet
 
-# The auto-configuring HAProxy system appears to require that each proxied service runs in a dedicated virtual network
-networks:
-  httpfsnet:
-    driver: overlay
+# # The auto-configuring HAProxy system appears to require that each proxied service runs in a dedicated virtual network
+# networks:
+#   httpfsnet:
+#     driver: overlay
 
