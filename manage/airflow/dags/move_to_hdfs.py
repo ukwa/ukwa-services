@@ -51,7 +51,7 @@ Configuration:
 
 How to check it's working:
 
-* The Task Instance logs in Airflow will show e.g. how many WARCs were moved.
+* The Task Instance logs in Airflow will show e.g. how many WARCs were copied.
 
 Tool container versions:
 
@@ -60,12 +60,14 @@ Tool container versions:
 """ 
 
     up_to_hdfs = DockerOperator(
-        task_id='upload-to-h3-hdfs',
+        task_id='upload-fc-npld-to-h3-hdfs',
         image=c.rclone_image,
         command='copy --hdfs-namenode h3nn.wa.bl.uk:54310 --hdfs-username ingest' \
-		' /mnt/gluster/fc/heritrix/output :hdfs:/heritrix/output' \
+		' /mnt/gluster/fc/heritrix/output/frequent-npld :hdfs:/heritrix/output/frequent-npld' \
 		' --include "*.warc.gz" --include "crawl.log.cp*"' \
 		' --no-traverse --dry-run',
+        # rclone copy --max-age 48h --no-traverse /mnt/gluster/fc/heritrix/output/frequent-npld hadoop3:/heritrix/output/frequent-npld --include "*.warc.gz" --include "crawl.log.cp*"
+
         #user=0, # Run as root due to file permissions
         mounts= [
             Mount( source='/mnt/gluster/fc', target='/mnt/gluster/fc', type='bind' )
