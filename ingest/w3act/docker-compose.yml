@@ -135,25 +135,24 @@ services:
     ports:
       - 8866:8866
 
-  metabase:
-    image: metabase/metabase:latest
-    environment: 
-      MB_DB_TYPE: postgres
-      MB_DB_DBNAME: metabase
-      MB_DB_PORT: 5432
-      MB_DB_USER: metabase
-      MB_DB_PASS: metabase
-      MB_DB_HOST: metabase-postgres
+  grafana:
+    image: grafana/grafana-oss:8.3.4
+    environment:
+      - "GF_SERVER_DOMAIN=dev.webarchive.org.uk"
+      - "GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/act/grafana/"
+      - "GF_SERVER_SERVE_FROM_SUB_PATH=true"
+      - "GF_SECURITY_ADMIN_USER=admin" # Auth against W3ACT handled in NGINX
+      - "GF_AUTH_PROXY_ENABLED=true"
+      - "GF_AUTH_PROXY_HEADER_NAME=X-AUTH-REMOTE-USER-EMAIL" # X-Auth-Remote-User-Primary-Role
+      - "GF_AUTH_PROXY_HEADER_PROPERTY=email"
+      - "GF_AUTH_PROXY_AUTO_SIGN_UP=true"
+      - "GF_AUTH_DISABLE_SIGNOUT_MENU=true"
+    volumes:
+      - ./grafana:/etc/grafana/provisioning
+      - "${W3ACT_STORAGE}/grafana:/var/lib/grafana"
+      - "${W3ACT_STORAGE}/dbs:/dbs"
     ports:
       - 3001:3000
-
-  metabase-postgres:
-    image: postgres:14.1
-    environment:
-      - "POSTGRES_USER=metabase"
-      - "POSTGRES_PASSWORD=${METABASE_PSQL_PASSWORD}"
-    volumes:
-      - "${METABASE_PSQL_DIR}:/var/lib/postgresql/data"
 
 networks:
   # Make network attachable so tasks can be run:

@@ -34,6 +34,8 @@ mkdir -p $DDHAPT_SIPS_SUBMITTED_DIR
 mkdir -p $W3ACT_DUMPS_DIR
 mkdir -p $DDHAPT_PSQL_DIR
 mkdir -p $METABASE_PSQL_DIR
+mkdir -p ${W3ACT_STORAGE}/grafana
+mkdir -p ${W3ACT_STORAGE}/dbs
 
 # Launch the common configuration with these environment variable:
 docker stack deploy -c docker-compose.yml w3act
