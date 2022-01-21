@@ -139,9 +139,7 @@ services:
     image: grafana/grafana-oss:8.3.4
     environment:
       - "GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/act/grafana/"
-      # Switching off Grafana Live as this needs WebSockets which are proving a pain to proxy:
-      - "GF_LIVE_MAX_CONNECTIONS=0"
-      #- "GF_LIVE_ALLOWED_ORIGINS=https://*.webarchive.org.uk"
+      - "GF_LIVE_ALLOWED_ORIGINS=https://*.webarchive.org.uk"
       - "GF_SERVER_SERVE_FROM_SUB_PATH=true"
       - "GF_SECURITY_ADMIN_USER=admin" # Auth against W3ACT handled in NGINX
       - "GF_AUTH_PROXY_ENABLED=true"
