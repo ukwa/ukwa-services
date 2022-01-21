@@ -138,12 +138,15 @@ services:
   grafana:
     image: grafana/grafana-oss:8.3.4
     environment:
-      - "GF_SERVER_DOMAIN=dev.webarchive.org.uk"
       - "GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/act/grafana/"
+      # Switching off Grafana Live as this needs WebSockets which are proving a pain to proxy:
+      - "GF_LIVE_MAX_CONNECTIONS=0"
+      #- "GF_LIVE_ALLOWED_ORIGINS=https://*.webarchive.org.uk"
       - "GF_SERVER_SERVE_FROM_SUB_PATH=true"
       - "GF_SECURITY_ADMIN_USER=admin" # Auth against W3ACT handled in NGINX
       - "GF_AUTH_PROXY_ENABLED=true"
-      - "GF_AUTH_PROXY_HEADER_NAME=X-AUTH-REMOTE-USER-EMAIL" # X-Auth-Remote-User-Primary-Role
+      - "GF_AUTH_PROXY_HEADER_NAME=X-AUTH-REMOTE-USER-EMAIL" 
+      # Consider adding X-Auth-Remote-User-Primary-Role as a Group 
       - "GF_AUTH_PROXY_HEADER_PROPERTY=email"
       - "GF_AUTH_PROXY_AUTO_SIGN_UP=true"
       - "GF_AUTH_DISABLE_SIGNOUT_MENU=true"
