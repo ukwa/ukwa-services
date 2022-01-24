@@ -15,6 +15,7 @@ services:
     volumes:
       - ./pywb/staff.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+      - ./logos/logo-staff.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
     ports:
@@ -22,17 +23,18 @@ services:
 
 
   # -------------------------------------------------------------
-  # Reading Room Wayback configuration per LDL:
+  # Reading Room Wayback with SCU locks, per LDL:
   # -------------------------------------------------------------
   pywb-bl:
     image: ukwa/ukwa-pywb:2.6.3
     environment:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
-      - "REDIS_URL=redis://redis:6379/0"
+      - "REDIS_URL=redis://redis:6379/0" # Locks stored in Redis DB 0
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+      - ./logos/bl_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
     ports:
@@ -47,6 +49,7 @@ services:
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+      - ./logos/nls_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
     ports:
