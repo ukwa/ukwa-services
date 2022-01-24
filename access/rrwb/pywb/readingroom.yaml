@@ -19,7 +19,6 @@ collections:
         single-use-lock: true
 
     # Access to internal documents using live web support:
-    # TODO Test if this actually works!
     live:
         index: $live
         single-use-lock: true

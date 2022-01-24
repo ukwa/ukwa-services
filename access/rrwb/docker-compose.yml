@@ -5,48 +5,76 @@ version: '3.2'
 services:
 
   # -------------------------------------------------------------
+  # Staff Access Service Configuration (no locks):
+  # -------------------------------------------------------------
+  pywb-staff:
+    image: ukwa/ukwa-pywb:2.6.3
+    environment:
+      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+    volumes:
+      - ./pywb/staff.yaml:/webarchive/config.yaml
+      - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+    depends_on:
+      - redis
+    ports:
+      - "8309:8080"
+
+
+  # -------------------------------------------------------------
   # Reading Room Wayback configuration per LDL:
   # -------------------------------------------------------------
   pywb-bl:
-    image: ukwa/ukwa-pywb:2.5.x-beta
-    #image: webrecorder/pywb:2.4.0
+    image: ukwa/ukwa-pywb:2.6.3
     environment:
-      - "DEBUG=True"
-      - "WEBHDFS_USER=access"
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       - "REDIS_URL=redis://redis:6379/0"
-      - "TLDEXTRACT_CACHE_TIMEOUT=0.1"
-      - "TLDEXTRACT_CACHE=/ukwa_pywb/_tldextract.cache"
     volumes:
-      - ./pywb/config.yaml:/webarchive/config.yaml
+      - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
-      - ./tmp-py-cache:/root/.cache/
     depends_on:
       - redis
-    cap_add:
-      - SYS_PTRACE
     ports:
-      - "8111:8080"
+      - "8300:8080"
+
+  pywb-nls:
+    image: ukwa/ukwa-pywb:2.6.3
+    environment:
+      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "REDIS_URL=redis://redis:6379/1"
+    volumes:
+      - ./pywb/readingroom.yaml:/webarchive/config.yaml
+      - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+    depends_on:
+      - redis
+    ports:
+      - "8301:8080"
 
   # Redis service to hold locks
   redis:
-    image: redis:3.2.4
+    image: redis:6
 
   # Add some setup via NGINX
   nginx:
-    image: nginx:1.13-alpine
-
+    image: nginx:1-alpine
     volumes:
       - ./nginx/:/etc/nginx/conf.d/:ro
-
     ports:
       - "8100:8100"
-      - "8101:8101"
-
+      - "8200:8200"
+      - "8201:8201"
+      - "8209:8209"
     depends_on:
-      - pywb
-
+      - pywb-staff
+      - pywb-bl
+      - pywb-nls
+    networks:
+      default:
+        aliases:
+          - bl.ldls.org.uk
+          - nls.ldls.org.uk
 
 #logging:
 #  driver: gelf

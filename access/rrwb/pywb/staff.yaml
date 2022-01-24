@@ -1,0 +1,40 @@
+INDEX:   &INDEX ${UKWA_INDEX}
+ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
+
+collections:
+    # NPLD access under /archive/
+    archive:
+        index_paths: *INDEX
+        archive_paths: *ARCHIVE
+
+        acl_paths:
+            - ./acl/blocks.aclj
+
+        default_access: allow
+
+        # up the query limit:
+        query_limit: 100000
+
+        # Do not nable SCU locks
+        single-use-lock: false
+
+    # Access to internal documents using live web support:
+    live:
+        index: $live
+        single-use-lock: false
+
+# redirect to exact url behavior
+redirect_to_exact: true
+
+# enable memento
+enable_memento: true
+
+# enable experimental Memento Prefer
+enable_prefer: false
+
+# Locale setup
+locales_root_dir: ./i18n/translations/
+locales:
+  - en
+  - cy
+
