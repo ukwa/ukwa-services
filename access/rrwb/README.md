@@ -3,6 +3,8 @@ Reading Room Wayback Service Stack
 
 This [Docker Swarm Stack](https://docs.docker.com/engine/swarm/key-concepts/) deploys the back-end services required to provide reading-room and staff access to Non-Print Legal Deposit material.
 
+This system provides a web-based access point for every Legal Deposit library, and one more for BL Staff, through which NPLD material can be accessed.  This covers items delivered to us by publishers (supporting eBook and ePub formats at this time), and web pages captured by the UK Web Archive. This system implements the access restrictions required by the NPLD regulations.
+
 This replaces the remote-desktop-based access system by using [UK Web Archive Python Wayback](https://github.com/ukwa/ukwa-pywb) (UKWA PyWB) to provide access to content directly to secure browsers in reading rooms (either directly, or via the forthcoming [NPLD Player](https://github.com/ukwa/npld-player)). The UKWA PyWB system also implements the Single-Concurrent Usage (SCU) locks, and provides a way for staff to manage those locks if needed.
 
 To Do
@@ -11,12 +13,15 @@ To Do
 - [ ] Confirm required network location. Do we need to be on the Access VLAN?
 - [ ] Ensure staff access can be separated out. May require separate IP address.
 - [ ] Understand various redundancies/back services needed.
+- [ ] Verify assumption that all failover redirection, SSL encryption, authentication, token validation or user identification are handled upstream.
+- [ ] Understand reporting needs and whether this is all handled upstream.
 - [ ] Consider training options, e.g. [this](https://www.pluralsight.com/paths/managing-docker-in-production)
 - [ ] @anjackson Add NGINX rules to map expected URLs to PyWB URLs.
 - [ ] @anjackson Add `LOCKS_AUTH=admin:password`
 - [ ] @anjackson Add in known test cases for manual testing below.
 - [ ] @anjackson Set up some tests, using [Robot Framework](https://github.com/ukwa/docker-robot-framework), sitting on the `access_rrwb_default` network.
 - [ ] @anjackson Allow access to the multi-cluster WARC Server as `warc-server.api.wa.bl.uk`
+- [ ] @webrecorder to add ePub and PDF support to the PYWB, and implement the NPLD Player.
 
 Overview
 --------
