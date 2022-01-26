@@ -15,6 +15,7 @@ To Do
 - [ ] Understand various redundancies/back services needed.
 - [ ] Verify assumption that all failover redirection, SSL encryption, authentication, token validation or user identification are handled upstream.
 - [ ] Understand reporting needs and whether this is all handled upstream.
+- [ ] Configure logging as appropriate.
 - [ ] Consider training options, e.g. [this](https://www.pluralsight.com/paths/managing-docker-in-production)
 - [ ] @anjackson Add NGINX rules to map expected URLs to PyWB URLs.
 - [ ] @anjackson Add `LOCKS_AUTH=admin:password`

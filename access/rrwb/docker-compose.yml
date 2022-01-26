@@ -8,7 +8,7 @@ services:
   # Staff Access Service Configuration (no locks):
   # -------------------------------------------------------------
   pywb-staff:
-    image: ukwa/ukwa-pywb:2.6.3
+    image: ${PYWB_IMAGE}
     environment:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
@@ -26,7 +26,7 @@ services:
   # Reading Room Wayback with SCU locks, per LDL:
   # -------------------------------------------------------------
   pywb-bl:
-    image: ukwa/ukwa-pywb:2.6.3
+    image: ${PYWB_IMAGE}
     environment:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
@@ -41,7 +41,7 @@ services:
       - "8300:8080"
 
   pywb-nls:
-    image: ukwa/ukwa-pywb:2.6.3
+    image: ${PYWB_IMAGE}
     environment:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
@@ -54,6 +54,66 @@ services:
       - redis
     ports:
       - "8301:8080"
+
+  pywb-llgc:
+    image: ${PYWB_IMAGE}
+    environment:
+      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "REDIS_URL=redis://redis:6379/2"
+    volumes:
+      - ./pywb/readingroom.yaml:/webarchive/config.yaml
+      - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+      - ./logos/llgc_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
+    depends_on:
+      - redis
+    ports:
+      - "8302:8080"
+
+  pywb-cam:
+    image: ${PYWB_IMAGE}
+    environment:
+      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "REDIS_URL=redis://redis:6379/3"
+    volumes:
+      - ./pywb/readingroom.yaml:/webarchive/config.yaml
+      - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+      - ./logos/cambridge_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
+    depends_on:
+      - redis
+    ports:
+      - "8303:8080"
+
+  pywb-bod:
+    image: ${PYWB_IMAGE}
+    environment:
+      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "REDIS_URL=redis://redis:6379/4"
+    volumes:
+      - ./pywb/readingroom.yaml:/webarchive/config.yaml
+      - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+      - ./logos/bodleian_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
+    depends_on:
+      - redis
+    ports:
+      - "8304:8080"
+
+  pywb-tcd:
+    image: ${PYWB_IMAGE}
+    environment:
+      - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
+      - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
+      - "REDIS_URL=redis://redis:6379/5"
+    volumes:
+      - ./pywb/readingroom.yaml:/webarchive/config.yaml
+      - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
+      - ./logos/trinity_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
+    depends_on:
+      - redis
+    ports:
+      - "8305:8080"
 
 
 
@@ -71,19 +131,31 @@ services:
     volumes:
       - ./nginx/:/etc/nginx/conf.d/:ro
     ports:
-      - "8100:8100"
-      - "8200:8200"
-      - "8201:8201"
-      - "8209:8209"
+      - "8100:8100" # Shared port (service determine by Host header)
+      - "8200:8200" # BL
+      - "8201:8201" # NLS
+      - "8202:8202" # LLGC
+      - "8203:8203" # CUL
+      - "8204:8204" # BOD
+      - "8205:8205" # TCD
+      - "8209:8209" # Staff (default when Host header does not match)
     depends_on:
       - pywb-staff
       - pywb-bl
       - pywb-nls
+      - pywb-llgc
+      - pywb-cam
+      - pywb-bod
+      - pywb-tcd
     networks:
       default:
-        aliases:
+        aliases: # So Docker services on this network can resolve services by name:
           - bl.ldls.org.uk
           - nls.ldls.org.uk
+          - llgc.ldls.org.uk
+          - cam.ldls.org.uk
+          - bodleian.ldls.org.uk
+          - tcdlibrary.ldls.org.uk
 
 #logging:
 #  driver: gelf
