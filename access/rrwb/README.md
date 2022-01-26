@@ -1,9 +1,9 @@
 Reading Room Wayback Service Stack
 ==================================
 
-This [Docker Swarm Stack](https://docs.docker.com/engine/swarm/stack-deploy/) deploys the set of services required to provide reading-room and staff access to Non-Print Legal Deposit material.
+This [Docker Swarm Stack](https://docs.docker.com/engine/swarm/stack-deploy/) deploys the back-end services required to provide reading-room and staff access to Non-Print Legal Deposit material.
 
-This replaces the remote-desktop-based access system, using [UK Web Archive Python Wayback](https://github.com/ukwa/ukwa-pywb) (PyWB) to provide access to content directly to secure browsers in reading rooms. Our PyWB system also implements the Single-Concurrent Usage (SCU) locks, and provides a way for staff to manage those locks if needed.
+This replaces the remote-desktop-based access system by using [UK Web Archive Python Wayback](https://github.com/ukwa/ukwa-pywb) (UKWA PyWB) to provide access to content directly to secure browsers in reading rooms (either directly, or via the [NPLD Player](https://github.com/ukwa/npld-player)). The UKWA PyWB system also implements the Single-Concurrent Usage (SCU) locks, and provides a way for staff to manage those locks if needed.
 
 To Do
 -----
@@ -12,6 +12,8 @@ To Do
 - [ ] Ensure staff access can be separated out. May require separate IP address.
 - [ ] Understand various redundancies/back services needed.
 - [ ] Consider training options, e.g. [this](https://www.pluralsight.com/paths/managing-docker-in-production)
+- [ ] @anjackson Add NGINX rules to map expected URLs to PyWB URLs.
+- [ ] @anjackson Add `LOCKS_AUTH=admin:password`
 - [ ] @anjackson Add in known test cases for manual testing below.
 - [ ] @anjackson Set up some tests, using [Robot Framework](https://github.com/ukwa/docker-robot-framework), sitting on the `access_rrwb_default` network.
 - [ ] @anjackson Allow access to the multi-cluster WARC Server as `warc-server.api.wa.bl.uk`
@@ -19,19 +21,20 @@ To Do
 Overview
 --------
 
-To ensure a smooth transition, this service maintains the same pattern of URLs for accessing content. e.g.
+To ensure a smooth transition, this service maintains the same pattern of URLs for accessing content as the current system. e.g.
 
 - https://blstaff.ldls.org.uk/welcome.html?ark:/81055/vdc_100090432161.0x000001
-- https://bl.ldls.org.uk/welcome.html?10000101000000/http://www.downstairsatthekingshead.com
 - http://bodleian.ldls.org.uk/ark:/81055/vdc_100090432161.0x000001
+- https://bl.ldls.org.uk/welcome.html?10000101000000/http://www.downstairsatthekingshead.com
+- https://nls.ldls.org.uk/10000101000000/http://www.downstairsatthekingshead.com
 
-The ARK identifiers are handled by the PyWB `live` collection that proxies the request downstream to DLS, and the `TIMESTAMP/URL` identifiers are passed to a second `archive` collection that plays the archived web pages back using UKWA internal services. NGINX is used to perform these mappings from expected URLs to those supported by PyWB.
+The items with ARK identifiers are handled by the PyWB `live` collection that proxies the request downstream to the digital library access service, and the `TIMESTAMP/URL` identifiers are passed to a second `archive` collection that 'replays' the archived web pages back using UKWA internal services. NGINX is used to perform the mappings from expected URLs to those supported by PyWB.
 
 For example, if a BL Reading Room patron uses this Access URL to get an URL from the web archive:
 
 - https://blstaff.ldls.org.uk/welcome.html?10000101000000/http://www.downstairsatthekingshead.com
 
-Then the URL will get mapped to this URL:
+Then the URL will get mapped to this PyWB URL:
 
 - https://blstaff.ldls.org.uk/archive/10000101000000/http://www.downstairsatthekingshead.com
 
@@ -47,9 +50,9 @@ In this case, a fixed timestamp is used for all ARKs and the `http://staffaccess
 
 Therefore, this stack runs the following set of services:
 
-- An NGINX service to provide URL management and mappings.
+- An NGINX service to provide URL management.
 - Six PyWB services, one for each Legal Deposit Library (BL/NLW/NLS/Bod/CUL/TCDL)
-- A Redis service, which stores the SCU locks for each PyWB service.
+- A Redis service, which holdss the SCU locks for each PyWB service.
 
 Note that the included NGINX setup expects that any failover redirection, SSL encrytion, authentication, token validation or user identification has all been handled upstream of this service. Each PyWB service also exposes a dedicated port, allowing upstream NGINX proxies to implement the necessary features rather than relying on the local one, if needed.
 
@@ -113,7 +116,14 @@ It needs to be downloaded from there on a regular basis. e.g. a daily cron job l
 
 ### Inspecting and Managing SCU locks
 
-_...TBA..._
+The UKWA PyWB system includes [an improved version of the SCU locking mechanism](https://github.com/ukwa/ukwa-pywb/blob/master/docs/locks.md#single-concurrent-lock-system).  When an item is first retreived, a lock for that item is minted against a session cookie in the secure browser. This initial lock is stored in Redis and set to expire at the end of the day.
+
+However, while the item is being access, a JavaScript client is used to update the lock status, and changes the expiration of the lock to be five minutes in the future. This lock is refreshed every minute or so, so keeps being pushed back into the future while the item is in use. Once the item is no longer being used, the lock updates stop, and the lock is released shortly afterwards. This mechanism is expected to release item locks more reliably than the previous approach.
+
+See [the Admin Page documentation](https://github.com/ukwa/ukwa-pywb/blob/master/docs/locks.md#admin-page-and-api) to see how to access and manage the SCU locks.
+
+Access to this page is managed by HTTP Basic authentication via the `LOCKS_AUTH=username:pw` environment variable that must be set on launch.
+
 
 ### Testing
 
