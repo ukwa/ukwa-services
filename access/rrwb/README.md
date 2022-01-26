@@ -1,9 +1,9 @@
 Reading Room Wayback Service Stack
 ==================================
 
-This [Docker Swarm Stack](https://docs.docker.com/engine/swarm/stack-deploy/) deploys the back-end services required to provide reading-room and staff access to Non-Print Legal Deposit material.
+This [Docker Swarm Stack](https://docs.docker.com/engine/swarm/key-concepts/) deploys the back-end services required to provide reading-room and staff access to Non-Print Legal Deposit material.
 
-This replaces the remote-desktop-based access system by using [UK Web Archive Python Wayback](https://github.com/ukwa/ukwa-pywb) (UKWA PyWB) to provide access to content directly to secure browsers in reading rooms (either directly, or via the [NPLD Player](https://github.com/ukwa/npld-player)). The UKWA PyWB system also implements the Single-Concurrent Usage (SCU) locks, and provides a way for staff to manage those locks if needed.
+This replaces the remote-desktop-based access system by using [UK Web Archive Python Wayback](https://github.com/ukwa/ukwa-pywb) (UKWA PyWB) to provide access to content directly to secure browsers in reading rooms (either directly, or via the forthcoming [NPLD Player](https://github.com/ukwa/npld-player)). The UKWA PyWB system also implements the Single-Concurrent Usage (SCU) locks, and provides a way for staff to manage those locks if needed.
 
 To Do
 -----
@@ -26,7 +26,7 @@ To ensure a smooth transition, this service maintains the same pattern of URLs f
 - https://blstaff.ldls.org.uk/welcome.html?ark:/81055/vdc_100090432161.0x000001
 - http://bodleian.ldls.org.uk/ark:/81055/vdc_100090432161.0x000001
 - https://bl.ldls.org.uk/welcome.html?10000101000000/http://www.downstairsatthekingshead.com
-- https://nls.ldls.org.uk/10000101000000/http://www.downstairsatthekingshead.com
+- https://nls.ldls.org.uk/10000101000000/http://www.downstairsatthekingshead.com _TBC: Is this syntax supported? i.e. no `welcome.html`?_
 
 The items with ARK identifiers are handled by the PyWB `live` collection that proxies the request downstream to the digital library access service, and the `TIMESTAMP/URL` identifiers are passed to a second `archive` collection that 'replays' the archived web pages back using UKWA internal services. NGINX is used to perform the mappings from expected URLs to those supported by PyWB.
 
@@ -38,7 +38,7 @@ Then the URL will get mapped to this PyWB URL:
 
 - https://blstaff.ldls.org.uk/archive/10000101000000/http://www.downstairsatthekingshead.com
 
-Alterlatively, if a BL Staff Access URL used to get an eBook from DLS:
+Alternatively, if a BL Staff Access URL used to get an eBook from DLS:
 
 - https://blstaff.ldls.org.uk/welcome.html?ark:/81055/vdc_100090432161.0x000001
 
@@ -51,10 +51,10 @@ In this case, a fixed timestamp is used for all ARKs and the `http://staffaccess
 Therefore, this stack runs the following set of services:
 
 - An NGINX service to provide URL management.
-- Six PyWB services, one for each Legal Deposit Library (BL/NLW/NLS/Bod/CUL/TCDL)
-- A Redis service, which holdss the SCU locks for each PyWB service.
+- Six PyWB services, one for each Legal Deposit Library (BL/NLW/NLS/Bod/CUL/TCD)
+- A Redis service, which holds the SCU locks for each PyWB service.
 
-Note that the included NGINX setup expects that any failover redirection, SSL encrytion, authentication, token validation or user identification has all been handled upstream of this service. Each PyWB service also exposes a dedicated port, allowing upstream NGINX proxies to implement the necessary features rather than relying on the local one, if needed.
+Note that the included NGINX setup expects that any failover redirection, SSL encryption, authentication, token validation or user identification has all been handled upstream of this service. Each PyWB service also exposes a dedicated port, allowing upstream NGINX proxies to implement the necessary features rather than relying on the local one, if needed.
 
 Each service supports two host names, the real `.ldls.org.uk` name and a `.beta.ldls.org.uk` version that could be used if it is necessary to test this system in parallel with the original system.  When accessed over the shared port, NGINX uses the `Host` in the request to determine which service is being called.
 
@@ -116,7 +116,7 @@ It needs to be downloaded from there on a regular basis. e.g. a daily cron job l
 
 ### Inspecting and Managing SCU locks
 
-The UKWA PyWB system includes [an improved version of the SCU locking mechanism](https://github.com/ukwa/ukwa-pywb/blob/master/docs/locks.md#single-concurrent-lock-system).  When an item is first retreived, a lock for that item is minted against a session cookie in the secure browser. This initial lock is stored in Redis and set to expire at the end of the day.
+The UKWA PyWB system includes [an improved version of the SCU locking mechanism](https://github.com/ukwa/ukwa-pywb/blob/master/docs/locks.md#single-concurrent-lock-system).  When an item is first retrieved, a lock for that item is minted against a session cookie in the secure browser. This initial lock is stored in Redis and set to expire at the end of the day.
 
 However, while the item is being access, a JavaScript client is used to update the lock status, and changes the expiration of the lock to be five minutes in the future. This lock is refreshed every minute or so, so keeps being pushed back into the future while the item is in use. Once the item is no longer being used, the lock updates stop, and the lock is released shortly afterwards. This mechanism is expected to release item locks more reliably than the previous approach.
 
