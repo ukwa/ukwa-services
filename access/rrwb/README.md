@@ -11,9 +11,10 @@ To Do
 - [ ] Confirm required network location. Do we need to be on the Access VLAN?
 - [ ] Ensure staff access can be separated out. May require separate IP address.
 - [ ] Understand various redundancies/back services needed.
-- [ ] @anjackson Port table, expected setup (hostname -> IP)
-- [ ] @anjackson Tests using Robot Framework, sitting on the `access_rrwb_default` network.
-- [ ] @anjackson Expose multi-cluster WARC Server as `warc-server.api.wa.bl.uk`
+- [ ] Consider training options, e.g. [this](https://www.pluralsight.com/paths/managing-docker-in-production)
+- [ ] @anjackson Add in known test cases for manual testing below.
+- [ ] @anjackson Set up some tests, using [Robot Framework](https://github.com/ukwa/docker-robot-framework), sitting on the `access_rrwb_default` network.
+- [ ] @anjackson Allow access to the multi-cluster WARC Server as `warc-server.api.wa.bl.uk`
 
 Overview
 --------
@@ -52,9 +53,7 @@ Therefore, this stack runs the following set of services:
 
 Note that the included NGINX setup expects that any failover redirection, SSL encrytion, authentication, token validation or user identification has all been handled upstream of this service. Each PyWB service also exposes a dedicated port, allowing upstream NGINX proxies to implement the necessary features rather than relying on the local one, if needed.
 
-Each service supports two host names, the real `.ldls.org.uk` name and a `.beta.ldls.org.uk` version that could be used if it is necessary to test this system in parallel with the original system.
-
-_TODO_ Add port map here:
+Each service supports two host names, the real `.ldls.org.uk` name and a `.beta.ldls.org.uk` version that could be used if it is necessary to test this system in parallel with the original system.  When accessed over the shared port, NGINX uses the `Host` in the request to determine which service is being called.
 
 
 | Server Name           | Beta Server Name            | Shared NGINX Port | Dedicated NGINX Port | Direct PyWB Port (for debugging) |
@@ -74,27 +73,48 @@ In each deployment location:
 
 - One or more Linux servers with Docker installed and running in Swarm mode.
 - Network access to:
-    - The public web, if only temporarily, to download the Docker images during installation/deployment.
+    - The public web, if only temporarily, install these files and to download the Docker images during installation/deployment.
+        - If this is not possible [offline Docker image installation can be used](https://serverfault.com/a/718470).
     - The DLS back-end systems where ARK-based resources can be downloaded (e.g. `access.dl.bl.uk`, `staffaccess.dl.bl.uk`).
-    - The UKWA back-end systems where URL lookups and WARC record retrieval can be done (`cdx.api.wa.bl.uk`, `webhdfs.api.wa.bl.uk`, likely accessed from Access VLAN via web archive proxy).
-- The set of files in this folder.
+    - The UKWA back-end systems: 
+        - CDX index for URL lookups (`cdx.api.wa.bl.uk`).
+        - WARC record retrieval (`warc-server.api.wa.bl.uk`).
+        - GitLab where the URL block list is stored ([`git.wa.bl.uk`](http://git.wa.bl.uk/bl-services/wayback_excludes_update/-/tree/master/ldukwa/acl)).
+        - If deployed on the Access VLAN, the existing UKWA service proxy can be used to reach these systems.
 
 It is envisages that the same stack will be deployed in BSP and STP, and connected up using the existing failover mechanism(s).
 
 Operations
 ----------
 
-### Deployment
+### Deploying and Updating the Stack
 
-...
+The Swarm deployment needs access to an host drive location where the list of blocked URLs is stored.  The `deploy-rrwb-dev.sh` script shows an example of how this is done for the UKWA DEV system.  A similar deployment script should be created for each deployment context, setting the `STORAGE_PATH_SHARED` environment variable before deploying the stack:
 
-note  ops like `docker service update --force access_rrwb_nginx` required to get NGINX to reload configuration.
+    docker stack deploy -c docker-compose.yml access_rrwb
+
+Assuming the required Docker images can be downloaded (or have already been installed offline/manually), the services should start up and start to come online.
+
+
+If the `docker-compose.yml` file is updated, the stack can be redeployed in order to update the Swarm configuration. However, note that most of the specific configuration is in files held on disk, e.g. the NGINX configuration files. If these are changed, the services can be restarted, forcing the configuration to be reloaded, e.g.
+
+    docker service update --force access_rrwb_nginx
 
 ### Updating the Block List
 
-...
+The list of URLs that are blocked from access in the Reading Rooms needs to be installed when deploying the service, and will need to be updated periodically (when the web archive team receives take-down requests).
 
-### Updating The Stack
+The blocks list is version controlled and held in: http://git.wa.bl.uk/bl-services/wayback_excludes_update/-/tree/master/ldukwa/acl
 
-...
+It needs to be downloaded from there on a regular basis. e.g. a daily cron job like:
 
+    curl -o /shared-folder/blocks.aclj http://git.wa.bl.uk/bl-services/wayback_excludes_update/-/raw/master/ldukwa/acl/blocks.aclj
+
+
+### Inspecting and Managing SCU locks
+
+_...TBA..._
+
+### Testing
+
+_...TBA..._
