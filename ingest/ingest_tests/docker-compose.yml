@@ -11,6 +11,7 @@ services:
     command: "/tests ${EXTRA_TESTS}"
     environment: 
       - "HOST=${TEST_HOST}"
+      - "HOST_NO_AUTH=${HOST_NO_AUTH}"
       - "PUSH_GATEWAY=${PUSH_GATEWAY}"
       - "PROMETHEUS_JOB_NAME=${PROMETHEUS_JOB_NAME}"
       - "HTTP_PROXY=${HTTP_PROXY}"
