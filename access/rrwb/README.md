@@ -20,7 +20,7 @@ To Do
 - [ ] @anjackson Add NGINX rules to map expected URLs to PyWB URLs.
 - [ ] @anjackson Add `LOCKS_AUTH=admin:password`
 - [ ] @anjackson Add in known test cases for manual testing below.
-- [ ] @anjackson Set up some tests, using [Robot Framework](https://github.com/ukwa/docker-robot-framework), sitting on the `access_rrwb_default` network.
+- [ ] @anjackson Set up some tests, using [Robot Framework](https://github.com/ukwa/docker-robot-framework), sitting on the `access_rrwb_default` network. e.g. based on [this](https://github.com/ukwa/ukwa-pywb/blob/master/integration-test/robot/tests/check_single_concurrent_use_lock.robot), but with the [Robot Framework Browser library](https://robocorp.com/docs/development-guide/browser/playwright)'s [Switch Context](https://marketsquare.github.io/robotframework-browser/Browser.html#Switch%20Context) instead of Selenium with multiple browsers.
 - [ ] @anjackson Allow access to the multi-cluster WARC Server as `warc-server.api.wa.bl.uk`
 - [ ] @webrecorder to add ePub and PDF support to the PYWB, and implement the NPLD Player.
 
