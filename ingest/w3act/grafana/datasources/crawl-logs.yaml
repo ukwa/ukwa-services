@@ -14,4 +14,4 @@ datasources:
   jsonData:
     interval: "Daily"
     esVersion: "7.16.1"
-    timeField: "@timestamp"
+    timeField: "crawled.timestamp"

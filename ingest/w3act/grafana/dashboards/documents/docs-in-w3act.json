@@ -1,0 +1,431 @@
+{
+	"annotations": {
+		"list": [
+			{
+				"builtIn": 1,
+				"datasource": "-- Grafana --",
+				"enable": true,
+				"hide": true,
+				"iconColor": "rgba(0, 211, 255, 1)",
+				"name": "Annotations & Alerts",
+				"target": {
+					"limit": 100,
+					"matchAny": false,
+					"tags": [],
+					"type": "dashboard"
+				},
+				"type": "dashboard"
+			}
+		]
+	},
+	"editable": true,
+	"fiscalYearStartMonth": 0,
+	"graphTooltip": 0,
+	"id": 8,
+	"links": [],
+	"liveNow": false,
+	"panels": [
+		{
+			"datasource": {
+				"type": "postgres",
+				"uid": "MTNk8B-nz"
+			},
+			"description": "",
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"barAlignment": 0,
+						"drawStyle": "line",
+						"fillOpacity": 10,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"lineInterpolation": "stepBefore",
+						"lineWidth": 1,
+						"pointSize": 5,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "never",
+						"spanNulls": true,
+						"stacking": {
+							"group": "A",
+							"mode": "none"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"displayName": "${__field.labels.__values}",
+					"mappings": [
+						{
+							"options": {
+								"0": {
+									"index": 0,
+									"text": "Found"
+								}
+							},
+							"type": "value"
+						}
+					],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 9,
+				"w": 12,
+				"x": 0,
+				"y": 0
+			},
+			"id": 2,
+			"options": {
+				"legend": {
+					"calcs": [],
+					"displayMode": "list",
+					"placement": "right"
+				},
+				"tooltip": {
+					"mode": "multi"
+				}
+			},
+			"pluginVersion": "8.3.4",
+			"targets": [
+				{
+					"alias": "",
+					"bucketAggs": [
+						{
+							"field": "crawled.timestamp",
+							"id": "2",
+							"settings": {
+								"interval": "auto"
+							},
+							"type": "date_histogram"
+						}
+					],
+					"datasource": {
+						"type": "postgres",
+						"uid": "MTNk8B-nz"
+					},
+					"format": "time_series",
+					"group": [],
+					"metricColumn": "none",
+					"metrics": [
+						{
+							"id": "1",
+							"type": "count"
+						}
+					],
+					"query": "",
+					"rawQuery": true,
+					"rawSql": "WITH m (k, v) as (values (0, 'New'),(1, 'Saved'),(2, 'Submitted'),(3, 'Ignored'),(4, 'Deleted'))\r\n\r\nSELECT\r\n  $__timeGroup(updated_at, '24h', 0) as time,\r\n  m.v as kind,\r\n  count(id)\r\nFROM\r\n  document\r\nJOIN m\r\n  ON status = m.k\r\nWHERE\r\n  $__timeFilter(updated_at)\r\nGROUP BY\r\n  time, kind\r\nORDER BY 1",
+					"refId": "A",
+					"select": [
+						[
+							{
+								"params": [
+									"value"
+								],
+								"type": "column"
+							},
+							{
+								"params": [
+									"avg"
+								],
+								"type": "aggregate"
+							},
+							{
+								"params": [
+									"value"
+								],
+								"type": "alias"
+							}
+						]
+					],
+					"timeColumn": "time",
+					"timeField": "crawled.timestamp",
+					"where": [
+						{
+							"name": "$__timeFilter",
+							"params": [],
+							"type": "macro"
+						}
+					]
+				}
+			],
+			"title": "Documents by last updated date",
+			"transformations": [],
+			"type": "timeseries"
+		},
+		{
+			"datasource": {
+				"type": "postgres",
+				"uid": "MTNk8B-nz"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						}
+					},
+					"mappings": []
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 9,
+				"w": 4,
+				"x": 12,
+				"y": 0
+			},
+			"id": 4,
+			"options": {
+				"legend": {
+					"displayMode": "list",
+					"placement": "bottom"
+				},
+				"pieType": "pie",
+				"reduceOptions": {
+					"calcs": [
+						"lastNotNull"
+					],
+					"fields": "",
+					"values": false
+				},
+				"tooltip": {
+					"mode": "single"
+				}
+			},
+			"targets": [
+				{
+					"alias": "",
+					"bucketAggs": [
+						{
+							"field": "crawled.timestamp",
+							"id": "2",
+							"settings": {
+								"interval": "auto"
+							},
+							"type": "date_histogram"
+						}
+					],
+					"datasource": {
+						"type": "postgres",
+						"uid": "MTNk8B-nz"
+					},
+					"format": "table",
+					"group": [],
+					"metricColumn": "none",
+					"metrics": [
+						{
+							"id": "1",
+							"type": "count"
+						}
+					],
+					"query": "",
+					"rawQuery": true,
+					"rawSql": "WITH m (k, v) as (values (0, 'New'),(1, 'Saved'),(2, 'Submitted'),(3, 'Ignored'),(4, 'Deleted'))\n\nSELECT\n  m.v as state,\n  count(id)\nFROM document\nJOIN m ON status = m.k\nWHERE\n  $__timeFilter(updated_at)\nGROUP BY state\nORDER BY 1",
+					"refId": "A",
+					"select": [
+						[
+							{
+								"params": [
+									"id"
+								],
+								"type": "column"
+							},
+							{
+								"params": [
+									"avg"
+								],
+								"type": "aggregate"
+							},
+							{
+								"params": [
+									"id"
+								],
+								"type": "alias"
+							}
+						]
+					],
+					"table": "document",
+					"timeColumn": "updated_at",
+					"timeColumnType": "timestamp",
+					"timeField": "crawled.timestamp",
+					"where": []
+				}
+			],
+			"title": "Document Totals by Staus",
+			"transformations": [
+				{
+					"id": "rowsToFields",
+					"options": {}
+				}
+			],
+			"type": "piechart"
+		},
+		{
+			"datasource": {
+				"type": "postgres",
+				"uid": "MTNk8B-nz"
+			},
+			"description": "",
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"custom": {
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"axisSoftMin": 0,
+						"fillOpacity": 80,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"lineWidth": 1
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": null
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 9,
+				"w": 8,
+				"x": 16,
+				"y": 0
+			},
+			"id": 6,
+			"options": {
+				"barWidth": 0.75,
+				"groupWidth": 0.7,
+				"legend": {
+					"calcs": [],
+					"displayMode": "hidden",
+					"placement": "bottom"
+				},
+				"orientation": "horizontal",
+				"showValue": "auto",
+				"stacking": "none",
+				"tooltip": {
+					"mode": "single"
+				},
+				"xTickLabelRotation": 0
+			},
+			"pluginVersion": "8.3.4",
+			"targets": [
+				{
+					"alias": "",
+					"bucketAggs": [
+						{
+							"field": "crawled.timestamp",
+							"id": "2",
+							"settings": {
+								"interval": "auto"
+							},
+							"type": "date_histogram"
+						}
+					],
+					"datasource": {
+						"type": "postgres",
+						"uid": "MTNk8B-nz"
+					},
+					"format": "table",
+					"group": [],
+					"metricColumn": "none",
+					"metrics": [
+						{
+							"id": "1",
+							"type": "count"
+						}
+					],
+					"query": "",
+					"rawQuery": true,
+					"rawSql": "WITH m (k, v) as (values (0, 'New'),(1, 'Saved'),(2, 'Submitted'),(3, 'Ignored'),(4, 'Deleted'))\r\n\r\nSELECT\r\n  target.title,\r\n  count(document.id)\r\nFROM document\r\nJOIN watched_target ON watched_target.id = document.id_watched_target\r\nJOIN target ON target.id = watched_target.id_target\r\nWHERE\r\n  $__timeFilter(document.updated_at)\r\nGROUP BY target.title\r\nORDER BY count(*) DESC\r\nLIMIT 20",
+					"refId": "A",
+					"select": [
+						[
+							{
+								"params": [
+									"value"
+								],
+								"type": "column"
+							}
+						]
+					],
+					"timeColumn": "time",
+					"timeField": "crawled.timestamp",
+					"where": [
+						{
+							"name": "$__timeFilter",
+							"params": [],
+							"type": "macro"
+						}
+					]
+				}
+			],
+			"title": "Document by Target Title (Top 20)",
+			"transformations": [],
+			"type": "barchart"
+		}
+	],
+	"schemaVersion": 34,
+	"style": "dark",
+	"tags": [],
+	"templating": {
+		"list": []
+	},
+	"time": {
+		"from": "now-6M",
+		"to": "now"
+	},
+	"timepicker": {},
+	"timezone": "",
+	"title": "Documents in W3ACT",
+	"uid": "iEj-Hsa7z",
+	"version": 7,
+	"weekStart": ""
+}

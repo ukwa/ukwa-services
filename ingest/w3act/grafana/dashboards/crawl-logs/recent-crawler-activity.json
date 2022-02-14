@@ -8,64 +8,97 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
         "type": "dashboard"
       }
     ]
   },
   "editable": true,
-  "gnetId": null,
+  "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 28,
-  "iteration": 1642709935379,
+  "id": 2,
+  "iteration": 1642802339048,
   "links": [],
+  "liveNow": false,
   "panels": [
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Frequent  Crawler Logs",
       "description": "",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 10,
         "x": 0,
         "y": 0
       },
-      "hiddenSeries": false,
       "id": 2,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": true,
-        "show": true,
-        "total": true,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "percentage": false,
-      "pluginVersion": "7.5.7",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      "pluginVersion": "8.3.4",
       "targets": [
         {
           "alias": "",
@@ -82,6 +115,7 @@
               "type": "terms"
             },
             {
+              "field": "crawled.timestamp",
               "id": "2",
               "settings": {
                 "interval": "auto"
@@ -89,6 +123,10 @@
               "type": "date_histogram"
             }
           ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "P160792DE97139F2A"
+          },
           "metrics": [
             {
               "id": "1",
@@ -97,97 +135,85 @@
           ],
           "query": "",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "crawled.timestamp"
         }
       ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
       "title": "Crawl Events by Status Code",
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "type": "timeseries"
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Frequent  Crawler Logs",
       "description": "",
       "fieldConfig": {
-        "defaults": {},
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 10,
         "x": 10,
         "y": 0
       },
-      "hiddenSeries": false,
       "id": 9,
-      "legend": {
-        "alignAsTable": true,
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "rightSide": true,
-        "show": true,
-        "total": true,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
       "options": {
-        "alertThreshold": true
+        "legend": {
+          "calcs": [
+            "sum"
+          ],
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
       },
-      "percentage": false,
-      "pluginVersion": "7.5.7",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
+      "pluginVersion": "8.3.4",
       "targets": [
         {
           "alias": "",
@@ -204,7 +230,7 @@
               "type": "terms"
             },
             {
-              "field": "@timestamp",
+              "field": "crawled.timestamp",
               "id": "2",
               "settings": {
                 "interval": "auto"
@@ -212,6 +238,10 @@
               "type": "date_histogram"
             }
           ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "P160792DE97139F2A"
+          },
           "metrics": [
             {
               "id": "1",
@@ -220,52 +250,13 @@
           ],
           "query": "",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "crawled.timestamp"
         }
       ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
       "title": "Crawl Event by Host Server",
-      "tooltip": {
-        "shared": true,
-        "sort": 2,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "type": "timeseries"
     },
     {
-      "datasource": "Frequent  Crawler Logs",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -319,12 +310,13 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.3.4",
       "targets": [
         {
           "alias": "",
           "bucketAggs": [
             {
+              "field": "crawled.timestamp",
               "id": "2",
               "settings": {
                 "interval": "auto"
@@ -332,6 +324,10 @@
               "type": "date_histogram"
             }
           ],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "P160792DE97139F2A"
+          },
           "metrics": [
             {
               "id": "1",
@@ -340,7 +336,7 @@
           ],
           "query": "-crawled.hop_path:/.+/ AND crawled.thread:*",
           "refId": "A",
-          "timeField": "@timestamp"
+          "timeField": "crawled.timestamp"
         }
       ],
       "title": "Seeds Launched",
@@ -348,7 +344,10 @@
       "type": "stat"
     },
     {
-      "datasource": "Frequent  Crawler Logs",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "P160792DE97139F2A"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -392,7 +391,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.3.4",
       "targets": [
         {
           "alias": "",
@@ -421,7 +420,10 @@
       "type": "stat"
     },
     {
-      "datasource": "Frequent  Crawler Logs",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "P160792DE97139F2A"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -475,7 +477,7 @@
         "text": {},
         "textMode": "auto"
       },
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.3.4",
       "targets": [
         {
           "alias": "",
@@ -515,14 +517,17 @@
       "type": "stat"
     },
     {
-      "datasource": "Frequent  Crawler Logs",
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "P160792DE97139F2A"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
           "custom": {
-            "align": null,
+            "displayMode": "auto",
             "filterable": false
           },
           "mappings": [],
@@ -563,10 +568,17 @@
       },
       "id": 4,
       "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "7.5.7",
+      "pluginVersion": "8.3.4",
       "targets": [
         {
           "alias": "",
@@ -655,18 +667,18 @@
     }
   ],
   "refresh": "1m",
-  "schemaVersion": 27,
+  "schemaVersion": 34,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": [
       {
-        "datasource": "Frequent  Crawler Logs",
-        "description": null,
-        "error": null,
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "P160792DE97139F2A"
+        },
         "filters": [],
         "hide": 0,
-        "label": null,
         "name": "Filters",
         "skipUrlSync": false,
         "type": "adhoc"
@@ -681,5 +693,6 @@
   "timezone": "",
   "title": "Recent Crawler Activity",
   "uid": "67xk-317z",
-  "version": 12
+  "version": 1,
+  "weekStart": ""
 }
