@@ -148,6 +148,7 @@ services:
       - "GF_AUTH_PROXY_HEADER_PROPERTY=email"
       - "GF_AUTH_PROXY_AUTO_SIGN_UP=true"
       - "GF_AUTH_DISABLE_SIGNOUT_MENU=true"
+      - "HTTPS_PROXY=${HTTPS_PROXY}"
     volumes:
       - ./grafana:/etc/grafana/provisioning
       - "${W3ACT_STORAGE}/grafana:/var/lib/grafana"
