@@ -98,7 +98,13 @@ In each deployment location:
 Operations
 ----------
 
-When running operations on the server, the operator shoudl use a non-root user account that is able to use Docker (i.e. a member of the `docker` group on the machine).
+When running operations on the server, the operator shoudl use a non-root user account that is able to use Docker (i.e. a member of the `docker` group on the machine). e.g.
+
+```
+[root@demo ~]# useradd -G docker access
+[root@demo ~]# su - access
+[access@demo ~]$ docker run hello-world
+```
 
 ### Deploying and Updating the Stack
 
