@@ -108,9 +108,32 @@ When running operations on the server, the operator shoudl use a non-root user a
 
 ### Deploying and Updating the Stack
 
-The Swarm deployment needs access to an host drive location where the list of blocked URLs is stored.  The `deploy-rrwb-dev.sh` script shows an example of how this is done for the UKWA DEV system.  A similar deployment script should be created for each deployment context, setting the `STORAGE_PATH_SHARED` environment variable before deploying the stack:
+First get the `ukwa-services` repository and change to the relevant directory:
 
-    docker stack deploy -c docker-compose.yml access_rrwb
+```
+ git clone https://github.com/ukwa/ukwa-services.git
+ cd ukwa-services/access/rrwb
+ ```
+
+The Swarm deployment needs access to an host drive location where the list of blocked URLs is stored.  The `deploy-rrwb-dev.sh` script shows an example of how this is done for the UKWA DEV system:  
+
+```
+#!/bin/sh
+
+# Where to store shared files:
+export STORAGE_PATH_SHARED=/mnt/nfs/data/airflow/data_exports
+
+# Username and password to use to access the locks pages:
+export LOCKS_AUTH=demouser:demopass
+
+# Which version of PyWB to use:
+export PYWB_IMAGE=ukwa/ukwa-pywb:2.6.4
+
+# Deploy as a Docker Stack
+docker stack deploy -c docker-compose.yml access_rrwb
+```
+
+A similar deployment script should be created for each deployment context, setting the `STORAGE_PATH_SHARED` environment variable before deploying the stack, and setting the `LOCKS_AUTH` username and password as required.
 
 Assuming the required Docker images can be downloaded (or have already been installed offline/manually), the services should start up and start to come online.
 
