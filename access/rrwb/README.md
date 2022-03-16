@@ -57,7 +57,7 @@ graph LR;
 To support this mode of operation, this stack runs the following set of services:
 
 - An NGINX service to provide URL management, with a shared port and separate ports for each service.
-- Six PyWB services, one for each Legal Deposit Library (BL/NLW/NLS/Bod/CUL/TCD), managing SCU locks for each.
+- Seven PyWB services, one for each Legal Deposit Library (BL/NLW/NLS/Bod/CUL/TCD managing SCU locks for each), and one for staff access (no SCU locks).
 - A Redis service, which holds the SCU lock state for all the PyWB services.
 
 Each service supports two host names, the real `*.ldls.org.uk` name and a `*.beta.ldls.org.uk` version that could be used if it is necessary to test this system in parallel with the original system.  When accessed over the shared port, NGINX uses the `Host` in the request to determine which service is being called. Each PyWB service also exposes a dedicated port, but this is intended to debugging rather than production use.
@@ -66,7 +66,7 @@ Each service supports two host names, the real `*.ldls.org.uk` name and a `*.bet
 | Server Name           | Beta Server Name            | Shared NGINX Port | Dedicated NGINX Port | Direct PyWB Port (for debugging) |
 |-----------------------|-----------------------------|-------------------|----------------------|----------------------------------|
 | bl.ldls.org.uk        | bl.beta.ldls.org.uk         | 8100              | 8200                 | 8300                             |
-| nls.ldls.org.uk	    | nls.beta.ldls.org.uk        | 8100              | 8201                 | 8301                             |
+| nls.ldls.org.uk	      | nls.beta.ldls.org.uk        | 8100              | 8201                 | 8301                             |
 | llgc.ldls.org.uk      | llgc.beta.ldls.org.uk       | 8100              | 8202                 | 8302                             |
 | cam.ldls.org.uk       | cam.beta.ldls.org.uk        | 8100              | 8203                 | 8303                             |
 | bodleian.ldls.org.uk  | bodleian.beta.ldls.org.uk   | 8100              | 8204                 | 8304                             |
