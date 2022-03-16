@@ -30,7 +30,7 @@ For example, if a BL Reading Room patron uses this Access URL to get an URL from
 
 Then the URL will get mapped to this PyWB URL:
 
-- https://blstaff.ldls.org.uk/archive/10000101000000/http://www.downstairsatthekingshead.com
+- https://blstaff.ldls.org.uk/web/10000101000000/http://www.downstairsatthekingshead.com
 
 Alternatively, if a BL Staff Access URL used to get an eBook from DLS:
 
@@ -38,7 +38,7 @@ Alternatively, if a BL Staff Access URL used to get an eBook from DLS:
 
 Then the content will be served from this URL:
 
-- https://blstaff.ldls.org.uk/live/20010101120000/http://staffaccess.dl.bl.uk/ark:/81055/vdc_100090432161.0x000001
+- https://blstaff.ldls.org.uk/doc/20010101120000/http://staffaccess.dl.bl.uk/ark:/81055/vdc_100090432161.0x000001
 
 In this case, a fixed timestamp is used for all ARKs and the `http://staffaccess.dl.bl.uk` prefix has been added, as PyWB needs both a timestamp and a URL to get the content and manage the SCU locks. Requests from reading rooms would be directed to `http://access.dl.bl.uk`, e.g. http://access.dl.bl.uk/ark:/81055/vdc_100022588767.0x000002
 
@@ -87,6 +87,7 @@ In each deployment location:
 - Network access to:
     - The public web, if only temporarily, install these files and to download the Docker images during installation/deployment.
         - If this is not possible [offline Docker image installation can be used](https://serverfault.com/a/718470).
+    - The BL internal nameservers, so `\*.api.wa.bl.uk` service domains can be resolved.
     - The DLS back-end systems where ARK-based resources can be downloaded (e.g. `access.dl.bl.uk`, `staffaccess.dl.bl.uk`).
     - The UKWA back-end systems: 
         - CDX index for URL lookups (`cdx.api.wa.bl.uk`).
@@ -135,11 +136,37 @@ docker stack deploy -c docker-compose.yml access_rrwb
 
 A similar deployment script should be created for each deployment context, setting the `STORAGE_PATH_SHARED` environment variable before deploying the stack, and setting the `LOCKS_AUTH` username and password as required.
 
-Assuming the required Docker images can be downloaded (or have already been installed offline/manually), the services should start up and start to come online.
+Before running the deployment script, a copy of the URL block access control list should be placed in your shared folder, as per the [Updating the Blocks List section below](#updating-the-block-list).  Once that's in place, you can run your script to deploy the services.
+
+Assuming the required Docker images can be downloaded (or have already been installed offline/manually), the services should start up and start to come online. In a few moments, you should see:
+
+```
+[access@demo rrwb]$ docker service ls
+ID             NAME                     MODE         REPLICAS   IMAGE                  PORTS
+8de1fqo812x2   access_rrwb_nginx        replicated   1/1        nginx:1-alpine         *:8100->8100/tcp, *:8200-8205->8200-8205/tcp, *:8209->8209/tcp
+0nrr4jvzo1z5   access_rrwb_pywb-bl      replicated   1/1        ukwa/ukwa-pywb:2.6.4   *:8300->8080/tcp
+oce47sczlkbi   access_rrwb_pywb-bod     replicated   1/1        ukwa/ukwa-pywb:2.6.4   *:8304->8080/tcp
+pbhou0zmso6f   access_rrwb_pywb-cam     replicated   1/1        ukwa/ukwa-pywb:2.6.4   *:8303->8080/tcp
+a1ixwrebslj0   access_rrwb_pywb-llgc    replicated   1/1        ukwa/ukwa-pywb:2.6.4   *:8302->8080/tcp
+oczh6d2c4oh8   access_rrwb_pywb-nls     replicated   1/1        ukwa/ukwa-pywb:2.6.4   *:8301->8080/tcp
+lddlkbb80ez7   access_rrwb_pywb-staff   replicated   1/1        ukwa/ukwa-pywb:2.6.4   *:8309->8080/tcp
+9s1wyzmlshx0   access_rrwb_pywb-tcd     replicated   1/1        ukwa/ukwa-pywb:2.6.4   *:8305->8080/tcp
+e54xnbxkkk14   access_rrwb_redis        replicated   1/1        redis:6
+```
+
+Where all service replicas are `1/1`. If any are stuck at `0/1` then they are having trouble starting, and you can use commands like `docker service ps --no-trunc access_rrwb_nginx` to check on individual services.
 
 If the `docker-compose.yml` file is updated, the stack can be redeployed in order to update the Swarm configuration. However, note that most of the specific configuration is in files held on disk, e.g. the NGINX configuration files. If these are changed, the services can be restarted, forcing the configuration to be reloaded, e.g.
 
     docker service update --force access_rrwb_nginx
+    
+In case things seem to get into a confused state, it is possible to completely remove the whole service stack and then redeploy it, e.g.
+
+```bash
+docker stack rm access_rrwb
+# Wait a couple of minutes while everything gets tidied up, then 
+./deploy-rrwb-dev.sh
+```
 
 ### Updating the Block List
 
@@ -163,5 +190,10 @@ Access to this page is managed by HTTP Basic authentication via the `LOCKS_AUTH=
 
 
 ### Testing
+
+e.g. 
+
+- http://host:8209/web/19950418155600/http://portico.bl.uk/
+- http://host:8209/doc/20010101120000/http://staffaccess.dl.bl.uk/ark:/81055/vdc_100090432161.0x000001
 
 _...TBA..._
