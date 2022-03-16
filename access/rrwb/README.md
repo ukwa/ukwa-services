@@ -158,6 +158,13 @@ Where all service replicas are `1/1`. If any are stuck at `0/1` then they are ha
 If the `docker-compose.yml` file is updated, the stack can be redeployed in order to update the Swarm configuration. However, note that most of the specific configuration is in files held on disk, e.g. the NGINX configuration files. If these are changed, the services can be restarted, forcing the configuration to be reloaded, e.g.
 
     docker service update --force access_rrwb_nginx
+    
+In case things seem to get into a confused state, it is possible to completely remove the whole service stack and then redeploy it, e.g.
+
+```
+docker stack rm access_rrwb
+./deploy-rrwb-dev.sh
+```
 
 ### Updating the Block List
 
