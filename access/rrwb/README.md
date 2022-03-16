@@ -161,8 +161,9 @@ If the `docker-compose.yml` file is updated, the stack can be redeployed in orde
     
 In case things seem to get into a confused state, it is possible to completely remove the whole service stack and then redeploy it, e.g.
 
-```
+```bash
 docker stack rm access_rrwb
+# Wait a couple of minutes while everything gets tidied up, then 
 ./deploy-rrwb-dev.sh
 ```
 
