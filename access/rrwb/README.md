@@ -87,6 +87,7 @@ In each deployment location:
 - Network access to:
     - The public web, if only temporarily, install these files and to download the Docker images during installation/deployment.
         - If this is not possible [offline Docker image installation can be used](https://serverfault.com/a/718470).
+    - The BL internal nameservers, so `\*.api.wa.bl.uk` service domains can be resolved.
     - The DLS back-end systems where ARK-based resources can be downloaded (e.g. `access.dl.bl.uk`, `staffaccess.dl.bl.uk`).
     - The UKWA back-end systems: 
         - CDX index for URL lookups (`cdx.api.wa.bl.uk`).
