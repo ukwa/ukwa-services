@@ -1,11 +1,11 @@
-INDEX:   &INDEX ${UKWA_INDEX}
-ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
-
 collections:
-    # NPLD access under /archive/
-    archive:
-        index_paths: *INDEX
-        archive_paths: *ARCHIVE
+    # NPLD web archive access under /web/
+    web:
+        index:
+          type: cdx
+          api_url: "http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429&filter=!mimetype:warc/revisit"
+          replay_url: ""
+        archive_paths: "webhdfs://warc-server.api.wa.bl.uk/by-filename/"
 
         acl_paths:
             - ./acl/blocks.aclj
@@ -15,11 +15,11 @@ collections:
         # up the query limit:
         query_limit: 100000
 
-        # Do not nable SCU locks
+        # Do not enable SCU locks
         single-use-lock: false
 
-    # Access to internal documents using live web support:
-    live:
+    # Access to NPLD documents using live web support, under /doc/:
+    doc:
         index: $live
         single-use-lock: false
 
