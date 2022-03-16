@@ -42,15 +42,25 @@ Then the content will be served from this URL:
 
 In this case, a fixed timestamp is used for all ARKs and the `http://staffaccess.dl.bl.uk` prefix has been added, as PyWB needs both a timestamp and a URL to get the content and manage the SCU locks. Requests from reading rooms would be directed to `http://access.dl.bl.uk`, e.g. http://access.dl.bl.uk/ark:/81055/vdc_100022588767.0x000002
 
-Therefore, this stack runs the following set of services:
+### Deployment Architecture
 
-- An NGINX service to provide URL management.
-- Six PyWB services, one for each Legal Deposit Library (BL/NLW/NLS/Bod/CUL/TCD)
-- A Redis service, which holds the SCU locks for each PyWB service.
+It is expected that the services in this stack are used as the back-end for an upstream proxy.  For example, for the British Library, there is some frontend proxy that the `bl.ldls.org.uk` domain name resolves to. That 'front door' proxy will then pass the request on to the relevant back-end services provided by this service stack, which will be deployed in BSP and STP, and connected up using the existing failover mechanism. For example, if we consider two different 'front door' entry points:
 
-Note that the included NGINX setup expects that any failover redirection, SSL encryption, authentication, token validation or user identification has all been handled upstream of this service. Each PyWB service also exposes a dedicated port, allowing upstream NGINX proxies to implement the necessary features rather than relying on the local one, if needed.
+```mermaid
+graph LR;
+  BL(bl.ldls.org.uk proxy) --> S1(BSP Stack);
+  BL -.-> S2(STP Stack);
+  NLS(nls.ldls.org.uk proxy) --> S1;
+  NLS -.-> S2;
+```
 
-Each service supports two host names, the real `.ldls.org.uk` name and a `.beta.ldls.org.uk` version that could be used if it is necessary to test this system in parallel with the original system.  When accessed over the shared port, NGINX uses the `Host` in the request to determine which service is being called.
+To support this mode of operation, this stack runs the following set of services:
+
+- An NGINX service to provide URL management, with a shared port and separate ports for each service.
+- Six PyWB services, one for each Legal Deposit Library (BL/NLW/NLS/Bod/CUL/TCD), managing SCU locks for each.
+- A Redis service, which holds the SCU lock state for all the PyWB services.
+
+Each service supports two host names, the real `*.ldls.org.uk` name and a `*.beta.ldls.org.uk` version that could be used if it is necessary to test this system in parallel with the original system.  When accessed over the shared port, NGINX uses the `Host` in the request to determine which service is being called. Each PyWB service also exposes a dedicated port, but this is intended to debugging rather than production use.
 
 
 | Server Name           | Beta Server Name            | Shared NGINX Port | Dedicated NGINX Port | Direct PyWB Port (for debugging) |
@@ -62,6 +72,10 @@ Each service supports two host names, the real `.ldls.org.uk` name and a `.beta.
 | bodleian.ldls.org.uk  | bodleian.beta.ldls.org.uk   | 8100              | 8204                 | 8304                             |
 | tcdlibrary.ldls.org.uk| tcdlibrary.beta.ldls.org.uk | 8100              | 8205                 | 8305                             |
 | blstaff.ldls.org.uk   | blstaff.beta.ldls.org.uk    | 8100              | 8209                 | 8309                             |
+
+
+This NGINX setup assumes that any failover redirection, SSL encryption, authentication, token validation or user identification has all been handled upstream of this service stack. 
+
 
 Pre-requisites
 --------------
@@ -79,10 +93,11 @@ In each deployment location:
         - GitLab where the URL block list is stored ([`git.wa.bl.uk`](http://git.wa.bl.uk/bl-services/wayback_excludes_update/-/tree/master/ldukwa/acl)).
         - If deployed on the Access VLAN, the existing UKWA service proxy can be used to reach these systems.
 
-It is envisages that the same stack will be deployed in BSP and STP, and connected up using the existing failover mechanism(s).
 
 Operations
 ----------
+
+When running operations on the server, the operator shoudl use a non-root user account that is able to use Docker (i.e. a member of the `docker` group on the machine).
 
 ### Deploying and Updating the Stack
 
@@ -91,7 +106,6 @@ The Swarm deployment needs access to an host drive location where the list of bl
     docker stack deploy -c docker-compose.yml access_rrwb
 
 Assuming the required Docker images can be downloaded (or have already been installed offline/manually), the services should start up and start to come online.
-
 
 If the `docker-compose.yml` file is updated, the stack can be redeployed in order to update the Swarm configuration. However, note that most of the specific configuration is in files held on disk, e.g. the NGINX configuration files. If these are changed, the services can be restarted, forcing the configuration to be reloaded, e.g.
 
@@ -106,7 +120,6 @@ The blocks list is version controlled and held in: http://git.wa.bl.uk/bl-servic
 It needs to be downloaded from there on a regular basis. e.g. a daily cron job like:
 
     curl -o /shared-folder/blocks.aclj http://git.wa.bl.uk/bl-services/wayback_excludes_update/-/raw/master/ldukwa/acl/blocks.aclj
-
 
 ### Inspecting and Managing SCU locks
 
