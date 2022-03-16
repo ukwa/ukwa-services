@@ -76,6 +76,7 @@ Each service supports two host names, the real `*.ldls.org.uk` name and a `*.bet
 
 This NGINX setup assumes that any failover redirection, SSL encryption, authentication, token validation or user identification has all been handled upstream of this service stack. 
 
+For testing purposes, a local `/etc/hosts` file can be used to point the `*.ldls.org.uk` domain names to the service stack, allowing the service to be viewed in a web browser. Of course this won't include any of the services that are handled upstream.
 
 Pre-requisites
 --------------
