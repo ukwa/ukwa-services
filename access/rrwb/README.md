@@ -30,7 +30,7 @@ For example, if a BL Reading Room patron uses this Access URL to get an URL from
 
 Then the URL will get mapped to this PyWB URL:
 
-- https://blstaff.ldls.org.uk/archive/10000101000000/http://www.downstairsatthekingshead.com
+- https://blstaff.ldls.org.uk/web/10000101000000/http://www.downstairsatthekingshead.com
 
 Alternatively, if a BL Staff Access URL used to get an eBook from DLS:
 
@@ -38,7 +38,7 @@ Alternatively, if a BL Staff Access URL used to get an eBook from DLS:
 
 Then the content will be served from this URL:
 
-- https://blstaff.ldls.org.uk/live/20010101120000/http://staffaccess.dl.bl.uk/ark:/81055/vdc_100090432161.0x000001
+- https://blstaff.ldls.org.uk/doc/20010101120000/http://staffaccess.dl.bl.uk/ark:/81055/vdc_100090432161.0x000001
 
 In this case, a fixed timestamp is used for all ARKs and the `http://staffaccess.dl.bl.uk` prefix has been added, as PyWB needs both a timestamp and a URL to get the content and manage the SCU locks. Requests from reading rooms would be directed to `http://access.dl.bl.uk`, e.g. http://access.dl.bl.uk/ark:/81055/vdc_100022588767.0x000002
 
@@ -190,5 +190,10 @@ Access to this page is managed by HTTP Basic authentication via the `LOCKS_AUTH=
 
 
 ### Testing
+
+e.g. 
+
+- http://host:8209/web/19950418155600/http://portico.bl.uk/
+- http://host:8209/doc/20010101120000/http://staffaccess.dl.bl.uk/ark:/81055/vdc_100090432161.0x000001
 
 _...TBA..._
