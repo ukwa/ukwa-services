@@ -31,6 +31,7 @@ services:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       - "REDIS_URL=redis://redis:6379/0" # Locks stored in Redis DB 0
+      - "LOCKS_AUTH=${LOCKS_AUTH}"
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
@@ -46,6 +47,7 @@ services:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       - "REDIS_URL=redis://redis:6379/1"
+      - "LOCKS_AUTH=${LOCKS_AUTH}"
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
@@ -61,6 +63,7 @@ services:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       - "REDIS_URL=redis://redis:6379/2"
+      - "LOCKS_AUTH=${LOCKS_AUTH}"
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
@@ -76,6 +79,7 @@ services:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       - "REDIS_URL=redis://redis:6379/3"
+      - "LOCKS_AUTH=${LOCKS_AUTH}"
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
@@ -91,6 +95,7 @@ services:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       - "REDIS_URL=redis://redis:6379/4"
+      - "LOCKS_AUTH=${LOCKS_AUTH}"
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
@@ -106,6 +111,7 @@ services:
       - "UKWA_INDEX=xmlquery+http://cdx.api.wa.bl.uk/data-heritrix"
       - "UKWA_ARCHIVE=webhdfs://hdfs.api.wa.bl.uk"
       - "REDIS_URL=redis://redis:6379/5"
+      - "LOCKS_AUTH=${LOCKS_AUTH}"
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
