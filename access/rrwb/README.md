@@ -56,14 +56,16 @@ graph LR;
   LDL(*.ldls.org.uk proxy) --> S1(BSP Stack);
   LDL -.-> S2(STP Stack);
 
-  S1 --> DA(access.dl.bl.uk)
-  S1 --> DS(staffaccess.dl.bl.uk)
-  S1 --> UKWA(*.api.wa.bl.uk)
+  S1 --> DA(access.dl.bl.uk BSP)
+  S1 --> DS(staffaccess.dl.bl.uk BSP)
+  S1 --> UKWA(*.api.wa.bl.uk BSP)
   
-  S2 -.-> DA(access.dl.bl.uk)
-  S2 -.-> DS(staffaccess.dl.bl.uk)
-  S2 -.-> UKWA(*.api.wa.bl.uk)
+  S2 -.-> DA2(access.dl.bl.uk STP)
+  S2 -.-> DS2(staffaccess.dl.bl.uk STP)
+  S2 -.-> UKWA
 ```
+
+Note that the web archive is only accessible via the BSP site at present, so will become unavailable if BSP is down and all content is being served via STP. Access to NPLD douments should work fine, as the `*.dl.bl.uk` services are available at both sites.
 
 To support this mode of operation, this stack runs the following set of services:
 
