@@ -30,6 +30,8 @@ services:
       - "REDIS_URL=redis://redis:6379/0" # Locks stored in Redis DB 0
       - "LOCKS_AUTH=${LOCKS_AUTH}"
       - "TLDEXTRACT_CACHE_TIMEOUT=0.1"
+      - "LOCK_PING_INTERVAL=5"
+      - "LOCK_PING_EXTEND_TIME=10"
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
@@ -123,6 +125,17 @@ services:
   # Redis service to hold locks
   redis:
     image: redis:6
+
+  # Redis Browser      
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+    - REDIS_HOSTS=redis:redis:6379
+    ports:
+    - "8081:8081"
+    depends_on:
+    - redis
+
 
   # Add some setup via NGINX
   nginx:
