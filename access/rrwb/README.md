@@ -44,14 +44,25 @@ In this case, a fixed timestamp is used for all ARKs and the `http://staffaccess
 
 ### Deployment Architecture
 
-It is expected that the services in this stack are used as the back-end for an upstream proxy.  For example, for the British Library, there is some frontend proxy that the `bl.ldls.org.uk` domain name resolves to. That 'front door' proxy will then pass the request on to the relevant back-end services provided by this service stack, which will be deployed in BSP and STP, and connected up using the existing failover mechanism. For example, if we consider two different 'front door' entry points:
+It is expected that the services in this stack are used as the back-end for an upstream proxy.  For example, for the British Library, there is some frontend proxy that the `bl.ldls.org.uk` domain name resolves to. That 'front door' proxy will then pass the request on to the relevant back-end services provided by this service stack, which will be deployed in BSP and STP, and connected up using the existing failover mechanism. This backend system can be used directly from secure reading room PCs, or using the NPLD Player on unsecured reading room PCs.  Note that the back-end setup is the same in either case, as the access restrictions are implemented at the network level, and the NPLD Player authentication is handled upstream.
 
 ```mermaid
 graph LR;
-  BL(bl.ldls.org.uk proxy) --> S1(BSP Stack);
-  BL -.-> S2(STP Stack);
-  NLS(nls.ldls.org.uk proxy) --> S1;
-  NLS -.-> S2;
+  NP(NPLD Player on Insecure PC) --> AP(Authenticating Proxy);
+  AP --> LDL;
+
+  WB(Browser on Secure Reading Room PC) --> LDL;
+
+  LDL(*.ldls.org.uk proxy) --> S1(BSP Stack);
+  LDL -.-> S2(STP Stack);
+
+  S1 --> DA(access.dl.bl.uk)
+  S1 --> DS(staffaccess.dl.bl.uk)
+  S1 --> UKWA(*.api.wa.bl.uk)
+  
+  S2 -.-> DA(access.dl.bl.uk)
+  S2 -.-> DS(staffaccess.dl.bl.uk)
+  S2 -.-> UKWA(*.api.wa.bl.uk)
 ```
 
 To support this mode of operation, this stack runs the following set of services:
