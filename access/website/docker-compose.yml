@@ -55,7 +55,7 @@ services:
   # OA Wayback configuration:
   # -------------------------------------------------------------
   pywb:
-    image: ukwa/ukwa-pywb:2.6.3
+    image: ukwa/ukwa-pywb:2.6.4.1
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
@@ -78,8 +78,7 @@ services:
 
   # An embedded, bannerless OA Wayback to render screenshots:
   pywb-nobanner:
-    image: ukwa/ukwa-pywb:2.6.3
-    #image: ukwa/ukwa-pywb:2.5.x-beta
+    image: ukwa/ukwa-pywb:2.6.4.1
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
@@ -98,7 +97,7 @@ services:
 
   # Internal WARC server that can pull from multiple clusters and local disk
   warc-server:
-    image: ukwa/warc-server:1.0.0
+    image: ukwa/warc-server:1.1.0
     # Alternative command for debugging:
     #command: "gunicorn --log-level debug --error-logfile - --access-logfile - --bind 0.0.0.0:8000 --workers 5 --worker-class gthread --threads 20 warc_server:app"
     ports:
