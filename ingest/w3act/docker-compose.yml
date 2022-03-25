@@ -12,7 +12,7 @@ services:
 
   # PyWB for QA
   pywb:
-    image: ukwa/ukwa-pywb:2.6.3
+    image: ukwa/ukwa-pywb:2.6.4.1
     environment:
       UKWA_INDEX: "http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429&filter=!mimetype:warc/revisit"
       UKWA_ARCHIVE: "webhdfs://warc-server:8000/by-filename/"
@@ -179,8 +179,7 @@ services:
   backstage:
     image: ukwa/backstage:master
     environment:
-     - "CATALOG_SOLR_URL=http://solr.api.wa.bl.uk/solr/fc"
-     - "TRACKDB_SOLR_URL=http://solr8.api.wa.bl.uk/solr/tracking"
+     - "SOLR_URL=http://solr.api.wa.bl.uk/solr/fc"
      - "DEPLOY_RELATIVE_URL_ROOT=/act/backstage"
      - "RAILS_SERVE_STATIC_FILES=true"
     ports:
