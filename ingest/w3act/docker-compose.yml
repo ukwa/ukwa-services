@@ -162,7 +162,7 @@ services:
   # SolrWayback service for Staff
   # -------------------------------------------------------------
   solrwayback:
-    image: ukwa/solrwayback:docker-hub-action
+    image: ghrc.io/ukwa/solrwayback:master`
     ports:
       - "18081:8080"
     environment: 
