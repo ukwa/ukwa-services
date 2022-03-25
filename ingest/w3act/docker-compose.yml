@@ -24,7 +24,9 @@ services:
 
   # Internal WARC server that can pull from multiple clusters and local disk
   warc-server:
-    image: ukwa/warc-server:1.0.0
+    image: ukwa/warc-server:1.1.0
+    # Modify number of workers:
+    command: "gunicorn --log-level warn --error-logfile - --access-logfile - --bind 0.0.0.0:8000 --workers 10 --worker-class gthread --threads 10 warc_server:app"
     # Alternative command for debugging:
     #command: "gunicorn --log-level debug --error-logfile - --access-logfile - --bind 0.0.0.0:8000 --workers 5 --worker-class gthread --threads 20 warc_server:app"
     ports:
@@ -155,6 +157,34 @@ services:
       - "${W3ACT_STORAGE}/dbs:/dbs"
     ports:
       - 3001:3000
+
+  # -------------------------------------------------------------
+  # SolrWayback service for Staff
+  # -------------------------------------------------------------
+  solrwayback:
+    image: ukwa/solrwayback:docker-hub-action
+    ports:
+      - "18081:8080"
+    environment: 
+      # Allow Solr and WARC server locations to be overidden:
+      - "SOLR_URL=http://solr.api.wa.bl.uk/solr/fc"
+      - "WARC_SERVER_PREFIX=http://warc-server:8000/by-filename/"
+      - "BASE_URL=https://dev.webarchive.org.uk/act/solrwayback/"
+      - "ALT_WAR_NAME=act#solrwayback"
+      - "ALT_PLAYBACK_PREFIX=https://dev.webarchive.org.uk/act/wayback/archive/"
+
+  # -------------------------------------------------------------
+  # Backstage Browser
+  # -------------------------------------------------------------
+  backstage:
+    image: ukwa/backstage:master
+    environment:
+     - "CATALOG_SOLR_URL=http://solr.api.wa.bl.uk/solr/fc"
+     - "TRACKDB_SOLR_URL=http://solr8.api.wa.bl.uk/solr/tracking"
+     - "DEPLOY_RELATIVE_URL_ROOT=/act/backstage"
+     - "RAILS_SERVE_STATIC_FILES=true"
+    ports:
+     - 3002:3000
 
 networks:
   # Make network attachable so tasks can be run:
