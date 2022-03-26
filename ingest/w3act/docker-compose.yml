@@ -26,7 +26,7 @@ services:
   warc-server:
     image: ukwa/warc-server:1.1.0
     # Modify number of workers:
-    command: "gunicorn --log-level warn --error-logfile - --access-logfile - --bind 0.0.0.0:8000 --workers 10 --worker-class gthread --threads 10 warc_server:app"
+    command: "gunicorn --log-level warn --error-logfile - --access-logfile - --bind 0.0.0.0:8000 --workers 2 --worker-class gthread --threads 25 warc_server:app"
     # Alternative command for debugging:
     #command: "gunicorn --log-level debug --error-logfile - --access-logfile - --bind 0.0.0.0:8000 --workers 5 --worker-class gthread --threads 20 warc_server:app"
     ports:
