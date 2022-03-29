@@ -10,10 +10,8 @@ on:
         type: string
     secrets:
       DOCKER_HUB_USERNAME:
-        default: ${{ secrets.DOCKER_HUB_USERNAME }}
         required: true
       DOCKER_HUB_ACCESS_TOKEN:
-        default: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
         required: true
 
 env:
