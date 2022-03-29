@@ -1,0 +1,72 @@
+name: Build, scan and push to Docker Hub
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        description: 'Override the default name for the Docker image.'
+        default: ${{ github.repository }}
+        required: false
+        type: string
+
+env:
+  TEST_TAG: ukwa/test-image:test
+
+jobs:
+  push_to_docker_hub:
+    name: Push Docker image to Docker Hub
+    # This uses the default metadata-action configuration, see https://github.com/docker/metadata-action
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Set up Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ${{ inputs.image_name }}
+            ghcr.io/${{ inputs.image_name }}
+
+      - name: Log in to the GitHub Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and export to Docker for testing
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          load: true
+          tags: ${{ env.TEST_TAG }}
+
+      - name: Scan image for vulnerabilities using Anchore
+        uses: anchore/scan-action@v3
+        id: scan
+        with:
+          image: ${{ env.TEST_TAG }}
+          acs-report-enable: true
+          fail-build: false
+
+      - name: Upload Anchore scan SARIF report
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+
+      - name: Build and push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
