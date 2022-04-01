@@ -134,6 +134,8 @@ services:
     environment:
      - "HTTPS_PROXY=http://explorer.bl.uk:3127" # This is needed because we're talking to the live public API (we should have an internal one)
      - "PYTHONPATH=/app"
+     - "API_PREFIX=https://${SERVER_NAME}"
+     - "WB_PREFIX=https://${SERVER_NAME}"
     ports:
       - 8866:8866
 
