@@ -169,7 +169,7 @@ services:
       - "18081:8080"
     environment: 
       # Allow Solr and WARC server locations to be overidden:
-      - "SOLR_URL=http://solr.api.wa.bl.uk/solr/fc"
+      - "SOLR_URL=http://solr.api.wa.bl.uk/solr/all"
       - "WARC_SERVER_PREFIX=http://warc-server:8000/by-filename/"
       - "BASE_URL=https://${SERVER_NAME}/act/solrwayback/"
       - "ALT_WAR_NAME=act#solrwayback"
@@ -181,7 +181,7 @@ services:
   backstage:
     image: ukwa/backstage:master
     environment:
-     - "SOLR_URL=http://solr.api.wa.bl.uk/solr/fc"
+     - "SOLR_URL=http://solr.api.wa.bl.uk/solr/all"
      - "DEPLOY_RELATIVE_URL_ROOT=/act/backstage"
      - "RAILS_SERVE_STATIC_FILES=true"
     ports:
