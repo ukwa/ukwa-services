@@ -147,7 +147,7 @@ services:
     image: ukwa/ukwa-access-api
     environment:
       - "CDX_SERVER=${CDX_SERVER}"
-      - "WEBHDFS_PREFIX=http://hdfs.api.wa.bl.uk/webhdfs/v1"
+      - "WEBHDFS_PREFIX=http://warc-server:8000/by-filename/"
       - "API_LABEL=UK Web Archive API"
       - "KAFKA_LAUNCH_BROKER=${KAFKA_BROKER}"
       - "KAFKA_LAUNCH_TOPIC=fc.tocrawl.npld"
