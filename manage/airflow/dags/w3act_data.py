@@ -29,6 +29,9 @@ access_w3act = Connection.get_connection_from_secrets("access_w3act")
 # Which Collections Solr to update:
 collections_solr = Connection.get_connection_from_secrets("access_collections_solr")
 
+# Which Crawler Kafka service to talk to:
+fc_crawler_kafka = Connection.get_connection_from_secrets("fc_crawler_kafka")
+
 # Connection to commit to GitLab Wayback ACLs (including access token in it)
 try:
     gitlab_wayback_acl_remote = Connection.get_connection_from_secrets("gitlab_wayback_acl_remote")
@@ -91,6 +94,7 @@ with DAG(
         'storage_path': c.storage_path,
         'collections_solr': collections_solr.get_uri(),
         'gitlab_wayback_acl_remote': gitlab_wayback_acl_remote,
+        'fc_crawler_kafka': f'{fc_crawler_kafka.host}:{fc_crawler_kafka.port}'
     },
     tags=['access', 'w3act'],
 ) as dag1:
@@ -105,6 +109,12 @@ This dumps the W3ACT database and extracts useful data from it. This includes:
 - [Solr Collections]({dag1.params['collections_solr']}/select?q=*:*&wt=json&indent=on) for the website (Topics & Themes)
 - Metadata used for full-text indexing (`allows.txt`, `annotations.json`)
 - Crawl feeds and block lists (`crawl_feed_bypm.jsonl`, `crawl_feed_npld.jsonl`, `never_crawl.surts`)
+
+It also launches crawls:
+
+- Talks to the FC Crawler Kafka service at: `{dag1.params['fc_crawler_kafka']}` 
+- Reads the `bypm` feed and launches URLs for the current hour to the `fc.tocrawl.bypm` topic.
+- __DOES NOT LAUNCH NPLD CRAWLS YET__
 
 These are necessary pre-requisites for access processes, like indexing and playback.
 
@@ -132,6 +142,7 @@ Tool container versions:
 
  * W3ACT Task Image: `{c.w3act_task_image}`
  * UKWA Manage Task Image: `{c.ukwa_task_image}`
+ * Crawl Streams Image: `{c.crawlstreams_image}`
 
 """
 
@@ -229,6 +240,16 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
 
     # Define workflow dependencies:
     cleanup >> dump >> [ acl, aclj, ann, cfld, cfby, never ] >> mvs >> [ socol, stat ]
+
+    # Launch crawls now the files are updated:
+    launch_bypm = DockerOperator(
+        task_id='launch_bypm_fc_crawl_urls',
+        image=c.crawlstreams_image,
+        command='launcher -k {{ params.fc_crawler_kafka }} -L {{ next_execution_date }} fc.tocrawl.bypm /storage/data_exports/crawl_feed_bypm.jsonl',
+    )
+
+    mvs >> launch_bypm
+
 
     # Add optional dependency based on whether the GitLab remote is set:
     if gitlab_wayback_acl_remote:

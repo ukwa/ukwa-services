@@ -36,11 +36,12 @@ with DAG(
     tags=['ingest'],
 ) as dag:
     dag.doc_md = f"""
-### Copy WARCs and crawl logs from Gluster to Hadoop 3 HDFS
+### INACTIVE: Copy WARCs and crawl logs from Gluster to Hadoop 3 HDFS
 
 This task performs some work to tidy up the WARCs and logs from the crawler.
 
 * Uses the rclone command to upload data to HDFS.
+    * Requires rclone >= 1.58.0 as [that is the first version with HDFS file move support](https://rclone.org/changelog/#v1-58-0-2022-03-18).
 * Does not need to be backfilled, as each run always attempts to catch up with all uploads.
 * **CURRENTLY HARDCODED TO DRY-RUN ONLY**
 
