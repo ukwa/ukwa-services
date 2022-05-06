@@ -12,7 +12,7 @@ services:
 
   # PyWB for QA
   pywb:
-    image: ukwa/ukwa-pywb:2.6.6
+    image: ukwa/ukwa-pywb:2.6.7
     environment:
       UKWA_INDEX: "http://cdx.api.wa.bl.uk/data-heritrix?url={url}&closest={closest}&sort=closest&filter=!statuscode:429&filter=!mimetype:warc/revisit"
       UKWA_ARCHIVE: "webhdfs://warc-server:8000/by-filename/"
@@ -21,6 +21,13 @@ services:
       - "7070:8080"
     volumes:
       - ./config/pywb.yaml:/webarchive/config.yaml
+    deploy:
+      # If we don't place a limit on resources it just consumes all RAM rather than cleaning up:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: '2G'
+
 
   # Internal WARC server that can pull from multiple clusters and local disk
   warc-server:
