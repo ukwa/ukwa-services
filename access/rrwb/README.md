@@ -260,7 +260,7 @@ Access to that IP address should be managed at the network and firewall level. O
 
 In reading rooms without locked-down terminals, readers must use the NPLD Player to access content.  This means deploying two components:
 
-- the NPLD Player on reading room terminals, including a bundled secret key that the Player will use to authenticate itself.
+- the [NPLD Player](https://github.com/ukwa/npld-player) on reading room terminals, including a bundled secret key that the Player will use to authenticate itself. _n.b. as yet there are no builds of the player package/installer available for deployment_
 - the authenticating proxy, that checks the secret key, and proxies the requests on to the central services.
 
 There are two possible deployment patterns, depending on whether the library in question is directly peered onto the DLS Access VLAN, or uses a remote outbound proxy to connect to the central services.
