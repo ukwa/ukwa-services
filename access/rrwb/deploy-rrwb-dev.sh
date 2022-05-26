@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Pull in vars
-set -a && . dev.env && set +a
+set -a && . ./dev.env && set +a
 
 # Deploy as a Docker Stack
-docker stack deploy -c docker-compose.yml access_rrwb
+docker stack deploy -c docker-compose.yml $EXTRA_CONFIG access_rrwb

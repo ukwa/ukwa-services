@@ -1,0 +1,23 @@
+
+# This is the base configuration. 
+version: '3.2'
+
+services:
+
+  # Redis Browser      
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+    - REDIS_HOSTS=redis:redis:6379
+    ports:
+    - "8081:8081"
+    depends_on:
+    - redis
+
+  # Local PushProx instance for trials
+  pushprox:
+    image: prom/pushprox
+    ports:
+    - "9494:8080"
+
+
