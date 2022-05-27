@@ -9,6 +9,7 @@ Reading Room Wayback Service Stack <!-- omit in toc -->
   - [Pre-requisites](#pre-requisites)
   - [Operations](#operations)
     - [Deploying and Updating the Stack](#deploying-and-updating-the-stack)
+    - [Setting up logging](#setting-up-logging)
     - [Updating the Block List](#updating-the-block-list)
     - [Inspecting and Managing SCU locks](#inspecting-and-managing-scu-locks)
     - [Deployment Testing](#deployment-testing)
@@ -137,7 +138,7 @@ In each deployment location:
 
 ### Operations
 
-When running operations on the server, the operator shoudl use a non-root user account that is able to use Docker (i.e. a member of the `docker` group on the machine). e.g.
+When running operations on the server, the operator should use a non-root user account that is able to use Docker (i.e. a member of the `docker` group on the machine). e.g.
 
 ```
 [root@demo ~]# useradd -G docker access
@@ -205,6 +206,19 @@ docker stack rm access_rrwb
 # Wait a couple of minutes while everything gets tidied up, then 
 ./deploy-rrwb-dev.sh
 ```
+#### Setting up logging
+
+_TBA: How should logging be set up, for MI and for security?_
+
+Currently, the stack extracts Prometheus metrics from web access logs as they stream past, and all the actual log files are managed by Docker.
+
+If we need to keep access log files from NGINX for analysis, there are various options:
+
+- Change Docker to write logs to files, and do log rotation like [this](https://www.digitalocean.com/community/tutorials/how-to-configure-logging-and-log-rotation-in-nginx-on-an-ubuntu-vps).
+- Push logs to Logstash and use it to make dated log files.
+- Push all Docker logs to a syslog server (okay for security, not much use for M.I.).
+
+_The precise details depend on how M.I. integration works._
 
 #### Updating the Block List
 
