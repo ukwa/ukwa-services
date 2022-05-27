@@ -140,7 +140,7 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d/:ro
       - ./nginx/mtail:/opt/mtail:ro
-      - ./nginx/logs:/var/log/nginx:rw
+      #- ./nginx/logs:/var/log/nginx:rw
     ports:
       - "8100:8100" # Shared port (service determine by Host header)
       - "8200:8200" # BL

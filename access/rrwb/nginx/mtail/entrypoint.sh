@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Hook log files to stdout/stderr
+# For NGINX, these are already hooked up correctly!
 #ln -sf /dev/stdout /var/log/nginx/access.log
 #ln -sf /dev/stderr /var/log/nginx/error.log
 
