@@ -141,7 +141,7 @@ services:
     image: prom/pushprox:v0.1.0
     entrypoint: '/app/pushprox-client'
     command:
-      - '--fqdn=nginx' # The specific service we are proxying
+      - '--fqdn=${PUSHPROX_FQDN}' # Should point to the host server so any ports can be accessed.
       - '--proxy-url=${PUSHPROX_URL}'
 
   # Add some setup via NGINX

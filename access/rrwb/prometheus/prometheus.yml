@@ -9,8 +9,8 @@ scrape_configs:
     static_configs:
       - targets: ['prometheus:9090']
 
-  - job_name: 'nginx-exporter'
+  - job_name: 'rrwb-exporter'
     proxy_url: 'http://pushprox:8080/'
     static_configs:
-      - targets: ['pushprox-client:3903']
+      - targets: ['dev1.n45.wa.bl.uk:3903']
 

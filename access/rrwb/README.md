@@ -10,6 +10,7 @@ Reading Room Wayback Service Stack <!-- omit in toc -->
   - [Operations](#operations)
     - [Deploying and Updating the Stack](#deploying-and-updating-the-stack)
     - [Setting up logging](#setting-up-logging)
+    - [Setting up monitoring](#setting-up-monitoring)
     - [Updating the Block List](#updating-the-block-list)
     - [Inspecting and Managing SCU locks](#inspecting-and-managing-scu-locks)
     - [Deployment Testing](#deployment-testing)
@@ -219,6 +220,13 @@ If we need to keep access log files from NGINX for analysis, there are various o
 - Push all Docker logs to a syslog server (okay for security, not much use for M.I.).
 
 _The precise details depend on how M.I. integration works._
+
+
+#### Setting up monitoring
+
+The NGINX metrics are exposed on port 3903, but are not accessible directly, due to DLS network restrictions. However, we are allowed to make some outward connections, so Prometheus monitoring can be facilitated by PushProx.
+
+The Web Archive team can ensure the proxy is in place, and configure their monitoring services to gather metrics from the live service. there should not be any further setup required.
 
 #### Updating the Block List
 
