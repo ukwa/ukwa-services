@@ -95,9 +95,10 @@ The Central Services
 
 To provide the central services on the _BSP Stack_ and _STP Stack_, each stack runs the following set of services:
 
-- An NGINX service to provide URL management, with a shared port and separate ports for each service.
+- An NGINX service to provide URL management, with a shared port and separate ports for each service. This also includes a [mtail](https://github.com/google/mtail) process used for monitoring the service.
 - Seven PyWB services, one for each Legal Deposit Library (BL/NLW/NLS/Bod/CUL/TCD managing SCU locks for each), and one for staff access (no SCU locks).
 - A Redis service, which holds the SCU lock state for all the PyWB services.
+- A [PushProx](https://github.com/prometheus-community/PushProx) client service, which allows NGINX to be monitored by pushing metrics to a remote [Prometheus](https://prometheus.io/) service via a PushProx proxy.
 
 Each service supports two host names, the real `*.ldls.org.uk` name and a `*.beta.ldls.org.uk` version that could be used if it is necessary to test this system in parallel with the original system.  When accessed over the shared port, NGINX uses the `Host` in the request to determine which service is being called. Each PyWB service also exposes a dedicated port, but this is intended to debugging rather than production use.
 

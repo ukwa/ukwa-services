@@ -172,7 +172,7 @@ services:
       - pywb-tcd
     networks:
       default:
-        aliases: # So Docker services on this network can resolve services by name:
+        aliases: # So Docker services on the internal network can resolve services by name:
           - bl.ldls.org.uk
           - nls.ldls.org.uk
           - llgc.ldls.org.uk

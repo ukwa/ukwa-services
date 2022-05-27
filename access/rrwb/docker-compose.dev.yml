@@ -14,7 +14,7 @@ services:
     depends_on:
     - redis
 
-  # Local PushProx instance for trials
+  # Local PushProx server instance for trials
   pushprox:
     image: prom/pushprox
     ports:
