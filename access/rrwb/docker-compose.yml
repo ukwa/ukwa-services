@@ -138,7 +138,7 @@ services:
 
   # PushProx to enable integration with Prometheus monitoring
   pushprox-client:
-    image: prom/pushprox
+    image: prom/pushprox:v0.1.0
     entrypoint: '/app/pushprox-client'
     command:
       - '--fqdn=nginx' # The specific service we are proxying

@@ -16,7 +16,7 @@ services:
 
   # Local PushProx server instance for trials
   pushprox:
-    image: prom/pushprox
+    image: prom/pushprox:v0.1.0
     ports:
     - "9494:8080"
 
