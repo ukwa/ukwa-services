@@ -250,6 +250,14 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
 
     mvs >> launch_bypm
 
+    launch_npld = DockerOperator(
+        task_id='launch_npld_fc_crawl_urls',
+        image=c.crawlstreams_image,
+        command='launcher -k {{ params.fc_crawler_kafka }} -L {{ next_execution_date }} fc.tocrawl.npld /storage/data_exports/crawl_feed_npld.jsonl',
+    )
+
+    mvs >> launch_npld
+
 
     # Add optional dependency based on whether the GitLab remote is set:
     if gitlab_wayback_acl_remote:
