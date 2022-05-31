@@ -1,0 +1,41 @@
+
+# This is the base configuration. 
+version: '3.2'
+
+services:
+
+  # Redis Browser      
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+    - REDIS_HOSTS=redis_bl:redis:6379:0,redis_nls:redis:6379:1,redis_llgc:redis:6379:2,redis_cam:redis:6379:3,redis_bod:redis:6379:4,redis_tcd:redis:6379:5
+    ports:
+    - "8081:8081"
+    depends_on:
+    - redis
+
+  # Local PushProx server instance for trials
+  pushprox:
+    image: prom/pushprox:v0.1.0
+    ports:
+    - "9494:8080"
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9393:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+    #  - "${STORAGE_PATH}/prometheus-data:/prometheus"
+    user: root
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=1000d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+     # - '--web.external-url=http://${CRAWL_HOST_LAN_IP}:9191/'
+      - '--web.enable-admin-api'
+      - '--web.enable-lifecycle'
+
