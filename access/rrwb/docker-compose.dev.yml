@@ -14,13 +14,14 @@ services:
     depends_on:
     - redis
 
-  # Local PushProx server instance for trials
+  # PushProx server for testing Prometheus integration
   pushprox:
     image: prom/pushprox:v0.1.0
     ports:
     - "9494:8080"
 
   # Prometheus
+  # Configured to target the PUSHPROX_FQDN of the pushprox-client
   prometheus:
     image: prom/prometheus
     ports:
