@@ -22,12 +22,11 @@ elif [[ ${ENVIRON} == 'beta' ]]; then
 	export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.1"
 	export SERVER_NAME=beta.webarchive.org.uk
 	export DEPLOYMENT_TAG=beta
-	export STORAGE_PATH_WEBSITE=/mnt/gluster/beta/ingest/data/website
-	export CONFIG_PATH=/home/ingest/gitlab/ukwa-services-env/access/pywb
-	export STORAGE_PATH_SHARED=/mnt/gluster/beta/ingest/data/airflow/data_exports
+	export STORAGE_PATH_WEBSITE=/mnt/gluster/beta/access/data/website
+	export CONFIG_PATH=/home/access/gitlab/ukwa-services-env/access/pywb
 	# Location where the w3act_export Airflow task stores the ACLs:
 	export PWYB_ACL_PATH=/mnt/gluster/beta/airflow/data/airflow/wayback_acls/oukwa/acl
-	source /home/ingest/gitlab/ukwa-services-env/beta.env
+	source /home/access/gitlab/ukwa-services-env/beta.env
 else
 	# dev vars
 	#export UKWA_UI_IMAGE="min2ha/ukwa-ui:new_feature_categories_anj"
