@@ -429,12 +429,20 @@ Tool container versions:
         task_id='run_full_report',
         image=c.w3act_task_image,
         command='w3act-qa-check -m "{{ params.full_report_email }}" -f -W /storage/{{ params.dump_name }}.json',
+        # Appers to be needed to download TLD public suffix list:
+        environment={
+            'HTTPS_PROXY': 'http://194.66.232.92:3127'
+        },
     ) 
 
     qa_short = DockerOperator(
         task_id='run_short_report',
         image=c.w3act_task_image,
         command='w3act-qa-check -m "{{ params.summary_report_email }}" -W /storage/{{ params.dump_name }}.json',
+        # Appers to be needed to download TLD public suffix list:
+        environment={
+            'HTTPS_PROXY': 'http://194.66.232.92:3127'
+        },
     ) 
 
     cleanup >> dump >> to_json >> qa_full >> qa_short
