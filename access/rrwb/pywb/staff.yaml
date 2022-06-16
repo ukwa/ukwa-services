@@ -55,7 +55,7 @@ redirect_to_exact: true
 enable_memento: true
 
 # enable experimental Memento Prefer
-enable_prefer: false
+enable_prefer: true
 
 # Locale setup
 locales_root_dir: ./i18n/translations/
