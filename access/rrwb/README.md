@@ -17,6 +17,7 @@ Reading Room Wayback Service Stack <!-- omit in toc -->
 - [Access in Reading Rooms](#access-in-reading-rooms)
   - [Via Secure Terminals](#via-secure-terminals)
   - [Via the NPLD Player](#via-the-npld-player)
+  - [Connection to the Central Services](#connection-to-the-central-services)
   - [Printing](#printing)
 - [Testing](#testing)
 - [Monitoring](#monitoring)
@@ -268,7 +269,7 @@ _...TBA PDF and ePub and a one or two more of each..._
 Access in Reading Rooms
 ------------------------
 
-How access works depends on the terminals in use.  All cases depend on the Central Services being available.
+How access works depends on the terminals in use.  
 
 ### Via Secure Terminals
 
@@ -295,6 +296,23 @@ If the secret key is verified, the request should be proxied on towards the cent
 For reading rooms without access to the DLS Access VLAN, the request should be proxied onwards to the Outbound Proxy that securely connects to the central services over the internet.  This should only need a single Linux VM in each network area. For incoming connections, this would handling NPLD Player authentication or provide access depending on client IP ranges, and would pass outgoing connections on the the central services using the appropriate TLS certificates and access keys.
 
 No further URL rewriting or other complicated configuration should be required, as and such manipulations should now be managed centrally.
+
+### Connection to the Central Services
+
+Both modes of access depend on the Central Services being available. The national libraries of Scotland, Wales and Britain should all be able to access the central services directly via the DLS Access VLAN, but the university libraries, and any library wishing to use the NPLD Player, will need to deploy an additional proxy server locally:
+
+```mermaid
+graph LR;
+  NP(NPLD Player on Insecure PC) --> LDLl;
+
+  WB(Browser on Secure Reading Room PC) --> LDLl;
+
+  LDLl(*.ldls.org.uk inc. Auth - LOCAL ) -->|Secure WAN Connection| LDLc;
+
+  LDLc(*.ldls.org.uk - CENTRAL)
+```
+
+The role of this server is to proxy user requests to the central services over the _Secure WAN Connection_. This is expected to be an NGINX instance that verifies the source IP addresses, handles the validation of the NPLD Player secure token, and sets up the ongoing secure connection to the central services.  This should not require a lot of resources, e.g. a Linux server with 2GB of RAM and at least 2 CPUs. 
 
 ### Printing
 
