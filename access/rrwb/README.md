@@ -18,6 +18,7 @@ Reading Room Wayback Service Stack <!-- omit in toc -->
   - [Via Secure Terminals](#via-secure-terminals)
   - [Via the NPLD Player](#via-the-npld-player)
   - [Connection to the Central Services](#connection-to-the-central-services)
+  - [Deploying the NPLD Player](#deploying-the-npld-player)
   - [Printing](#printing)
 - [Testing](#testing)
 - [Monitoring](#monitoring)
@@ -309,10 +310,18 @@ graph LR;
 
   LDLl(*.ldls.org.uk inc. Auth - LOCAL ) -->|Secure WAN Connection| LDLc;
 
-  LDLc(*.ldls.org.uk - CENTRAL)
+  LDLc(*.ldls.org.uk - CENTRAL);
 ```
 
 The role of this server is to proxy user requests to the central services over the _Secure WAN Connection_. This is expected to be an NGINX instance that verifies the source IP addresses, handles the validation of the NPLD Player secure token, and sets up the ongoing secure connection to the central services.  This should not require a lot of resources, e.g. a Linux server with 2GB of RAM and at least 2 CPUs. 
+
+### Deploying the NPLD Player
+
+Where Readers are expected to use the NPLD Player, this will need to be installed on the appropriate access terminals.
+
+Installation packages, built with the secret access token bundled inside, will be made available via this _private_ GitHub repository: https://github.com/ukwa/npld-player-builds  The intention is that all necessary local configuration will be held there and embedded in the distribution packages (one for each legal deposit library).  It will be the responsibility of the deploying library to ensure that the bundled secret access token is accepted by the local authenticating proxy.
+
+Any further documentation that is needed will be found at: https://github.com/ukwa/npld-player#readme
 
 ### Printing
 
