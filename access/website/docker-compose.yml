@@ -170,17 +170,14 @@ services:
 
   # Web page rendering post-crawl:
   webrender:
-    image: ukwa/webrender-api:1.0.15
+    image: ukwa/webrender-puppeteer:2.3.2
     environment:
       - "HTTP_PROXY=http://pywb-nobanner:8080"
-      - "DOCKER_NETWORK=access_website_default"
-      - "DOCKER_RENDERER_IMAGE=ukwa/webrender-puppeteer:1.0.11"
+      - "RUN_BEHAVIOURS=false"
       - "LC_ALL=en_US.utf8"
-      - "WEB_RENDER_TMP=${WEB_RENDER_TMP}"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      # Current implementation means this has to be a disk mount that has the same path as on host:
-      - ${WEB_RENDER_TMP}:${WEB_RENDER_TMP}
+      - "PORT=8010"
+      - "NODE_ENV=production"
+      - "PUPPETEER_CLUSTER_SIZE=8"
     depends_on:
       - pywb-nobanner
     deploy:
