@@ -17,6 +17,7 @@ services:
       - ./logos/logo-staff.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
+      - epub-streamer
     ports:
       - "8309:8080"
 
@@ -38,6 +39,7 @@ services:
       - ./logos/bl_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
+      - epub-streamer
     ports:
       - "8300:8080"
 
@@ -55,6 +57,7 @@ services:
       - ./logos/nls_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
+      - epub-streamer
     ports:
       - "8301:8080"
 
@@ -72,6 +75,7 @@ services:
       - ./logos/llgc_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
+      - epub-streamer
     ports:
       - "8302:8080"
 
@@ -89,6 +93,7 @@ services:
       - ./logos/cambridge_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
+      - epub-streamer
     ports:
       - "8303:8080"
 
@@ -106,6 +111,7 @@ services:
       - ./logos/bodleian_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
+      - epub-streamer
     ports:
       - "8304:8080"
 
@@ -123,6 +129,7 @@ services:
       - ./logos/trinity_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
+      - epub-streamer
     ports:
       - "8305:8080"
 
@@ -179,6 +186,12 @@ services:
           - cam.ldls.org.uk
           - bodleian.ldls.org.uk
           - tcdlibrary.ldls.org.uk
+
+  # ePub Streamer/Unzipper
+  epub-streamer:
+    image: ukwa/epub-streamer:main
+    environment:
+      - ARK_SERVER=http://staffaccess.dl.bl.uk
 
 #logging:
 #  driver: gelf
