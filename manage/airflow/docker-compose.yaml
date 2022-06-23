@@ -62,6 +62,8 @@ x-airflow-common:
     AIRFLOW__CORE__ENABLE_XCOM_PICKLING: 'true' # Permit non-JSON data to be passed between operators
     DEPLOYMENT_CONTEXT: ${DEPLOYMENT_CONTEXT} # DEV/BETA/PROD/etc.
     STORAGE_PATH: ${STORAGE_PATH}
+    W3ACT_STORAGE: ${W3ACT_STORAGE}
+    EXTERNAL_WEB_PROXY: ${HTTPS_PROXY}
   volumes:
     - "./dags:/opt/airflow/dags"
     - "./plugins:/opt/airflow/plugins"

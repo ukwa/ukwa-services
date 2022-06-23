@@ -20,6 +20,7 @@ class Config():
     webhdfs_access_user = wh_conn.login
     pg_conn = Connection.get_connection_from_secrets("metrics_push_gateway")
     push_gateway = f"{pg_conn.host}:{pg_conn.port}"
+    w3act_web_conn = Connection.get_connection_from_secrets("access_w3act_web")
 
     # Pick up some variables
     hadoop_job_warc_batch_size = Variable.get('hadoop_job_warc_batch_size')
@@ -31,6 +32,7 @@ class Config():
     postgres_image = 'postgres:9.6.2'
     rclone_image = 'rclone/rclone:1.58'
     crawlstreams_image = 'ukwa/crawl-streams:1.0.1'
+    rf_image = 'ukwa/robot-framework:1.0.0'
 
     # Get a copy of the default arguments:
     def get_default_args(self):
