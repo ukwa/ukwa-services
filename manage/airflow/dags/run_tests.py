@@ -48,16 +48,17 @@ with DAG(
 
 This task runs service-level regression tests against our services.
 
-* 
+* The tests are specified in <https://github.com/ukwa/docker-robot-framework> and are intended to cover all _critical_ service aspects.
 
 Configuration:
 
 * Test reports will be written to `{OUTPUT_PATH}`.
-* The push gateway is configured to be `{c.push_gateway}`.
+* Metrics will be sent to the push gateway, configured to be `{c.push_gateway}`.
 
 How to check it's working:
 
 * The test reports should be available via the W3ACT site, e.g. for production: <https://www.webarchive.org.uk/act/static/>
+* The `robot_framework_test_passed` and `robot_framework_test_suite_timestamp` metrics should be updated in Prometheus.
 
 Tool container versions:
 
