@@ -1,4 +1,3 @@
-# Pass requests to PyWB over uwSGI:
 # Common redirects to support the original URLs, included in other configs:
 location / {
 
