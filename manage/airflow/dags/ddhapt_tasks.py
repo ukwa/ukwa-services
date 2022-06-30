@@ -129,7 +129,7 @@ with DAG(
 
 This task analyses documents extracts metadata and posts them to W3ACT.
 
-* Runs the `windex log-analyse` command, which:
+* Runs the `ddhapt process` command, which:
     * Processes `{dag.params['batch_size']}` _NEW_ records from the 'Documents Found' database, in small chunks.
     * For each one, it checks if it's in the CDX, and if so, it attempts to work out the document metadata and push the record to W3ACT.
     * The results are used to update the 'Documents Found' database, e.g. _NEW_ documents are _ACCEPTED_ (in W3ACT) or _REJECTED_.
