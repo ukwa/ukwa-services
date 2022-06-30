@@ -21,6 +21,7 @@ class Config():
     pg_conn = Connection.get_connection_from_secrets("metrics_push_gateway")
     push_gateway = f"{pg_conn.host}:{pg_conn.port}"
     w3act_web_conn = Connection.get_connection_from_secrets("access_w3act_web")
+    ddhapt_w3act_web_conn = Connection.get_connection_from_secrets("ddhapt_w3act_web")
     ddhapt_df_db = Connection.get_connection_from_secrets("ddhapt_documents_found_db")
 
     # Pick up some variables

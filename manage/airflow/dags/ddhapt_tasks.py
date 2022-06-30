@@ -6,6 +6,7 @@ Tasks that are for the Document Harvester a.k.a. DDHAPT.
 import logging
 import json
 import sys
+import os
 from datetime import datetime
 
 from subprocess import check_output
@@ -29,6 +30,12 @@ default_args = c.get_default_args()
 # Connection to TrackDB to use:
 trackdb_url = c.get_trackdb_url()
 
+# Static location of crawl feed for watched targets:
+CRAWL_FEED_NPLD = '/storage/data_exports/crawl_feed_npld.jsonl'
+
+# Pick up proxy for external connections:
+EXTERNAL_WEB_PROXY = os.environ['EXTERNAL_WEB_PROXY']
+
 
 with DAG(
     'ddhapt_log_analyse',
@@ -41,7 +48,7 @@ with DAG(
     params={
         'trackdb_url' : trackdb_url,
         'df_db': c.ddhapt_df_db.get_uri(),
-        'crawl_feed': '/storage/data_exports/crawl_feed_npld.jsonl',
+        'crawl_feed': CRAWL_FEED_NPLD,
     },
     tags=['ingest', 'docharv', 'h3'],
 ) as dag:
@@ -97,4 +104,77 @@ Tool container versions:
         do_xcom_push=False,
     ) 
 
-      
+
+with DAG(
+    'ddhapt_process_docs',
+    default_args=default_args,
+    description='Gets metadata for found documents, pushes them to W3ACT.',
+    schedule_interval='@daily',
+    start_date=days_ago(1),
+    max_active_runs=1,
+    catchup=False,
+    params={
+        'df_db': c.ddhapt_df_db.get_uri(),
+        'crawl_feed': CRAWL_FEED_NPLD,
+        'cdx_url': 'http://cdx.api.wa.bl.uk/data-heritrix', #c.get_access_cdx_url(),
+        'w3act_url': f"http://{c.ddhapt_w3act_web_conn.host}/act",
+        'w3act_user': c.ddhapt_w3act_web_conn.login,
+        'w3act_pw': c.ddhapt_w3act_web_conn.password,
+        'batch_size': 2,
+    },
+    tags=['ingest', 'docharv', 'w3act'],
+) as dag:
+    dag.doc_md = f"""
+### Document Metadata Extraction to W3ACT
+
+This task analyses documents extracts metadata and posts them to W3ACT.
+
+* Runs the `windex log-analyse` command, which:
+    * Processes `{dag.params['batch_size']}` _NEW_ records from the 'Documents Found' database, in small chunks.
+    * For each one, it checks if it's in the CDX, and if so, it attempts to work out the document metadata and push the record to W3ACT.
+    * The results are used to update the 'Documents Found' database, e.g. _NEW_ documents are _ACCEPTED_ (in W3ACT) or _REJECTED_.
+
+Configuration:
+
+* Uses crawl feed at `{dag.params['crawl_feed']}`.
+* The Documents Found database is configured to be `{dag.params['df_db']}`.
+* Refers to the CDX index at `{dag.params['cdx_url']}`.
+* Talks to W3ACT via `{dag.params['w3act_url']}` using credentials `{dag.params['w3act_user']}`/`{dag.params['w3act_pw']}`.
+* The push gateway is configured to be `{c.push_gateway}`.
+
+How to check it's working:
+
+* The Task Instance logs in Airflow will show e.g. how many document processed.
+* Check for metrics in Prometheus (updated via Push Gateway):
+    * Look for job result metrics in [the push gateway configured for this task](http://{c.push_gateway}), e.g.:
+        * `ukwa_task_batch_size{{job="???", status="success"}}`
+        * `ukwa_task_event_timestamp{{job="???"}}`
+
+Tool container versions:
+
+ * UKWA Manage Task Image: `{c.ukwa_task_image}`
+
+""" 
+
+    doc_job = DockerOperator(
+        task_id='ddhapt_process_docs_found',
+        image=c.ukwa_task_image,
+        # Add Hadoop settings:
+        environment= {
+            'PUSH_GATEWAY': c.push_gateway,
+            "HTTP_PROXY": EXTERNAL_WEB_PROXY,
+            "HTTPS_PROXY": EXTERNAL_WEB_PROXY,
+        },
+        command='docharv process -v \
+            --act-url {{ params.w3act_url }} \
+            --act-user {{ params.w3act_user }} \
+            --act-pw {{ params.w3act_pw }} \
+            --cdx {{ params.cdx_url }} \
+            --batch-size {{ params.batch_size }} \
+            -T {{ params.crawl_feed }} \
+            -D {{ params.df_db }}',
+        tty=True, # <-- So we see logging
+        do_xcom_push=False,
+    ) 
+
+ 
