@@ -120,7 +120,7 @@ with DAG(
         'w3act_url': f"http://{c.ddhapt_w3act_web_conn.host}/act",
         'w3act_user': c.ddhapt_w3act_web_conn.login,
         'w3act_pw': c.ddhapt_w3act_web_conn.password,
-        'batch_size': 2,
+        'batch_size': 500,
     },
     tags=['ingest', 'docharv', 'w3act'],
 ) as dag:
@@ -173,7 +173,7 @@ Tool container versions:
             --batch-size {{ params.batch_size }} \
             -T {{ params.crawl_feed }} \
             -D {{ params.df_db }}',
-        tty=True, # <-- So we see logging
+        tty=True, # <-- So we see logging (stderr is inline?)
         do_xcom_push=False,
     ) 
 
