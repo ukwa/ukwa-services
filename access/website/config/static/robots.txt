@@ -15,3 +15,7 @@ Allow: /wayback/
 User-agent: facebookexternalhit
 Allow: /wayback/
 
+# Allow search engines to index specific sites:
+User-agent: *
+# As requested in https://github.com/ukwa/ukwa-services/issues/96
+Allow: /wayback/archive/*/http://www.europeandialogue.org/
