@@ -123,23 +123,23 @@ with DAG(
         'batch_size': 500,
     },
     tags=['ingest', 'docharv', 'w3act'],
-) as dag:
-    dag.doc_md = f"""
+) as dag2:
+    dag2.doc_md = f"""
 ### Document Metadata Extraction to W3ACT
 
 This task analyses documents extracts metadata and posts them to W3ACT.
 
 * Runs the `ddhapt process` command, which:
-    * Processes `{dag.params['batch_size']}` _NEW_ records from the 'Documents Found' database, in small chunks.
+    * Processes `{dag2.params['batch_size']}` _NEW_ records from the 'Documents Found' database, in small chunks.
     * For each one, it checks if it's in the CDX, and if so, it attempts to work out the document metadata and push the record to W3ACT.
     * The results are used to update the 'Documents Found' database, e.g. _NEW_ documents are _ACCEPTED_ (in W3ACT) or _REJECTED_.
 
 Configuration:
 
-* Uses crawl feed at `{dag.params['crawl_feed']}`.
-* The Documents Found database is configured to be `{dag.params['df_db']}`.
-* Refers to the CDX index at `{dag.params['cdx_url']}`.
-* Talks to W3ACT via `{dag.params['w3act_url']}` using credentials `{dag.params['w3act_user']}`/`{dag.params['w3act_pw']}`.
+* Uses crawl feed at `{dag2.params['crawl_feed']}`.
+* The Documents Found database is configured to be `{dag2.params['df_db']}`.
+* Refers to the CDX index at `{dag2.params['cdx_url']}`.
+* Talks to W3ACT via `{dag2.params['w3act_url']}` using credentials `{dag2.params['w3act_user']}`/`{dag2.params['w3act_pw']}`.
 * The push gateway is configured to be `{c.push_gateway}`.
 
 How to check it's working:
