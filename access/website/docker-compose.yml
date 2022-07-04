@@ -55,7 +55,7 @@ services:
   # OA Wayback configuration:
   # -------------------------------------------------------------
   pywb:
-    image: ukwa/ukwa-pywb:2.6.7
+    image: "${PYWB_IMAGE}"
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
@@ -78,7 +78,7 @@ services:
 
   # An embedded, bannerless OA Wayback to render screenshots:
   pywb-nobanner:
-    image: ukwa/ukwa-pywb:2.6.7
+    image: "${PYWB_IMAGE}"
     environment:
       - "WEBHDFS_USER=access"
       - "UKWA_INDEX=${UKWA_INDEX}"
@@ -144,7 +144,7 @@ services:
   # The Python service that provides some basic APIs
   # -------------------------------------------------------------
   api:
-    image: ukwa/ukwa-access-api
+    image: "${API_IMAGE}"
     environment:
       - "CDX_SERVER=${CDX_SERVER}"
       - "WEBHDFS_PREFIX=http://warc-server:8000/by-filename/"
