@@ -18,10 +18,62 @@ collections:
         # Enable SCU locks
         single-use-lock: true
 
+        add_headers:
+          Cache-Control: 'max-age=0, no-cache, must-revalidate, proxy-revalidate, private'
+          Expires: 'Thu, 01 Jan 1970 00:00:00 GMT'
+
+        ext_redirects:
+        'epub': '/static/viewers/epub_viewer/index.html?bookPath={0}'
+
+        content_type_redirects:
+          # allows
+          'text/': 'allow'
+          'image/': 'allow'
+          'video/': 'allow'
+          'audio/': 'allow'
+          'application/javascript': 'allow'
+
+          'text/rtf': 'https://example.com/viewer?{0}'
+          'application/epub+zip': '/static/viewers/epub_viewer/index.html?bookPath={0}'
+          'application/pdf': '/static/viewers/pdf_viewer/web/viewer.html?file={0}'
+
+          #'application/': 'allowed'
+
+          # default redirects
+          '<any-download>': 'https://example.com/blocked?url={0}'
+          '*': 'https://example.com/blocked?url={0}'
+
+
     # Access to NPLD documents using live web support, under /doc/:
     doc:
         index: $live
         single-use-lock: true
+
+        add_headers:
+          Cache-Control: 'max-age=0, no-cache, must-revalidate, proxy-revalidate, private'
+          Expires: 'Thu, 01 Jan 1970 00:00:00 GMT'
+
+        ext_redirects:
+        'epub': '/static/viewers/epub_viewer/index.html?bookPath={0}'
+
+        content_type_redirects:
+          # allows
+          'text/': 'allow'
+          'image/': 'allow'
+          'video/': 'allow'
+          'audio/': 'allow'
+          'application/javascript': 'allow'
+
+          'text/rtf': 'https://example.com/viewer?{0}'
+          'application/epub+zip': '/static/viewers/epub_viewer/index.html?bookPath={0}'
+          'application/pdf': '/static/viewers/pdf_viewer/web/viewer.html?file={0}'
+
+          #'application/': 'allowed'
+
+          # default redirects
+          '<any-download>': 'https://example.com/blocked?url={0}'
+          '*': 'https://example.com/blocked?url={0}'
+
 
 # redirect to exact url behavior
 redirect_to_exact: true
@@ -30,7 +82,7 @@ redirect_to_exact: true
 enable_memento: true
 
 # enable experimental Memento Prefer
-enable_prefer: false
+enable_prefer: true
 
 # Locale setup
 locales_root_dir: ./i18n/translations/

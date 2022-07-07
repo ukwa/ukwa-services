@@ -14,29 +14,3 @@ services:
     depends_on:
     - redis
 
-  # PushProx server for testing Prometheus integration
-  pushprox:
-    image: prom/pushprox:v0.1.0
-    ports:
-    - "9494:8080"
-
-  # Prometheus
-  # Configured to target the PUSHPROX_FQDN of the pushprox-client
-  prometheus:
-    image: prom/prometheus
-    ports:
-      - 9393:9090
-    volumes:
-      - ./prometheus:/etc/prometheus
-    #  - "${STORAGE_PATH}/prometheus-data:/prometheus"
-    user: root
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=1000d'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-     # - '--web.external-url=http://${CRAWL_HOST_LAN_IP}:9191/'
-      - '--web.enable-admin-api'
-      - '--web.enable-lifecycle'
-

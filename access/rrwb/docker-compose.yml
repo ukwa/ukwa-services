@@ -90,7 +90,7 @@ services:
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
-      - ./logos/cambridge_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
+      - ./logos/cambridge_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
       - doc-streamer
@@ -108,7 +108,7 @@ services:
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
-      - ./logos/bodleian_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
+      - ./logos/bodleian_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
       - doc-streamer
@@ -126,7 +126,7 @@ services:
     volumes:
       - ./pywb/readingroom.yaml:/webarchive/config.yaml
       - ${STORAGE_PATH_SHARED}:/ukwa_pywb/acl/
-      - ./logos/trinity_logo.jpg:/ukwa_pywb/static/ukwa-2018-w-med.png
+      - ./logos/trinity_logo.png:/ukwa_pywb/static/ukwa-2018-w-med.png
     depends_on:
       - redis
       - doc-streamer
@@ -191,7 +191,7 @@ services:
   doc-streamer:
     image: ukwa/epub-streamer:main
     environment:
-      - ARK_SERVER=http://staffaccess.dl.bl.uk
+      - ARK_SERVER=${DLS_ACCESS_SERVER}
 
 #logging:
 #  driver: gelf
