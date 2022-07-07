@@ -21,7 +21,6 @@ collections:
         # up the query limit:
         query_limit: 100000
 
-
 proxy:
     # collection for proxy mode
     coll: archive
@@ -49,3 +48,5 @@ locales:
   - en
   - cy
 
+# Modify Content-Security-Policy header to allow GA4 tracking:
+csp-header: "default-src 'unsafe-eval' 'unsafe-inline' 'self' data: blob: mediastream: ws: wss: *.googletagmanager.com ; form-action 'self'"
