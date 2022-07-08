@@ -42,7 +42,7 @@ with DAG(
     default_args=default_args,
     description='Log analysis and document extraction.',
     schedule_interval='@daily',
-    start_date=datetime(2022, 6, 24), #'2022-06-24'
+    start_date=datetime(2022, 6, 12), #'2022-06-24' for the Border Operating Model example
     max_active_runs=1,
     catchup=True,
     params={
