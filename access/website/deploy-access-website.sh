@@ -10,7 +10,7 @@ fi
 # Set up environment variables
 if [[ ${ENVIRON} == 'prod' ]]; then
 	export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.2"
-        export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7"
+        export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.1"
         export API_IMAGE="ukwa/ukwa-access-api:latest"
 	export SERVER_NAME=www.webarchive.org.uk
 	export DEPLOYMENT_TAG=prod
@@ -22,7 +22,7 @@ if [[ ${ENVIRON} == 'prod' ]]; then
 
 elif [[ ${ENVIRON} == 'beta' ]]; then
 	export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.2"
-        export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7"
+        export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.1"
         export API_IMAGE="ukwa/ukwa-access-api:latest"
 	export SERVER_NAME=beta.webarchive.org.uk
 	export DEPLOYMENT_TAG=beta
@@ -35,7 +35,7 @@ else
 	# dev vars
 	#export UKWA_UI_IMAGE="min2ha/ukwa-ui:new_feature_categories_anj"
 	export UKWA_UI_IMAGE="ukwa/ukwa-ui:master"
-        export PYWB_IMAGE="ukwa/ukwa-pywb:master"
+        export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.1"
         export API_IMAGE="ukwa/ukwa-access-api:fastapi"
 	export SERVER_NAME=dev.webarchive.org.uk
 	export DEPLOYMENT_TAG=dev
