@@ -65,7 +65,7 @@ services:
   # W3ACT
   w3act:
     image: ukwa/w3act:2.3.3
-    command: /w3act/bin/w3act -J-Xmx6g -J-XX:+ExitOnOutOfMemoryError -Dconfig.file=/w3act/conf/docker.conf -Dpidfile.path=/dev/null -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1898 -Dcom.sun.management.jmxremote.rmi.port=1898 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=${JMX_HOSTNAME}
+    command: /w3act/bin/w3act -J-Xmx8g -J-XX:+ExitOnOutOfMemoryError -Dconfig.file=/w3act/conf/docker.conf -Dpidfile.path=/dev/null -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1898 -Dcom.sun.management.jmxremote.rmi.port=1898 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.local.only=false -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=${JMX_HOSTNAME}
     environment:
       - "APPLICATION_NAVBAR_COLOR=${APPLICATION_NAVBAR_COLOR}"
       - "APPLICATION_SECRET=${APPLICATION_SECRET}"
@@ -161,6 +161,7 @@ services:
       - "GF_AUTH_PROXY_AUTO_SIGN_UP=true"
       - "GF_AUTH_DISABLE_SIGNOUT_MENU=true"
       - "HTTPS_PROXY=${HTTPS_PROXY}"
+      - "W3ACT_PSQL_VIEWER_PASSWORD=${W3ACT_PSQL_VIEWER_PASSWORD}"
     volumes:
       - ./grafana:/etc/grafana/provisioning
       - "${W3ACT_STORAGE}/grafana:/var/lib/grafana"
