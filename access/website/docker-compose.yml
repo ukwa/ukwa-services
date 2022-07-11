@@ -155,6 +155,7 @@ services:
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
       - "SCRIPT_NAME=/api" # Deploy the API under this prefix
+      - "ROOT_PATH=/api/" # Deploy the API under this prefix
       - "HTTP_X_FORWARDED_PROTO=https"
       - "WEBRENDER_ARCHIVE_SERVER=http://webrender:8010/render"
       - "CACHE_FOLDER=/cache"
@@ -188,7 +189,7 @@ services:
     image: lyrasis/cantaloupe
     environment:
       SOURCE_STATIC: "HttpSource"
-      HTTPSOURCE_BASICLOOKUPSTRATEGY_URL_PREFIX: "http://api:8000/api/render_raw?pwid="
+      HTTPSOURCE_BASICLOOKUPSTRATEGY_URL_PREFIX: "http://api:8000/iiif/render_raw?pwid="
       HTTPSOURCE_BASICLOOKUPSTRATEGY_URL_SUFFIX: ""
       HTTPSOURCE_REQUEST_TIMEOUT: 3600
       PROCESSOR_STREAM_RETRIEVAL_STRATEGY: "CacheStrategy"
