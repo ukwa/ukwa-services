@@ -68,11 +68,11 @@ Tool container versions:
 
     run_tests_on_prod = DockerOperator(
         task_id='run-tests-on-prod',
-        image=c.rf_image,
-        command=f'--skiponfailure a11y --splitlog --loglevel FAIL --outputdir {OUTPUT_PATH}/test-reports/prod /tests',
+        image='ukwa/robot-framework:main',
+        command=f'--skiponfailure a11y --outputdir {OUTPUT_PATH}/test-reports/dev /tests',
         environment={
-          "HOST": "https://www.webarchive.org.uk",
-          "HOST_NO_AUTH": "https://www.webarchive.org.uk",
+          "HOST": "https://dev:aq5ua7%UJ@dev.webarchive.org.uk",
+          "HOST_NO_AUTH": "https://dev.webarchive.org.uk",
           "W3ACT_USERNAME": c.w3act_web_conn.login,
           "W3ACT_PASSWORD": c.w3act_web_conn.password,
           # URL to use when testing playback/APIs etc.
@@ -80,11 +80,12 @@ Tool container versions:
           "HTTP_PROXY": EXTERNAL_WEB_PROXY,
           "HTTPS_PROXY": EXTERNAL_WEB_PROXY,
           'PUSH_GATEWAY': c.push_gateway,
-          "PROMETHEUS_JOB_NAME": "service_tests_prod",
+          "PROMETHEUS_JOB_NAME": "service_tests_dev",
         },
         mounts= [
             Mount( source=OUTPUT_PATH, target=OUTPUT_PATH, type='bind' )
         ],
         tty=True, # <-- So we see logging
         do_xcom_push=False,
+        retries=0,
     )

@@ -155,7 +155,6 @@ services:
       - "SERVER_NAME=${SERVER_NAME}"
       - "ANALYSIS_SOURCE_FILE=/analysis/fc.crawled.json"
       - "SCRIPT_NAME=/api" # Deploy the API under this prefix
-      - "ROOT_PATH=/api/" # Deploy the API under this prefix
       - "HTTP_X_FORWARDED_PROTO=https"
       - "WEBRENDER_ARCHIVE_SERVER=http://webrender:8010/render"
       - "CACHE_FOLDER=/cache"
