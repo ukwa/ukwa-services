@@ -20,7 +20,7 @@ collections:
     crawler:
         index: cdx+http://crawldb-fc.api.wa.bl.uk/fc
         archive_paths:
-          - http://192.168.45.34:8001/by-filename/
+          - http://warc-server.api.wa.bl.uk/webhdfs/v1/by-filename/
 
         # up the query limit:
         query_limit: 100000
