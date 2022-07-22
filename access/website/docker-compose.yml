@@ -14,6 +14,7 @@ services:
   # Static content hosted within the container, including robots.txt
   nginx:
     image: ukwa/ukwa-site:master
+    hostname: "{{.Service.Name}}-{{.Task.Slot}}"
     ports:
       - "80:80"
     volumes:
@@ -65,6 +66,7 @@ services:
       - "7171:8080"
     volumes:
       - ./config/pywb/config.yaml:/webarchive/config.yaml
+      #- ./config/pywb/uwsgi.ini:/ukwa_pywb/uwsgi.ini
       # Used to store the access control lists used by the pywb services.
       - "${PWYB_ACL_PATH}:/ukwa_pywb/acl/"
     deploy:
