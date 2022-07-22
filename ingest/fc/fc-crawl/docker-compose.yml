@@ -24,7 +24,7 @@ services:
       - "${STORAGE_PATH}/surts/npld:/shared" # Shared configuration - surts file held here.
     deploy:
       replicas: 1
-    stop_grace_period: 10m # Give the H3 instances some time to shut down neatly following SIGTERM
+    stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     depends_on:
       - clamd
       - webrender
@@ -75,7 +75,7 @@ services:
 
   # The WARChiving proxy itself
   warcprox:
-    image: ukwa/warcprox:2.4.17.1
+    image: ukwa/docker-warcprox:2.4.17.2
     command: "warcprox -b 0.0.0.0 -d /output/warcs --base32 --gzip --rollover-idle-time 600 --dedup-db-file /host/warcprox_dedup_db.sqlite --stats-db-file /dev/null --quiet --plugin warcprox-plugins.listeners.UpdateOutbackCDX --plugin warcprox-plugins.listeners.KafkaCaptureFeed --max-threads 1000 --queue-size 1000"
     environment:
       - "KAFKA_BOOTSTRAP_SERVERS=kafka:9092"
@@ -98,9 +98,9 @@ services:
   # Web Render Farm
   # ----------------------------------------------
 
-  # PhantomJS web page rendering service
+  # Puppeteer web page rendering service
   webrender:
-    image: ukwa/webrender-puppeteer:2.1.0
+    image: ukwa/webrender-puppeteer:2.3.3
     # Can't use this with dnsrr
     #ports:
     #  - 8010:8010
