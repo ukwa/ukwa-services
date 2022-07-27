@@ -3,47 +3,50 @@
 # read script environ argument
 ENVIRON=$1
 if ! [[ ${ENVIRON} =~ dev|beta|prod ]]; then
-	echo "ERROR: Script $0 requires environment argument (dev|beta|prod)"
-	exit
+    echo "ERROR: Script $0 requires environment argument (dev|beta|prod)"
+    exit
 fi
 
 # Set up environment variables
 if [[ ${ENVIRON} == 'prod' ]]; then
-	export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.2"
-        export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
-        export API_IMAGE="ukwa/ukwa-access-api:latest"
-	export SERVER_NAME=www.webarchive.org.uk
-	export DEPLOYMENT_TAG=prod
-	export STORAGE_PATH_WEBSITE=/mnt/nfs/prod1/access/data/website
-	export CONFIG_PATH=/mnt/nfs/prod1/access/gitlab/ukwa-services-env/access/pywb
-	# Location where the w3act_export Airflow task stores the ACLs:
-	export PWYB_ACL_PATH=/mnt/nfs/prod1/airflow/data/airflow/wayback_acls/oukwa/acl
-	source /mnt/nfs/prod1/access/gitlab/ukwa-services-env/prod.env
+    export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.2"
+    export UKWA_NGINX_IMAGE="nginx:alpine"
+    export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
+    export API_IMAGE="ukwa/ukwa-access-api:latest"
+    export SERVER_NAME=www.webarchive.org.uk
+    export DEPLOYMENT_TAG=prod
+    export STORAGE_PATH_WEBSITE=/mnt/nfs/prod1/access/data/website
+    export CONFIG_PATH=/mnt/nfs/prod1/access/gitlab/ukwa-services-env/access/pywb
+    # Location where the w3act_export Airflow task stores the ACLs:
+    export PWYB_ACL_PATH=/mnt/nfs/prod1/airflow/data/airflow/wayback_acls/oukwa/acl
+    source /mnt/nfs/prod1/access/gitlab/ukwa-services-env/prod.env
 
 elif [[ ${ENVIRON} == 'beta' ]]; then
-	export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.2"
-        export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
-        export API_IMAGE="ukwa/ukwa-access-api:latest"
-	export SERVER_NAME=beta.webarchive.org.uk
-	export DEPLOYMENT_TAG=beta
-	export STORAGE_PATH_WEBSITE=/mnt/gluster/beta/access/data/website
-	export CONFIG_PATH=/home/access/gitlab/ukwa-services-env/access/pywb
-	# Location where the w3act_export Airflow task stores the ACLs:
-	export PWYB_ACL_PATH=/mnt/gluster/beta/airflow/data/airflow/wayback_acls/oukwa/acl
-	source /home/access/gitlab/ukwa-services-env/beta.env
+    export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.2"
+    export UKWA_NGINX_IMAGE="nginx:alpine"
+    export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
+    export API_IMAGE="ukwa/ukwa-access-api:latest"
+    export SERVER_NAME=beta.webarchive.org.uk
+    export DEPLOYMENT_TAG=beta
+    export STORAGE_PATH_WEBSITE=/mnt/gluster/beta/access/data/website
+    export CONFIG_PATH=/home/access/gitlab/ukwa-services-env/access/pywb
+    # Location where the w3act_export Airflow task stores the ACLs:
+    export PWYB_ACL_PATH=/mnt/gluster/beta/airflow/data/airflow/wayback_acls/oukwa/acl
+    source /home/access/gitlab/ukwa-services-env/beta.env
 else
-	# dev vars
-	#export UKWA_UI_IMAGE="min2ha/ukwa-ui:new_feature_categories_anj"
-	export UKWA_UI_IMAGE="ukwa/ukwa-ui:master"
-        export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
-        export API_IMAGE="ukwa/ukwa-access-api:fastapi"
-	export SERVER_NAME=dev.webarchive.org.uk
-	export DEPLOYMENT_TAG=dev
-	export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
-	export CONFIG_PATH=/mnt/nfs/config/gitlab/ukwa-services-env/access/pywb
-	# Location where the w3act_export Airflow task stores the ACLs:
-	export PWYB_ACL_PATH=/mnt/nfs/data/airflow/wayback_acls/oukwa/acl
-	source /mnt/nfs/config/gitlab/ukwa-services-env/dev.env
+    # dev vars
+    #export UKWA_UI_IMAGE="min2ha/ukwa-ui:new_feature_categories_anj"
+    export UKWA_UI_IMAGE="ukwa/ukwa-ui:master"
+    export UKWA_NGINX_IMAGE="ukwa/ukwa-site:main"
+    export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
+    export API_IMAGE="ukwa/ukwa-access-api:fastapi"
+    export SERVER_NAME=dev.webarchive.org.uk
+    export DEPLOYMENT_TAG=dev
+    export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
+    export CONFIG_PATH=/mnt/nfs/config/gitlab/ukwa-services-env/access/pywb
+    # Location where the w3act_export Airflow task stores the ACLs:
+    export PWYB_ACL_PATH=/mnt/nfs/data/airflow/wayback_acls/oukwa/acl
+    source /mnt/nfs/config/gitlab/ukwa-services-env/dev.env
 fi
 
 # Common configuration

@@ -13,7 +13,7 @@ services:
   # All complex setup relating to the public website is here.
   # Static content hosted within the container, including robots.txt
   nginx:
-    image: ukwa/ukwa-site:master
+    image:  "${UKWA_NGINX_IMAGE}"
     hostname: "{{.Service.Name}}-{{.Task.Slot}}"
     ports:
       - "80:80"
