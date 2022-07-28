@@ -35,7 +35,6 @@ elif [[ ${ENVIRON} == 'beta' ]]; then
     source /home/access/gitlab/ukwa-services-env/beta.env
 else
     # dev vars
-    #export UKWA_UI_IMAGE="min2ha/ukwa-ui:new_feature_categories_anj"
     export UKWA_UI_IMAGE="ukwa/ukwa-ui:master"
     export UKWA_NGINX_IMAGE="ukwa/ukwa-site:main"
     export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
