@@ -4,7 +4,7 @@ services:
 
   # UKWA Heritrix for NPLD
   npld-dc-heritrix-worker:
-    image: ukwa/heritrix:2.8.2
+    image: ukwa/heritrix:2.9.1
     hostname: "npld-dc-heritrix3-worker-{{.Task.Slot}}"
     ports:
       - 8443:8443 # https
@@ -12,7 +12,7 @@ services:
       - 9118:9118 # metrics
     env_file: heritrix-shared-settings.env
     environment:
-      - "CRAWL_NAME=dc2021"
+      - "CRAWL_NAME=dc2022"
       - "LAUNCH_AUTOMATICALLY=false"
       - "KAFKA_SEEK_TO_BEGINNING=false"
       - "KAFKA_TOCRAWL_TOPIC=dc.tocrawl"
@@ -51,7 +51,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == ip-172-31-26-103.eu-west-2.compute.internal] # Only allow it to deploy on the appropriate server
+        constraints: [node.hostname == ip-172-31-27-250.eu-west-2.compute.internal] # Only allow it to deploy on the appropriate server
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     ulimits:
       nproc: 65535
