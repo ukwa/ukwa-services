@@ -12,7 +12,7 @@ if [[ ${ENVIRON} == 'prod' ]]; then
     export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.3"
     export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.0.0"
     export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
-    export API_IMAGE="ukwa/ukwa-access-api:latest"
+    export API_IMAGE="ukwa/ukwa-access-api:1.0.1"
     export SERVER_NAME=www.webarchive.org.uk
     export DEPLOYMENT_TAG=prod
     export STORAGE_PATH_WEBSITE=/mnt/nfs/prod1/access/data/website
@@ -25,7 +25,7 @@ elif [[ ${ENVIRON} == 'beta' ]]; then
     export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.3"
     export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.0.0"
     export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
-    export API_IMAGE="ukwa/ukwa-access-api:latest"
+    export API_IMAGE="ukwa/ukwa-access-api:1.0.1"
     export SERVER_NAME=beta.webarchive.org.uk
     export DEPLOYMENT_TAG=beta
     export STORAGE_PATH_WEBSITE=/mnt/gluster/beta/access/data/website
@@ -38,7 +38,7 @@ else
     export UKWA_UI_IMAGE="ukwa/ukwa-ui:master"
     export UKWA_NGINX_IMAGE="ukwa/ukwa-site:master"
     export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
-    export API_IMAGE="ukwa/ukwa-access-api:fastapi"
+    export API_IMAGE="ukwa/ukwa-access-api:master"
     export SERVER_NAME=dev.webarchive.org.uk
     export DEPLOYMENT_TAG=dev
     export STORAGE_PATH_WEBSITE=/mnt/nfs/data/website
