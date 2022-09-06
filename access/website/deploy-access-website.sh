@@ -9,7 +9,7 @@ fi
 
 # Set up environment variables
 if [[ ${ENVIRON} == 'prod' ]]; then
-    export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.3"
+    export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.4"
     export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.0.0"
     export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
     export API_IMAGE="ukwa/ukwa-access-api:1.0.1"
@@ -22,7 +22,7 @@ if [[ ${ENVIRON} == 'prod' ]]; then
     source /mnt/nfs/prod1/access/gitlab/ukwa-services-env/prod.env
 
 elif [[ ${ENVIRON} == 'beta' ]]; then
-    export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.3"
+    export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.4"
     export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.0.0"
     export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.7.2"
     export API_IMAGE="ukwa/ukwa-access-api:1.0.1"
