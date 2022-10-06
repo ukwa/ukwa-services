@@ -174,7 +174,7 @@ services:
 
   # Web page rendering post-crawl:
   webrender:
-    image: ukwa/webrender-puppeteer:2.3.2
+    image: ukwa/webrender-puppeteer:2.3.3
     environment:
       - "HTTP_PROXY=http://pywb-nobanner:8080"
       - "RUN_BEHAVIOURS=false"
