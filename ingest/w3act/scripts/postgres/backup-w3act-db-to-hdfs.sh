@@ -1,6 +1,8 @@
 #!/bin/sh
 
 # Common setup
+set -a
+set -o allexport
 source ./common.env
 echo "DOCKER_COMMAND: [${DOCKER_COMMAND}]"
 echo "W3ACT_PSQL_DIR: [${W3ACT_PSQL_DIR}]"
