@@ -34,7 +34,7 @@ class Config():
     postgres_image = 'postgres:9.6.2'
     rclone_image = 'rclone/rclone:1.58'
     crawlstreams_image = 'ukwa/crawl-streams:1.0.1'
-    rf_image = 'ukwa/robot-framework:1.1.0'
+    rf_image = 'ukwa/robot-framework:1.2.0'
 
     # Get a copy of the default arguments:
     def get_default_args(self):

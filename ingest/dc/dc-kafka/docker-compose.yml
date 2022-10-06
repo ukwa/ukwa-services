@@ -54,7 +54,7 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == ip-172-31-26-103.eu-west-2.compute.internal]
+        constraints: [node.hostname == ip-172-31-27-250.eu-west-2.compute.internal]
 
   # Kafka UI
   ui:

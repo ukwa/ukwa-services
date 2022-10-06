@@ -69,7 +69,7 @@ Tool container versions:
     run_tests_on_prod = DockerOperator(
         task_id='run-tests-on-prod',
         image=c.rf_image,
-        command=f'--skiponfailure a11y --splitlog --loglevel FAIL --outputdir {OUTPUT_PATH}/test-reports/prod /tests',
+        command=f'--skiponfailure a11y --outputdir {OUTPUT_PATH}/test-reports/prod /tests',
         environment={
           "HOST": "https://www.webarchive.org.uk",
           "HOST_NO_AUTH": "https://www.webarchive.org.uk",
@@ -87,4 +87,5 @@ Tool container versions:
         ],
         tty=True, # <-- So we see logging
         do_xcom_push=False,
+        retries=0,
     )

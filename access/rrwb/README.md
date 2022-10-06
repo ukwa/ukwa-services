@@ -323,6 +323,8 @@ Installation packages, built with the secret access token bundled inside, will b
 
 Any further documentation that is needed will be found at: https://github.com/ukwa/npld-player#readme
 
+Note that as with the previous solution, the secure deployment of the NPLD Player is critically dependent on the careful management of the Outbound Proxy that links back to the centralized services.  This should be locked down so that it can only be used from IP ranges that correspond to reading rooms, and that the IP range corresponding to reading rooms without locked-down terminals is also configured to require the secure token header, thus ensuring only the NPLD Player can access the material.
+
 ### Printing
 
 Printing should work exactly the same as for any other web page being viewed in the reading room. When the NPLD Player is in use, this will act like any other application on the machine, and use on the local print system via standard OS calls.

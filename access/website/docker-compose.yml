@@ -11,14 +11,14 @@ services:
   # -------------------------------------------------------------
   # All routing to sub-components goes through here.
   # All complex setup relating to the public website is here.
+  # Static content hosted within the container, including robots.txt
   nginx:
-    image: nginx:alpine
+    image:  "${UKWA_NGINX_IMAGE}"
     hostname: "{{.Service.Name}}-{{.Task.Slot}}"
     ports:
       - "80:80"
     volumes:
       - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./config/static:/webroot:ro
     depends_on:
       - shine
       - pywb
@@ -164,6 +164,8 @@ services:
       - "WAYBACK_SERVER=http://pywb:8080/archive/"
       # Used to secure cookies/tokens/etc.
       - "APP_SECRET=${APP_SECRET}"
+      # Nominations DB creation is not safe to run under multiple processes:
+      - "WORKERS=1"
     volumes:
       - "${STORAGE_PATH_WEBSITE}/cache:/cache"
       - fc_analysis:/analysis
@@ -190,7 +192,7 @@ services:
     image: lyrasis/cantaloupe
     environment:
       SOURCE_STATIC: "HttpSource"
-      HTTPSOURCE_BASICLOOKUPSTRATEGY_URL_PREFIX: "http://api:8000/api/render_raw?pwid="
+      HTTPSOURCE_BASICLOOKUPSTRATEGY_URL_PREFIX: "http://api:8000/iiif/render_raw?pwid="
       HTTPSOURCE_BASICLOOKUPSTRATEGY_URL_SUFFIX: ""
       HTTPSOURCE_REQUEST_TIMEOUT: 3600
       PROCESSOR_STREAM_RETRIEVAL_STRATEGY: "CacheStrategy"
