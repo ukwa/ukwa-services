@@ -59,6 +59,7 @@ def generate_cdx_dag(hadoop_service):
             'cdx_service' : f"http://{cdx_host}",
             'cdx_collection': cdx_col,
             'batch_size': c.hadoop_job_warc_batch_size,
+            'years_back': 10,
         },
         tags=['access', 'index', 'cdx', hadoop_service]
     ) as dag:
@@ -71,6 +72,7 @@ def generate_cdx_dag(hadoop_service):
 
     * Reads and updates TrackDB at `{dag.params['trackdb_url']}`
     * Processes WARCS on Hadoop `{dag.params['hadoop_service']}` in batches of `{dag.params['batch_size']}`
+    * Looks `{dag.params['years_back']}` years back, processing batches in reverse-chronological order.
     * Updates CDX collection `{dag.params['cdx_collection']}` on CDX service `{dag.params['cdx_service']}`
     * The push gateway is configured to be `{c.push_gateway}`.
 
@@ -107,7 +109,7 @@ def generate_cdx_dag(hadoop_service):
             'MRJOB_CONF': mrjob_conf,
             'PUSH_GATEWAY': c.push_gateway,
         },
-            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S webrecorder -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }}',
+            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S webrecorder -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }} --years-back {{ params.years_back }}',
         ) 
 
         cdx_fc = DockerOperator(
@@ -119,7 +121,7 @@ def generate_cdx_dag(hadoop_service):
             'MRJOB_CONF': mrjob_conf,
             'PUSH_GATEWAY': c.push_gateway,
         },
-            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S frequent -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }}',
+            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S frequent -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }} --years-back {{ params.years_back }}',
         ) 
 
         cdx_dc = DockerOperator(
@@ -131,10 +133,11 @@ def generate_cdx_dag(hadoop_service):
             'MRJOB_CONF': mrjob_conf,
             'PUSH_GATEWAY': c.push_gateway,
         },
-            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S domain -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }}',
+            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S domain -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }} --years-back {{ params.years_back }}',
         )
 
-        cdx_wr >> cdx_fc >> cdx_dc
+        # Run in strict order (can be helpful for checking/debugging but not needed usually)
+        #cdx_wr >> cdx_fc >> cdx_dc
 
         # Register the DAG
         globals()[dag_id] = dag

@@ -109,7 +109,7 @@ with DAG(
     'ddhapt_process_docs',
     default_args=default_args,
     description='Gets metadata for found documents, pushes them to W3ACT.',
-    schedule_interval='@daily',
+    schedule_interval='@hourly',
     start_date=days_ago(1),
     max_active_runs=1,
     catchup=False,
@@ -120,7 +120,7 @@ with DAG(
         'w3act_url': f"http://{c.ddhapt_w3act_web_conn.host}/act",
         'w3act_user': c.ddhapt_w3act_web_conn.login,
         'w3act_pw': c.ddhapt_w3act_web_conn.password,
-        'batch_size': 500,
+        'batch_size': 400,
     },
     tags=['ingest', 'docharv', 'w3act'],
 ) as dag2:
@@ -159,11 +159,12 @@ Tool container versions:
     doc_job = DockerOperator(
         task_id='ddhapt_process_docs_found',
         image=c.ukwa_task_image,
-        # Add Hadoop settings:
+        # Add proxy settings:
         environment= {
             'PUSH_GATEWAY': c.push_gateway,
             "HTTP_PROXY": EXTERNAL_WEB_PROXY,
             "HTTPS_PROXY": EXTERNAL_WEB_PROXY,
+            "NO_PROXY": "wa.bl.uk,ad.bl.uk",
         },
         command='docharv process -v \
             --act-url {{ params.w3act_url }} \
