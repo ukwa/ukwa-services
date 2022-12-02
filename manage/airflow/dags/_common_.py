@@ -12,6 +12,7 @@ class Config():
     # Pick up definitions for the deployment context, and any secrets:
     deployment_context = os.environ['DEPLOYMENT_CONTEXT']
     storage_path = os.environ['STORAGE_PATH']
+    w3act_static_web_root = os.path.join(os.environ['W3ACT_STORAGE'], 'static/' )
 
     # Define the connection parameters, e.g. you might want to change within a given deployment:
     # FIXME Do we need the webhdfs here?
@@ -28,7 +29,7 @@ class Config():
     hadoop_job_warc_batch_size = Variable.get('hadoop_job_warc_batch_size')
 
     # Define the common parameters for running Docker tasks:
-    w3act_task_image = 'ukwa/python-w3act:2.0.0'
+    w3act_task_image = 'ukwa/python-w3act:2.1.0'
     ukwa_task_image = 'ukwa/ukwa-manage:2.3.2'
     hadoop_docker_image = 'ukwa/docker-hadoop:2.1.2'
     postgres_image = 'postgres:9.6.2'
@@ -50,6 +51,7 @@ class Config():
             },
             'mounts': [
                 Mount( source=self.storage_path, target='/storage', type='bind' ),
+                Mount( source=self.w3act_static_web_root, target=self.w3act_static_web_root, type='bind' ),
                  ],
             'email_on_failure': True,
             'email': [

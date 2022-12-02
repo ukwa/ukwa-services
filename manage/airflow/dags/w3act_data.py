@@ -94,7 +94,7 @@ with DAG(
         'storage_path': c.storage_path,
         'collections_solr': collections_solr.get_uri(),
         'gitlab_wayback_acl_remote': gitlab_wayback_acl_remote,
-        'fc_crawler_kafka': f'{fc_crawler_kafka.host}:{fc_crawler_kafka.port}'
+        'w3act_static_web_root': c.w3act_static_web_root
     },
     tags=['access', 'w3act'],
 ) as dag1:
@@ -110,13 +110,7 @@ This dumps the W3ACT database and extracts useful data from it. This includes:
 - Metadata used for full-text indexing (`allows.txt`, `annotations.json`)
 - Crawl feeds and block lists (`crawl_feed_bypm.jsonl`, `crawl_feed_npld.jsonl`, `never_crawl.surts`)
 
-It also launches crawls:
-
-- Talks to the FC Crawler Kafka service at: `{dag1.params['fc_crawler_kafka']}` 
-- Reads the `bypm` feed and launches URLs for the current hour to the `fc.tocrawl.bypm` topic.
-- __DOES NOT LAUNCH NPLD CRAWLS YET__
-
-These are necessary pre-requisites for access processes, like indexing and playback.
+These are necessary pre-requisites for crawling and for access processes, like indexing and playback.
 
 Configuration:
 
@@ -131,12 +125,14 @@ Configuration:
     * That connection should only be set in production.
 * Pull those updated access lists from GitHub to where they are used for access.
     * **TODO** Move access updates (solr+acl) into a separate workflow, so they are decoupled and can be managed independently.
+* Export API JSON to a folder in `{c.w3act_static_web_root}`
 
 How to check it's working:
 
 * All export files indicated above are present and up-to-date in the `{c.storage_path}` folder on the host machine. 
 * The [`ukwa_record_count` metrics are up to date in Prometheus](http://monitor-prometheus.api.wa.bl.uk/graph?g0.expr=ukwa_record_count&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=2d).
 * Access lists up-to-date in GitLab.
+* API JSON available via W3ACT, e.g. for production: <https://www.webarchive.org.uk/act/static/>
 
 Tool container versions:
 
@@ -206,6 +202,13 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
         """,
     )
 
+    # Output JSON version of data to w3act_static_web_root
+    api_json_export = DockerOperator(
+        task_id='export_w3act_static_api_json',
+        image=c.w3act_task_image,
+        command='w3act csv-to-api-json --include-unpublished-collections -d /storage/{{ params.dump_name }} -o {{ params.w3act_static_web_root }}/api-json-including-unpublished',
+    )
+
     @task()
     def push_w3act_data_stats():
         from prometheus_client import CollectorRegistry, Gauge, push_to_gateway
@@ -239,25 +242,7 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
     stat = push_w3act_data_stats()
 
     # Define workflow dependencies:
-    cleanup >> dump >> [ acl, aclj, ann, cfld, cfby, never ] >> mvs >> [ socol, stat ]
-
-    # Launch crawls now the files are updated:
-    launch_bypm = DockerOperator(
-        task_id='launch_bypm_fc_crawl_urls',
-        image=c.crawlstreams_image,
-        command='launcher -k {{ params.fc_crawler_kafka }} -L {{ next_execution_date }} fc.tocrawl.bypm /storage/data_exports/crawl_feed_bypm.jsonl',
-    )
-
-    mvs >> launch_bypm
-
-    launch_npld = DockerOperator(
-        task_id='launch_npld_fc_crawl_urls',
-        image=c.crawlstreams_image,
-        command='launcher -k {{ params.fc_crawler_kafka }} -L {{ next_execution_date }} fc.tocrawl.npld /storage/data_exports/crawl_feed_npld.jsonl',
-    )
-
-    mvs >> launch_npld
-
+    cleanup >> dump >> [ acl, aclj, ann, cfld, cfby, never, api_json_export ] >> mvs >> [ socol, stat ]
 
     # Add optional dependency based on whether the GitLab remote is set:
     if gitlab_wayback_acl_remote:
@@ -280,7 +265,6 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
         )
 
         mvs >> acls_git
-
 
 
 # ----------------------------------------------------------------------------

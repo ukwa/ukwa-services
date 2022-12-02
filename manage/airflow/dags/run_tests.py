@@ -27,7 +27,7 @@ c = Config()
 default_args = c.get_default_args()
 
 # Pick up the output path:
-OUTPUT_PATH = os.path.join(os.environ['W3ACT_STORAGE'], 'static/' )
+OUTPUT_PATH = c.w3act_static_web_root
 
 # Need a proxy to talk to our websites on their public IPs/names:
 EXTERNAL_WEB_PROXY = os.environ['EXTERNAL_WEB_PROXY']
