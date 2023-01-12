@@ -1,5 +1,10 @@
 name: Deploy UKWA BETA Services
 
+on:
+  push:
+    branches:
+      - master
+
 jobs:
   test-job:
     runs-on: [self-hosted, ukwa-beta-swarm]
