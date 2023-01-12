@@ -4,11 +4,10 @@ jobs:
   test-job:
     runs-on: [self-hosted, ukwa-beta-swarm]
     steps:
-      - name: Run test for env vars
-        run: export
-        shell: bash
-    steps:
-      - name: Run test for files
-        run: ls
-        shell: bash
+    - name: Run test for env vars
+      run: export
+      shell: bash
+    - name: Run test for files
+      run: ls
+      shell: bash
 
