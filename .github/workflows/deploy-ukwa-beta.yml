@@ -7,7 +7,7 @@ on:
 
 jobs:
   test-job:
-    runs-on: [self-hosted, ukwa-beta-swarm]
+    runs-on: [self-hosted, linux, x64, ukwa-beta-swarm]
     steps:
     - name: Run test for env vars
       run: export
