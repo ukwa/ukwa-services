@@ -13,6 +13,6 @@ jobs:
       run: export
       shell: bash
     - name: Run test for files
-      run: ls
+      run: ls $HOME
       shell: bash
 
