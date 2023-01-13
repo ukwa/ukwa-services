@@ -9,17 +9,14 @@ services:
 # -----------------------------------------------------------
 
   robot:
-    image: ukwa/robot-framework:latest
+    image: ukwa/robot-framework:1.2.0
     environment: 
       - "HOST=${HOST}"
       - "PUSH_GATEWAY=${PUSH_GATEWAY}"
       - "PROMETHEUS_JOB_NAME=${PROMETHEUS_JOB_NAME}"
+      - "HTTPS_PROXY=${HTTPS_PROXY}"
     volumes:
-      - ./make_profile.py:/make_profile.py
-      - ./tests:/tests:ro
       - ./results:/results:rw
-    depends_on:
-      - hub
     deploy:
       restart_policy:
         # Run once:
@@ -27,33 +24,4 @@ services:
         # If it fails, run every hour:
         delay: 60m
 
-  firefox:
-    image: selenium/node-firefox:3.141.59-zinc
-    volumes:
-      - /dev/shm:/dev/shm
-    environment:
-      - "http_proxy=${http_proxy}"
-      - "https_proxy=${https_proxy}"
-      - "no_proxy=hub"
-      - "HUB_HOST=hub"
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME" /opt/bin/entry_point.sh'
-
-  chrome:
-    image: selenium/node-chrome:3.141.59-zinc
-    volumes:
-      - /dev/shm:/dev/shm
-    environment:
-      - "http_proxy=${http_proxy}"
-      - "https_proxy=${https_proxy}"
-      - "no_proxy=hub"
-      - "HUB_HOST=hub"
-    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME" /opt/bin/entry_point.sh'
-
-  hub:
-    image: selenium/hub:3.141.59-zinc
-    ports:
-      - "4444:4444"
-    depends_on:
-      - firefox
-      - chrome
 
