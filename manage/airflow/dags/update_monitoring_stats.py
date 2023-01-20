@@ -71,7 +71,7 @@ Tool container versions:
         image=c.stat_pusher_image,
         environment={
           "HTTPS_PROXY": EXTERNAL_WEB_PROXY,
-          "ENV": 'prod',
+          "ENVIRON": 'prod',
           'PUSH_GATEWAY': c.push_gateway,
         },
         # Runs with the default command. None set here.
