@@ -4,4 +4,6 @@ URL=$1
 
 echo Checking pending URLs starting from: $URL
 
-docker run --net=host -ti ukwa/hapy h3cc -H crawler05.n45.bl.uk -u admin -p ${CRAWLER_PWD} -q $URL -l 1000 pending-urls-from
+echo Need a password set, ${CRAWLER_PWD}
+
+docker run --net=host -ti ukwa/hapy h3cc -H localhost -u admin -p ${CRAWLER_PWD} -q $URL -l 100 pending-urls-from
