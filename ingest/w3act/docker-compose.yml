@@ -145,8 +145,12 @@ services:
      - "PYTHONPATH=/app"
      - "API_PREFIX=https://${SERVER_NAME}"
      - "WB_PREFIX=https://${SERVER_NAME}"
+     - "TRACKDB_LIST_JSONL=/storage/trackdb_list.jsonl"
+     - "AWS_S3_LIST_JSONL=/storage/aws_s3_list.jsonl"
     ports:
       - 8866:8866
+    volumes:
+      - "${STORAGE_PATH}:/storage"
 
   grafana:
     image: grafana/grafana-oss:8.3.4

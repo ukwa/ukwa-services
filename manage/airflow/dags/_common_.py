@@ -30,7 +30,7 @@ class Config():
 
     # Define the common parameters for running Docker tasks:
     w3act_task_image = 'ukwa/python-w3act:2.1.0'
-    ukwa_task_image = 'ukwa/ukwa-manage:2.3.7'
+    ukwa_task_image = 'ukwa/ukwa-manage:2.3.8'
     hadoop_docker_image = 'ukwa/docker-hadoop:2.1.2'
     postgres_image = 'postgres:9.6.2'
     rclone_image = 'rclone/rclone:1.58'
