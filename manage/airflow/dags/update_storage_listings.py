@@ -58,11 +58,12 @@ This task:
 
 Configuration:
 
-* Updates [this Prometheus Push Gateway](http://{c.push_gateway}) _??? TBA ???_
+* Uses AWS keys defined in an Airflow Connection called `amazon_s3`.
 
 How to check it's working:
 
-* _TBA..._ {c.storage_path}
+* Fresh JSONL listings in {c.storage_path}: `trackdb_list.jsonl`, `aws_s3_list.jsonl`
+* The [holdings report](https://www.webarchive.org.uk/act/nbapps/voila/render/ukwa-holdings-summary-report.ipynb) is working and presenting that data.
 
 Tool container versions:
 
