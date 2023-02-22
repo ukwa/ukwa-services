@@ -1,4 +1,4 @@
-# Generally, block infinite traps;
+# Generally, block infinite traps, and avoid archives copies of websites interfering with live sites search presence:
 User-agent: *
 Disallow: /wayback/
 Disallow: /ukwa/search
@@ -7,6 +7,9 @@ Disallow: /cy/ukwa/search
 Disallow: /gd/ukwa/search
 Disallow: /datasets/
 Disallow: /shine/search
+# Allow search engines to index specific sites:
+# As requested in https://github.com/ukwa/ukwa-services/issues/96
+Allow: /wayback/archive/*/http://www.europeandialogue.org/
 
 # Allow Twitterbot so social cards work:
 User-agent: Twitterbot
@@ -14,8 +17,3 @@ Allow: /wayback/
 
 User-agent: facebookexternalhit
 Allow: /wayback/
-
-# Allow search engines to index specific sites:
-User-agent: *
-# As requested in https://github.com/ukwa/ukwa-services/issues/96
-Allow: /wayback/archive/*/http://www.europeandialogue.org/

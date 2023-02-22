@@ -66,7 +66,7 @@ services:
       - "7171:8080"
     volumes:
       - ./config/pywb/config.yaml:/webarchive/config.yaml
-      #- ./config/pywb/uwsgi.ini:/ukwa_pywb/uwsgi.ini
+      - ./config/pywb/uwsgi.ini:/ukwa_pywb/uwsgi.ini
       # Used to store the access control lists used by the pywb services.
       - "${PWYB_ACL_PATH}:/ukwa_pywb/acl/"
     deploy:
