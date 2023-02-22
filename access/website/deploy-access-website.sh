@@ -9,7 +9,7 @@ fi
 
 # Defaults for container versions:
 export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.4"
-export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.0.1"
+export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.0.2"
 export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.9"
 export API_IMAGE="ukwa/ukwa-access-api:1.0.1"
 
@@ -35,7 +35,7 @@ else
     # dev vars
     export UKWA_UI_IMAGE="ukwa/ukwa-ui:master"
     export UKWA_NGINX_IMAGE="ukwa/ukwa-site:master"
-    export PYWB_IMAGE="ukwa/ukwa-pywb:master"
+    export PYWB_IMAGE="ukwa/ukwa-pywb:2.7.x"
     export API_IMAGE="ukwa/ukwa-access-api:master"
     export SERVER_NAME=dev.webarchive.org.uk
     export DEPLOYMENT_TAG=dev
