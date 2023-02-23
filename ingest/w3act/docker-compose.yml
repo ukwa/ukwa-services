@@ -139,7 +139,8 @@ services:
   # -------------------------------------------------------------
   nbapps:
     image: ukwa/ukwa-notebook-apps:master
-    command: "--base_url=/act/nbapps/ --no-browser --Voila.ip=0.0.0.0 --debug /app"
+    # Make sure idle kernels get shut down (or we will run out of memory!):
+    command: "--MappingKernelManager.cull_interval=60 --MappingKernelManager.cull_idle_timeout=120 --base_url=/act/nbapps/ --no-browser --Voila.ip=0.0.0.0 --debug /app"
     environment:
      - "HTTPS_PROXY=http://explorer.bl.uk:3127" # This is needed because we're talking to the live public API (we should have an internal one)
      - "PYTHONPATH=/app"
