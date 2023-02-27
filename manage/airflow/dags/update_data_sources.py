@@ -81,7 +81,7 @@ Tool container versions:
         task_id='update_nominet_data',
         ssh_conn_id=EXT_DATA_SSH_CONN_ID,
         # Can't use environment without modifying SSH AcceptEnv setup.
-        command="docker run -e NOM_HOST={{ params.NOM_HOST }} -e NOM_USER={{ params.NOM_USER }} -e NOM_PWD='{{ params.NOM_PWD }}' {{ params.TASK_CONTAINER_IMAGE }} python -m lib.store.nominet"
+        command="docker run -e NOM_HOST={{ params.NOM_HOST }} -e NOM_USER={{ params.NOM_USER }} -e NOM_PWD='{{ params.NOM_PWD }}' --add-host h3httpfs.api.wa.bl.uk:192.168.45.40 {{ params.TASK_CONTAINER_IMAGE }} python -m lib.store.nominet"
     )
 
 

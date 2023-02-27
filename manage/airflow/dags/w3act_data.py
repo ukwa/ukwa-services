@@ -255,10 +255,10 @@ mv -f /storage/data_exports/crawl_feed_bypm.jsonl.new /storage/data_exports/craw
             git config user.email '{{ var.value.alert_email_address }}'
             git config user.email
             git config user.name 'Airflow W3ACT Export Task'
-            git pull origin master
+            git -c http.sslVerify=false pull origin master
             if [[ `git status --porcelain` ]]; then
             git commit -m 'Automated update from Airflow at {{ ts }} by {{ task_instance_key_str }}.' -a
-            git push {{ params.gitlab_wayback_acl_remote }} master
+            git -c http.sslVerify=false push {{ params.gitlab_wayback_acl_remote }} master
             fi
             "
             """,
