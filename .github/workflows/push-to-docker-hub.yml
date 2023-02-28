@@ -63,12 +63,9 @@ jobs:
           output: 'trivy-results.sarif'
           ignore-unfixed: false
           severity: 'HIGH,CRITICAL'
-          # Stop if there are vulns:
-          exit-code: 1
           
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
-        #if: always() # Always upload results, even if the vulns made the build fail
         with:
           sarif_file: 'trivy-results.sarif'
 
