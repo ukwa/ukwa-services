@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  TEST_TAG: ${{ inputs.image_name }}-test:${{ github.sha }}
+  TEST_TAG: ${{ inputs.image_name }}:testimage
 
 jobs:
   push_to_docker_hub:
