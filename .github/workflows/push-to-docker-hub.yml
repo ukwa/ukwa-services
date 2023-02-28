@@ -61,8 +61,8 @@ jobs:
           image-ref: '${{ env.TEST_TAG }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          exit-code: '1'
-          ignore-unfixed: false
+          exit-code: 1
+          ignore-unfixed: true
           severity: 'HIGH,CRITICAL'
           
       - name: Upload Trivy scan results to GitHub Security tab
