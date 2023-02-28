@@ -64,11 +64,22 @@ jobs:
           fail-build: false
           severity-cutoff: critical
 
-# Skipping upload for now:
-#      - name: Upload Anchore scan SARIF report
-#        uses: github/codeql-action/upload-sarif@v1
+      - name: Upload Anchore scan SARIF report
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+#      - name: Upload Trivy scan results to GitHub Security tab
+#        uses: github/codeql-action/upload-sarif@v2
 #        with:
-#          sarif_file: ${{ steps.scan.outputs.sarif }}
+#          sarif_file: 'trivy-results.sarif'
 
       - name: Build and push to Docker Hub
         uses: docker/build-push-action@v2
