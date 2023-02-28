@@ -61,7 +61,7 @@ jobs:
           image-ref: '${{ env.TEST_TAG }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          ignore-unfixed: true
+          ignore-unfixed: false
           severity: 'CRITICAL,HIGH'
           exit-code: '1' # Stop if there are vulns
           
