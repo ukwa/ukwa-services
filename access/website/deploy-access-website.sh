@@ -8,7 +8,7 @@ if ! [[ ${ENVIRON} =~ dev|beta|prod ]]; then
 fi
 
 # Defaults for container versions:
-export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.4"
+export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.5"
 export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.0.4"
 export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.9"
 export API_IMAGE="ukwa/ukwa-access-api:1.0.1"
