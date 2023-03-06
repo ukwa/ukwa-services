@@ -28,6 +28,7 @@ services:
     depends_on:
       - clamd
       - webrender
+      - crawler-cdx
     networks:
       - default
       - kafka
@@ -58,6 +59,7 @@ services:
     depends_on:
       - clamd
       - webrender
+      - crawler-cdx
     networks:
       - default
       - kafka
@@ -68,6 +70,21 @@ services:
     image: ukwa/clamd
     deploy:
       replicas: 8
+
+  # CDX server for deduplication and last-crawled-at:
+  crawler-cdx:
+    image: nlagovau/outbackcdx:0.11.0
+    command: "java -Xmx8g -jar /outbackcdx.jar -d /crawldb-fc -b 0.0.0.0 -p 8081 -t 5000 -u"
+    ports:
+      - "8081:8081"
+    volumes:
+      - ${CDX_STORAGE_PATH}:/crawldb-fc
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
 
   # ----------------------------------------------
   # WARC Proxy
@@ -89,6 +106,8 @@ services:
       nproc: 2000  # See https://github.com/internetarchive/warcprox/blob/2.x/warcprox/warcproxy.py#L413
     deploy:
       replicas: 1
+    depends_on:
+      - crawler-cdx
     networks:
       - default
       - kafka

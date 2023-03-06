@@ -21,6 +21,7 @@ mkdir -p ${STORAGE_PATH}/surts/npld
 mkdir -p ${STORAGE_PATH}/surts/bypm
 mkdir -p ${TMP_STORAGE_PATH}/heritrix/npld/state
 mkdir -p ${TMP_STORAGE_PATH}/heritrix/bypm/state
+mkdir -p ${CDX_STORAGE_PATH}
 mkdir -p /tmp/webrender
 mkdir -p ${STORAGE_PATH}/prometheus-data
 
