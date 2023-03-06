@@ -12,7 +12,7 @@ services:
       - 9118:9118 # metrics
     env_file: heritrix-shared-settings.env
     environment:
-      - "CRAWL_NAME=dc2022"
+      - "CRAWL_NAME=dc2023"
       - "LAUNCH_AUTOMATICALLY=false"
       - "KAFKA_SEEK_TO_BEGINNING=false"
       - "KAFKA_TOCRAWL_TOPIC=dc.tocrawl"
@@ -42,16 +42,16 @@ services:
       - "FRONTIER_JE_EVICTOR_MAX_THREADS=16" # Also allow more evictor when needed
       - "HERITRIX_OUT=/heritrix/output/heritrix_out.log"
     volumes:
-      - "/heritrix/output:/heritrix/output"
-      - "/heritrix/state:/heritrix/state"
-      - "/heritrix/scratch:/heritrix/scratch"
+      - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
+      - "${STORAGE_PATH}/heritrix/state:/heritrix/state"
+      - "${STORAGE_PATH}/heritrix/scratch:/heritrix/scratch"
       - "./shared:/shared" # Shared configuration - surts file held here.
       #- "./heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml" # Tweak the beans for DC.
       - "./heritrix/uriuniqfilter-bloom.xml:/jobs/frequent/uriuniqfilter.xml" # Use a Bloom filter for the domain crawl.
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname == ip-172-31-27-250.eu-west-2.compute.internal] # Only allow it to deploy on the appropriate server
+        constraints: [node.hostname == crawler04] # Only allow it to deploy on the appropriate server
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     ulimits:
       nproc: 65535
@@ -90,7 +90,7 @@ services:
         protocol: tcp
         mode: host
     volumes:
-      - /opt/data/cdx:/cdx-data
+      - "${STORAGE_PATH}/cdx-data:/cdx-data"
     logging:
       driver: "json-file"
       options:
@@ -107,8 +107,8 @@ services:
     ports:
       - 9191:9090
     volumes:
-      - "/heritrix/output/prometheus/config:/etc/prometheus"
-      - "/heritrix/output/prometheus/data:/prometheus"
+      - "${STORAGE_PATH}/heritrix/output/prometheus/config:/etc/prometheus"
+      - "${STORAGE_PATH}/heritrix/output/prometheus/data:/prometheus"
     user: root
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
