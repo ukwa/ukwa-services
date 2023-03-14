@@ -1,6 +1,12 @@
 INDEX:   &INDEX ${UKWA_INDEX}
 ARCHIVE: &ARCHIVE ${UKWA_ARCHIVE}
 
+ui:
+    logo: ukwa-2018-w-sml.png
+    navbar_background_hex: 2e6dd9
+    navbar_color_hex: fff
+    navbar_light_buttons: true
+
 collections:
     # open access (with access controls) under /archive/
     archive:
