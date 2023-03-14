@@ -5,6 +5,7 @@ Tasks handling pulling data from other sources
 """
 import json
 import os
+import datetime as dt
 
 from airflow.decorators import task
 from airflow.utils.decorators import apply_defaults
@@ -40,7 +41,8 @@ with DAG(
     description='Update our copy of domain data from Nominet.',
     default_args=default_args, 
     schedule_interval='@monthly',
-    start_date=days_ago(1),
+    # Needs a proper start date in order to schedule properly:
+    start_date=dt.datetime(2023, 1, 1),
     catchup=False,
     max_active_runs=1,
     params={
