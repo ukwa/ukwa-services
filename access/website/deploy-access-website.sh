@@ -24,6 +24,8 @@ if [[ ${ENVIRON} == 'prod' ]]; then
     source /mnt/nfs/prod1/access/gitlab/ukwa-services-env/prod.env
 
 elif [[ ${ENVIRON} == 'beta' ]]; then
+    export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.1.0"
+    export PYWB_IMAGE="ukwa/ukwa-pywb:2.7.x"
     export SERVER_NAME=beta.webarchive.org.uk
     export DEPLOYMENT_TAG=beta
     export STORAGE_PATH_WEBSITE=/mnt/gluster/beta/access/data/website
