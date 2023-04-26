@@ -53,8 +53,6 @@ services:
       - ${STORAGE_PATH}/prom-jmx/:/prom-jmx
     deploy:
       replicas: 1
-      placement:
-        constraints: [node.hostname == crawler04]
 
   # Kafka UI
   ui:

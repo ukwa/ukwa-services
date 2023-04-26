@@ -4,7 +4,7 @@ services:
 
   # UKWA Heritrix for NPLD
   npld-dc-heritrix-worker:
-    image: ukwa/heritrix:2.9.1
+    image: ukwa/heritrix:2.9.3
     hostname: "npld-dc-heritrix3-worker-{{.Task.Slot}}"
     ports:
       - 8443:8443 # https
@@ -48,10 +48,10 @@ services:
       - "./shared:/shared" # Shared configuration - surts file held here.
       #- "./heritrix/crawler-beans.cxml:/jobs/frequent/crawler-beans.cxml" # Tweak the beans for DC.
       - "./heritrix/uriuniqfilter-bloom.xml:/jobs/frequent/uriuniqfilter.xml" # Use a Bloom filter for the domain crawl.
+      # Block some URLs that we shouldn't have done:
+      - "./jobs/frequent/excludes.xml:/jobs/frequent/excludes.xml"
     deploy:
       replicas: 1
-      placement:
-        constraints: [node.hostname == crawler04] # Only allow it to deploy on the appropriate server
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     ulimits:
       nproc: 65535
@@ -107,8 +107,8 @@ services:
     ports:
       - 9191:9090
     volumes:
-      - "${STORAGE_PATH}/heritrix/output/prometheus/config:/etc/prometheus"
-      - "${STORAGE_PATH}/heritrix/output/prometheus/data:/prometheus"
+      - "${STORAGE_PATH}/heritrix/prometheus/config:/etc/prometheus"
+      - "${STORAGE_PATH}/heritrix/prometheus/data:/prometheus"
     user: root
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'

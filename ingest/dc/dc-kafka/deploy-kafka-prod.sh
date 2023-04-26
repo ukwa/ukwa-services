@@ -1,6 +1,7 @@
 #!/bin/sh
 export CURRENT_UID=$(id -u):$(id -g)
-export STORAGE_PATH=/mnt/lr10/dc
+
+source ../prod.env
 
 sudo mkdir -p ${STORAGE_PATH}/zookeeper/data
 sudo mkdir -p ${STORAGE_PATH}/zookeeper/datalog
