@@ -70,10 +70,16 @@ x-airflow-common:
     - "${STORAGE_PATH}/airflow/logs:/opt/airflow/logs"
     - "${STORAGE_PATH}:/storage"
     - "/var/run/docker.sock:/var/run/docker.sock"
+    # ANJ Add connection to host server ssh credentials so we can use DOCKER_URL="ssh://user@host" in DockerOperators
+    # Requires airflow user and uid to match up properly with host, as per usual install, and /home/airflow to be accessible cross-cluster
+    - "/home/airflow/.ssh:/home/airflow/.ssh"
   user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
   depends_on:
     - redis
     - postgres
+  extra_hosts:
+    # Add aliases for hosts that are not in DNS
+    crawler08.n45.bl.uk: 192.168.45.21
 
 services:
   postgres:
