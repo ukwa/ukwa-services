@@ -150,7 +150,8 @@ Tool container versions:
     # - a 'orphaned' crawl.log will not get picked up at present.
     # - the '--no-traverse' command avoids the system listing the HDFS remote contents ahead of time, which is quicker in our case.
     # - switch to --suffix EXEC_DATE_STAMP imstead of --immutable?
-    # - Changed from the defaults '--transfers 4' and '--checkers 8', which took ~30m/330. t=8 seemed to be slower 3h40m/1514
+    # - The default '--transfers 4' already saturates the 1Gbps/125MBps outgoing connection.
+    # - The default '--checkers 8' also saturated the incoming connection.
     # - the '--use-json-log' flag isn't that helpful in this context, so not using it at present.
     # - the '--delete-empty-src-dirs' deleted prometheus stuff and said it deleted the whole folder which was very alarming.
     shared_cmd =' --include "*{{ ds_nodash }}*.warc.gz"'\
@@ -158,7 +159,7 @@ Tool container versions:
                 ' --no-traverse'\
                 ' --immutable'\
                 ' --transfers 4'\
-                ' --checkers 12'\
+                ' --checkers 8'\
                 ' -v'
 
     # Copy the content up:
