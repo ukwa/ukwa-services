@@ -33,7 +33,7 @@ class Config():
     ukwa_task_image = 'ukwa/ukwa-manage:2.3.8'
     hadoop_docker_image = 'ukwa/docker-hadoop:2.1.2'
     postgres_image = 'postgres:9.6.2'
-    rclone_image = 'rclone/rclone:1.58'
+    rclone_image = 'rclone/rclone:1.62'
     crawlstreams_image = 'ukwa/crawl-streams:1.0.1'
     rf_image = 'ukwa/robot-framework:1.2.0'
     stat_pusher_image = 'ukwa/monitor-stat-pusher:master'

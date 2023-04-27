@@ -117,7 +117,7 @@ Tool container versions:
     shared_mounts = [
         Mount( 
             # Specify heritrix sub-folder as that's where the permissions are set right:
-            source=f"{dag.params['host_dir']}/heritrix/output.local", 
+            source=f"{dag.params['host_dir']}/heritrix/output", 
             target=f"{dag.params['host_dir']}/heritrix/output", 
             type='bind'
         ),
@@ -160,11 +160,12 @@ Tool container versions:
                 ' --immutable'\
                 ' --transfers 4'\
                 ' --checkers 8'\
-                ' -v'
+                ' -vv'
 
     # Copy the content up:
     copy_to_hdfs = DockerOperator(
         task_id='copy-to-hdfs',
+        # No point using --checksum here as the HDFS remote does not support checksums:
         command=f'copy {shared_cmd} {{{{ params.host_dir }}}}/heritrix/output h3:/heritrix/output',
         docker_url=dag.params['docker_url'],
         image=c.rclone_image,
