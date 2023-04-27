@@ -173,11 +173,11 @@ Tool container versions:
         mounts=shared_mounts,
         environment=shared_env,
         tty=True, # <-- So we see logging
-        #do_xcom_push=False,
+        do_xcom_push=False,
         mount_tmp_dir=False, # Because remote
     )
 
-    # Compare against HDFS using checksums, forcing the h3-hasher remote to calculate and store them:
+    # Run checksum comparison against HDFS, using --download to make the h3-hasher remote calculate checksums and store them:
     compare_to_hdfs = DockerOperator(
         task_id='compare-to-hdfs',
         command=f'check --one-way --download {shared_cmd} {{{{ params.host_dir }}}}/heritrix/output h3-hasher:/heritrix/output',
@@ -191,7 +191,7 @@ Tool container versions:
         mount_tmp_dir=False, # Because remote
     )
 
-    # Move to HDFS, verifying the (rclone-cached) local checksums against the (rclone-hasher-hached) remote checksums: 
+    # Move to HDFS, verifying the (rclone-cached) local checksums against the (rclone-hasher-cached) remote checksums: 
     move_to_hdfs = DockerOperator(
         task_id='move-to-hdfs',
         command=f'move --checksum {shared_cmd} {{{{ params.host_dir }}}}/heritrix/output h3-hasher:/heritrix/output',
