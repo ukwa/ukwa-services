@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?> 	
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:aop="http://www.springframework.org/schema/aop" 
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd            
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+                           
+    <!-- This configuration allows regular expressions to be used to 
+    exclude resources, rather than just SURT prefixes -->
+    <bean id="scopeExcludesList" class="java.util.ArrayList">
+        <constructor-arg>
+          <list>
+        	<value>^.+ProductCats\.asp\?Keywords=.+xargs=.+$</value>
+			<value>^.+index\.php\?Keywords=.+xargs=.+$</value>
+			<value>^.+\.uk/.*\bcheckout\b.*$</value>
+			<value>^.+GetSearchResults\.php\?Query=.*%5C.*$</value>
+			<value>^.+index\.php.+index\.php.*$</value>
+			<value>^.{512,}$</value>
+			<value>^.+camcycle\.org.+camcycle\.org.*$</value>
+			<value>^.+/cart/add/.+$</value>
+			<value>^.+jobs\.staffs\.ac\.uk/[A-Za-z0-9+/]{20,}.+$</value>
+			<value>^.+%20%20%20.+$</value>
+			<value>^.+/cms/events/calendar/.+/2014/.+$</value>
+			<value>^.+/cms/events/calendar/.+/2012/.+$</value>
+			<value>^.+ncl\.ac\.uk.+https%3.+$</value>
+			<value>^https?://[^/]+/catalog/product_compare/(add|remove)/.+$</value>
+			<value>^.+index\.php\?qs=06oENya.+$</value>
+			<value>^https?://[^/]+\.bbc\.co\.uk/iplayer/.*$</value>
+			<value>^.+action=buy_now.*$</value>
+			<value>^.+?mobile_switch=mobile</value>
+			<value>^https?://twitter\.com/.+\?lang=.+$</value>
+			<!-- Wordpress comment reply forms (from PANDAS/NLA) -->
+			<value>.*\?(?:.*&amp;)?replytocom=\d+</value>
+			<!-- Avoid Wordpress admin pages (from PANDAS/NLA) -->
+			<value>https?://[^/]+/wp-admin/.*</value>
+			<!-- Also block some over-zealous crawling from this particular crawl -->
+			<value>https?://[^/]+/humans.txt</value>
+			<value>https?://[^/]+/sellers.json</value>
+			<value>https?://[^/]+/.well-known/security.txt</value>
+			<value>https?://[^/]+/.well-known/host-meta.json</value>
+			<value>https?://[^/]+/.well-known/dat</value>
+           </list>
+         </constructor-arg>
+    </bean>
+   
+</beans>
