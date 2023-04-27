@@ -88,5 +88,5 @@ dag = DAG(
 )
 
 bash_task = BashOperator(task_id='run_airflow_db_clean',
-                         bash_command="airflow db clean -v --skip-archive --clean-before-timestamp '{{ macros.ds_add(ds, -params.max_days) }}'",
+                         bash_command="airflow db clean -v --yes --skip-archive --clean-before-timestamp '{{ macros.ds_add(ds, -params.max_days) }}'",
                          dag=dag)
