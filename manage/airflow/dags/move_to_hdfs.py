@@ -53,25 +53,33 @@ This task performs some work to tidy up the WARCs and logs from the crawler.
 
 * Uses the rclone command to upload data to HDFS.
     * Requires rclone >= 1.58.0 as [that is the first version with HDFS file move support](https://rclone.org/changelog/#v1-58-0-2022-03-18).
-* Does not need to be backfilled, as each run always attempts to catch up with all uploads.
-* **CURRENTLY HARDCODED TO DRY-RUN ONLY**
+* Selects WARCs and logs with file names reflecting the execution date, so uses backfill to ensure all data is transferred.
+    * TODO Any 'orphaned' crawl.log files will not get picked up at present.
+* Uses a copy/check/move process. The check step compares the files against HDFS and calculates the content hashes using rclone's `hasher` module.
+* The '--no-traverse' command avoids the system listing the HDFS remote contents ahead of time, which is quicker in our case.
+* The default '--transfers 4' already saturates the 1Gbps/125MBps outgoing connection.
+* The default '--checkers 8' also saturated the incoming connection.
+* The '--use-json-log' flag isn't that helpful in this context, so not using it at present.
+* TODO Switch to --suffix EXEC_DATE_STAMP imstead of --immutable?
+* TODO The '--delete-empty-src-dirs' deleted prometheus stuff and said it deleted the whole folder which was very alarming.
 
 Configuration:
 
-* Runs rclone remotely as user { dag.params['host_user'] } via DOCKER_HOST={ dag.params['docker_url'] }.
+* Runs rclone remotely on { dag.params['source'] } as user { dag.params['host_user'] } via DOCKER_HOST={ dag.params['docker_url'] }.
 * The tasks are configured to look for completed WARCs and log files under `{dag.params['host_dir']}/heritrix/output`.
-* The push gateway is configured to be `{c.push_gateway}`.
+* The push gateway is configured to be `{c.push_gateway}`. 
 
 How to check it's working:
 
-* The Task Instance logs in Airflow will show e.g. how many WARCs were copied.
+* The Task Instance logs in Airflow will show details of the data being copied.
+* The source and target folder can be inspected to determine what's changed.
+* TODO Currently, no metrics are pushed to Prometheus.
 
 Tool container versions:
 
  * Rclone Image: `{c.rclone_image}`
-
       
-    2023/04/26 15:09:53 INFO  : prometheus/data/wal/checkpoint.00000253: Removing directory
+2023/04/26 15:09:53 INFO  : prometheus/data/wal/checkpoint.00000253: Removing directory
 2023/04/26 15:09:53 INFO  : prometheus/data/wal: Removing directory
 2023/04/26 15:09:53 INFO  : prometheus/data/chunks_head: Removing directory
 2023/04/26 15:09:53 INFO  : prometheus/data/01GYZ18BCQCV0VQZAGQ2MFCQHS/chunks: Removing directory
@@ -145,15 +153,6 @@ Tool container versions:
         'RCLONE_CONFIG_H3-HASHER_REMOTE': 'h3:',
     }
     # Define the critical common rclone parameters here for easy re-use:
-    # Notes:
-    # - we only look for complete WARCs and checkpointed logs with the given date in them.
-    # - a 'orphaned' crawl.log will not get picked up at present.
-    # - the '--no-traverse' command avoids the system listing the HDFS remote contents ahead of time, which is quicker in our case.
-    # - switch to --suffix EXEC_DATE_STAMP imstead of --immutable?
-    # - The default '--transfers 4' already saturates the 1Gbps/125MBps outgoing connection.
-    # - The default '--checkers 8' also saturated the incoming connection.
-    # - the '--use-json-log' flag isn't that helpful in this context, so not using it at present.
-    # - the '--delete-empty-src-dirs' deleted prometheus stuff and said it deleted the whole folder which was very alarming.
     shared_cmd =' --include "*{{ ds_nodash }}*.warc.gz"'\
                 ' --include "crawl.log.cp*{{ ds_nodash }}*"' \
                 ' --no-traverse'\
