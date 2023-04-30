@@ -53,15 +53,15 @@ This task performs some work to tidy up the WARCs and logs from the crawler.
 
 * Uses the rclone command to upload data to HDFS.
     * Requires rclone >= 1.58.0 as [that is the first version with HDFS file move support](https://rclone.org/changelog/#v1-58-0-2022-03-18).
-* Selects WARCs and logs with file names reflecting the execution date, so uses backfill to ensure all data is transferred.
+* Selects WARCs and logs last modified between one and three days ago, so uses backfill to ensure all data is transferred.
     * TODO Any 'orphaned' crawl.log files will not get picked up at present.
 * Uses a copy/check/move process. The check step compares the files against HDFS and calculates the content hashes using rclone's `hasher` module.
-* The '--no-traverse' command avoids the system listing the HDFS remote contents ahead of time, which is quicker in our case.
-* The default '--transfers 4' already saturates the 1Gbps/125MBps outgoing connection.
-* The default '--checkers 8' also saturated the incoming connection.
-* The '--use-json-log' flag isn't that helpful in this context, so not using it at present.
-* TODO Switch to --suffix EXEC_DATE_STAMP imstead of --immutable?
-* TODO The '--delete-empty-src-dirs' deleted prometheus stuff and said it deleted the whole folder which was very alarming.
+* The `--no-traverse` command avoids the system listing the HDFS remote contents ahead of time, which is quicker in our case.
+* The default `--transfers 4` already saturates the 1Gbps/125MBps outgoing connection.
+* The default `--checkers 8` also saturated the incoming connection.
+* The `--use-json-log` flag isn't that helpful in this context, so not using it at present.
+* TODO Switch to `--suffix` EXEC_DATE_STAMP instead of `--immutable`?
+* TODO The `--delete-empty-src-dirs` deleted prometheus stuff and said it deleted the whole folder which was very alarming.
 
 Configuration:
 
@@ -153,13 +153,18 @@ Tool container versions:
         'RCLONE_CONFIG_H3-HASHER_REMOTE': 'h3:',
     }
     # Define the critical common rclone parameters here for easy re-use:
-    shared_cmd =' --include "*{{ ds_nodash }}*.warc.gz"'\
-                ' --include "crawl.log.cp*{{ ds_nodash }}*"' \
+    shared_cmd =' --include "*.warc.gz"'\
+                ' --include "crawl.log.cp*"' \
+                ' --include "crawl.log.\d+"' \
+                ' --min-age {{ ds }}'\
+                ' --max-age {{ macros.ds_add( ds, -2) }}'\
+                ' --dump filters'\
                 ' --no-traverse'\
                 ' --immutable'\
                 ' --transfers 4'\
                 ' --checkers 8'\
                 ' -vv'
+    #' --dry-run'\
 
     # Copy the content up:
     copy_to_hdfs = DockerOperator(
