@@ -153,10 +153,13 @@ Tool container versions:
         'RCLONE_CONFIG_H3-HASHER_REMOTE': 'h3:',
     }
     # Define the critical common rclone parameters here for easy re-use:
+    # Use 'next_ds' as the start of that day marks the end of the previous period.
+    # This is fine because these files don't get written to after they have these names.
+    # i.e. crawl.log and WARCNAME.warc.gz.out are the 'live' names.
     shared_cmd =' --include "*.warc.gz"'\
                 ' --include "crawl.log.cp*"' \
                 ' --include "crawl.log.\d+"' \
-                ' --min-age {{ ds }}'\
+                ' --min-age {{ next_ds }}'\
                 ' --max-age {{ macros.ds_add( ds, -2) }}'\
                 ' --dump filters'\
                 ' --no-traverse'\
