@@ -155,7 +155,7 @@ Tool container versions:
     # Define the critical common rclone parameters here for easy re-use:
     # Use 'next_ds' as the start of that day marks the end of the previous period.
     # This is fine because these files don't get written to after they have these names.
-    # i.e. crawl.log and WARCNAME.warc.gz.out are the 'live' names.
+    # (i.e. crawl.log and WARCNAME.warc.gz.out are the 'live' names.)
     shared_cmd =' --include "*.warc.gz"'\
                 ' --include "crawl.log.cp*"' \
                 ' --include "crawl.log.\d+"' \

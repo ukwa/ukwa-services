@@ -40,9 +40,12 @@ with DAG(
     'update_nominet_data',
     description='Update our copy of domain data from Nominet.',
     default_args=default_args, 
-    schedule_interval='@monthly',
+    # Run midnight on the 3rd day of the month:
+    schedule_interval='0 0 3 * *',
     # Needs a proper start date in order to schedule properly:
     start_date=dt.datetime(2023, 1, 1),
+    # Give a decent delay in case the server is down:
+    retry_delay=dt.timedelta(hours=3),
     catchup=False,
     max_active_runs=1,
     params={
