@@ -62,13 +62,13 @@ be used to help seed the domain crawl.
 
 This task:
 
-- Logs into the server `{ext_data_server.host}`
+- Logs into the server `{ext_data_server.host}` using the `{EXT_DATA_SSH_CONN_ID}` connection registered with Airflow.
 - Runs a Dockerized script (`{dag1.params['TASK_CONTAINER_IMAGE']}`) that talks to Nominet at `{nominet_scp.host}`.
 - Checks for files in recent days, downloads the relevant file and uploads to Hadoop3.
 
 Configuration:
 
-* TBC Updates [this Prometheus Push Gateway](http://{c.push_gateway}) _??? TBA ???_
+* __TBC:__ Updates [this Prometheus Push Gateway](http://{c.push_gateway})
 
 How to check it's working:
 
