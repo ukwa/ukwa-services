@@ -44,8 +44,6 @@ with DAG(
     schedule_interval='0 0 3 * *',
     # Needs a proper start date in order to schedule properly:
     start_date=dt.datetime(2023, 1, 1),
-    # Give a decent delay in case the server is down:
-    retry_delay=dt.timedelta(hours=3),
     catchup=False,
     max_active_runs=1,
     params={
@@ -86,7 +84,9 @@ Tool container versions:
         task_id='update_nominet_data',
         ssh_conn_id=EXT_DATA_SSH_CONN_ID,
         # Can't use environment without modifying SSH AcceptEnv setup.
-        command="docker run -e NOM_HOST={{ params.NOM_HOST }} -e NOM_USER={{ params.NOM_USER }} -e NOM_PWD='{{ params.NOM_PWD }}' --add-host h3httpfs.api.wa.bl.uk:192.168.45.40 {{ params.TASK_CONTAINER_IMAGE }} python -m lib.store.nominet"
+        command="docker run -e NOM_HOST={{ params.NOM_HOST }} -e NOM_USER={{ params.NOM_USER }} -e NOM_PWD='{{ params.NOM_PWD }}' --add-host h3httpfs.api.wa.bl.uk:192.168.45.40 {{ params.TASK_CONTAINER_IMAGE }} python -m lib.store.nominet",
+        # Give a decent delay in case the server is down:
+        retry_delay=dt.timedelta(hours=3),
     )
 
 
