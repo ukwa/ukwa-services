@@ -83,6 +83,10 @@ Tool container versions:
     update_nom_data = SSHOperator(
         task_id='update_nominet_data',
         ssh_conn_id=EXT_DATA_SSH_CONN_ID,
+        # Just in case the server is slow:
+        conn_timeout=20,
+        # This command can take a while:
+        cmd_timeout=60*5,
         # Can't use environment without modifying SSH AcceptEnv setup.
         command="docker run -e NOM_HOST={{ params.NOM_HOST }} -e NOM_USER={{ params.NOM_USER }} -e NOM_PWD='{{ params.NOM_PWD }}' --add-host h3httpfs.api.wa.bl.uk:192.168.45.40 {{ params.TASK_CONTAINER_IMAGE }} python -m lib.store.nominet",
         # Give a decent delay in case the server is down:
