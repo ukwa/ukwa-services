@@ -80,9 +80,9 @@ def generate_cdx_dag(hadoop_service):
     How to check it's working, you can:
 
     * Check the number of WARCs marked as indexed in TrackDB has increased:
-        * [For Webrecorder WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:webrecorder AND hdfs_service_id_s:{hadoop_service})
-        * [For Frequent WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:frequent AND hdfs_service_id_s:{hadoop_service})
-        * [For Domain WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']} AND stream_s:domain AND hdfs_service_id_s:{hadoop_service})
+        * [For Webrecorder WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']}+AND+stream_s:webrecorder+AND+hdfs_service_id_s:{hadoop_service})
+        * [For Frequent WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']}+AND+stream_s:frequent+AND+hdfs_service_id_s:{hadoop_service})
+        * [For Domain WARCs]({dag.params['trackdb_url']}/select?q=cdx_index_ss:{dag.params['cdx_collection']}+AND+stream_s:domain+AND+hdfs_service_id_s:{hadoop_service})
     * Check for various Prometheus metrics via the Push Gateway:
         * For Webrecorder WARCs:
             * `ukwa_task_event_timestamp{{job="cdx-index-{dag.params['hadoop_service']}-webrecorder", status="success"}}`

@@ -65,7 +65,7 @@ This task performs some work to tidy up the WARCs and logs from the crawler.
 
 Configuration:
 
-* Runs rclone remotely on { dag.params['source'] } as user { dag.params['host_user'] } via DOCKER_HOST={ dag.params['docker_url'] }.
+* Runs rclone remotely on _{ dag.params['source'] }_ as user `{ dag.params['host_user'] }` via `DOCKER_HOST={ dag.params['docker_url'] }`.
 * The tasks are configured to look for completed WARCs and log files under `{dag.params['host_dir']}/heritrix/output`.
 * The push gateway is configured to be `{c.push_gateway}`. 
 
@@ -154,13 +154,13 @@ Tool container versions:
     }
     # Define the critical common rclone parameters here for easy re-use:
     # Use 'next_ds' as the start of that day marks the end of the previous period.
-    # This is fine because these files don't get written to after they have these names.
-    # (i.e. crawl.log and WARCNAME.warc.gz.out are the 'live' names.)
+    # Matching files may be transferred immediately, which is fine because these files don't get written 
+    # to _after_ they have these names (i.e. crawl.log and WARCNAME.warc.gz.out are the 'live' names).
     shared_cmd =' --include "*.warc.gz"'\
                 ' --include "crawl.log.cp*"' \
                 ' --include "crawl.log.\d+"' \
                 ' --min-age {{ next_ds }}'\
-                ' --max-age {{ macros.ds_add( ds, -2) }}'\
+                ' --max-age {{ macros.ds_add(ds, -2) }}'\
                 ' --dump filters'\
                 ' --no-traverse'\
                 ' --immutable'\
