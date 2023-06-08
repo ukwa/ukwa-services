@@ -9,7 +9,7 @@ fi
 
 # Defaults for container versions:
 export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.5"
-export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.0.4"
+export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.1.2"
 export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.9"
 export API_IMAGE="ukwa/ukwa-access-api:1.0.1"
 
@@ -24,7 +24,6 @@ if [[ ${ENVIRON} == 'prod' ]]; then
     source /mnt/nfs/prod1/access/gitlab/ukwa-services-env/prod.env
 
 elif [[ ${ENVIRON} == 'beta' ]]; then
-    export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.1.1"
     export PYWB_IMAGE="ukwa/ukwa-pywb:2.7.x"
     export SERVER_NAME=beta.webarchive.org.uk
     export DEPLOYMENT_TAG=beta

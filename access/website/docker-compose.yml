@@ -164,8 +164,8 @@ services:
       - "WAYBACK_SERVER=http://pywb:8080/archive/"
       # Used to secure cookies/tokens/etc.
       - "APP_SECRET=${APP_SECRET}"
-      # Nominations DB creation is not safe to run under multiple processes:
-      - "WORKERS=1"
+      # Nominations DB creation is not safe to run under multiple processes, so is off at present:
+      - "WORKERS=10"
     volumes:
       - "${STORAGE_PATH_WEBSITE}/cache:/cache"
       - fc_analysis:/analysis
