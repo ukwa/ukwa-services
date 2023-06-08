@@ -15,6 +15,8 @@ Before using a service for crawls, we need:
 - A DNS service that can cope with very heavy usage (we usually use Google DNS servers).
 - The `nofiles` limit set to be reasonably high (e.g. 10240 instead of the default 1024).
 - Docker Swarm initialised.
+- Set the Java heap size appropriately, roughly 50% of RAM, scaling up to 64GB of a 128GB RAM machine if running on the cloud and scaling as we go (where memory starvation shows up as disk thrashing and consuming state space rapidly).
+- Checking the internal IP address changes matching the one in the Prometheus configuration, e.g. `/heritrix/output/prometheus/config/prometheus.yml`
 - ...???...
 
 
