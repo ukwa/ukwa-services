@@ -33,6 +33,8 @@ services:
     # UI container image configured by deployment context (see deployment script):
     image:  "${UKWA_UI_IMAGE}"
     command: java -Djava.security.egd=file:/dev/./urandom -jar /ukwa-ui.war --spring.config.location=file:/application.properties
+    #ports:
+    #  - "9030:8080"
     environment:
      - "OFF_SITE_URL=/wayback/archive/"
      - "SOLR_COLLECTION_SEARCH_PATH=http://collections_solr:8983"
@@ -47,6 +49,9 @@ services:
      - "BL_SMTP_SERVER_HOST=juno.bl.uk"
      - "BL_SMTP_USERNAME="
      - "BL_SMTP_PASSWORD="
+     # CAPTCHA validation needs to talk to Google, but other web connections are internal, so this is set specifically:
+     - "CAPTCHA_PROXY_HOST=explorer.bl.uk"
+     - "CAPTCHA_PROXY_PORT=3127"
     volumes:
       - ./config/ukwa-ui/ukwa-ui.properties:/application.properties:ro
     networks:
