@@ -52,6 +52,8 @@ services:
      # CAPTCHA validation needs to talk to Google, but other web connections are internal, so this is set specifically:
      - "CAPTCHA_PROXY_HOST=explorer.bl.uk"
      - "CAPTCHA_PROXY_PORT=3127"
+     - "RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}"
+     - "RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}"
     volumes:
       - ./config/ukwa-ui/ukwa-ui.properties:/application.properties:ro
     networks:
