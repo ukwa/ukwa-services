@@ -36,7 +36,7 @@ class Config():
     rclone_image = 'rclone/rclone:1.62'
     crawlstreams_image = 'ukwa/crawl-streams:1.0.1'
     rf_image = 'ukwa/robot-framework:1.2.0'
-    stat_pusher_image = 'ukwa/monitor-stat-pusher:master'
+    stat_pusher_image = 'ukwa/monitor-stat-pusher:latest'
 
     # Get a copy of the default arguments:
     def get_default_args(self):
