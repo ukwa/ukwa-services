@@ -140,6 +140,16 @@ Having set this chain up, if we visit e.g. `dev.webarchive.org.uk` the traffic s
 
 After which NGINX should restart and pick up any configuration changes and re-check whether it can connect to any proxied services inside the stack.
 
+Because the chain of proxies is quite complicated, we also add a `Via` header at each layer, e.g.
+
+```
+    # Add header for tracing where issues occur:
+    add_header Via $hostname always;
+```
+
+This adds a hostname for every successful proxy request, so the number of `Via` headers and their values can be used to trace problems with the proxies.
+
+
 ## Components
 
 Behind the NGINX, we have a set of modular components:
