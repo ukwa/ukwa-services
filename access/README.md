@@ -105,7 +105,7 @@ The website is designed to be run behind a boundary web proxy that handles SSL e
 
 The set of current proxies and historical redirects associated with the website are now contained in the [internal nginx.conf](./config/nginx.conf). This sets up a service on port 80 where all the site components can be accessed. Once running, the entire system should be exposed properly via the API gateway. For example, for accessing the dev system we want `website.dapi.wa.bl.uk` to point to `dev-swarm-members:80`.
 
-Because most of the complexity of the NGINX setup is in the internal NGINX, the proxy setup at the edge is much simpler. e.g. for DEV:
+Because most of the complexity of the NGINX setup is in the internal NGINX, the proxy setup at the edge is much simpler. e.g. for DEV, the external-facing NGINX configuration looks like:
 
 ```
     location / {
@@ -121,7 +121,16 @@ Because most of the complexity of the NGINX setup is in the internal NGINX, the 
     }
 ```
 
-(See the `dev_443.conf` setup for details.)
+(Internal users can see the `dev_443.conf` setup for details.)
+
+The [internal NGINX configuration](./website/config/nginx.conf) is more complex, merging together the various back-end systems and passing on the configuration as appropriate. For example, [the configuration for the public PyWB service](https://github.com/ukwa/ukwa-services/blob/d68e54d6d7d44e714df24bf31223c8f8f46e5ff6/access/website/config/nginx.conf#L40-L42) includes:
+
+```
+            uwsgi_param UWSGI_SCHEME $http_x_forwarded_proto;
+            uwsgi_param SCRIPT_NAME /wayback;
+```
+
+The service picks up the host name from the standard HTTP `Host` header, but here we add the scheme (http/https, passed from the upstream NGINX server via the `X-Forwarded-Proto` header) and fix the deployment path using the `SCRIPT_NAME` CGI variable.
 
 Having set this chain up, if we visit e.g. `dev.webarchive.org.uk` the traffic should show up on the API server as well as the Docker container.
 
