@@ -39,6 +39,8 @@
 			<value>.*\?(?:.*&amp;)?replytocom=\d+</value>
 			<!-- Avoid Wordpress admin pages (from PANDAS/NLA) -->
 			<value>https?://[^/]+/wp-admin/.*</value>
+			<!-- Avoid Wordpress config page, based on getting greylisted by BitNinja for downloading wp-config.php -->
+			<value>https?://[^/]+/wp-config\.php.*</value>
 			<!-- Also block some over-zealous crawling from this particular crawl -->
 			<value>https?://[^/]+/humans.txt</value>
 			<value>https?://[^/]+/sellers.json</value>

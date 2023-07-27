@@ -1,0 +1,38 @@
+version: "3.2"
+
+services:
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 9001:8080
+    environment:
+      - "KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:9092"
+      - "DYNAMIC_CONFIG_ENABLED=true"
+    networks:
+      - kafka
+
+#
+# Here for reference, but not as nice to use as the above.
+#
+#  akhq:
+#    image: tchiotludo/akhq:latest
+#    ports:
+#      - "9002:8080"
+#    networks:
+#      - kafka
+#    environment:
+#      AKHQ_CONFIGURATION: |
+#        akhq:
+#          connections:
+#            fc:
+#              properties:
+#                bootstrap.servers: "kafka-1:9092"
+#          security:
+#            default-group: reader
+
+networks:
+  kafka:
+    external:
+      name: dc_kafka_default
+
