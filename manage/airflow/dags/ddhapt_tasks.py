@@ -41,7 +41,7 @@ with DAG(
     'ddhapt_log_analyse',
     default_args=default_args,
     description='Log analysis and document extraction.',
-    schedule_interval='@daily',
+    schedule_interval='0 4 * * *',
     start_date=datetime(2022, 6, 12), #'2022-06-24' for the Border Operating Model example
     max_active_runs=1,
     catchup=True,
@@ -59,6 +59,7 @@ This task performs the log analysis required to extract documents.
 
 * Runs the `windex log-analyse` command, which:
     * Checks for log files in TrackDB with a Last Modified date of the day of the run.
+        * This needs TrackDB to be up-to-date, so no files with modification dates in the past suddenlty appear. This DAG runs at 4am as this should be enough time for yesterday's file listings to be updated.
     * Runs a Hadoop 3 job to process the logs.
     * Post-processes the log results and pushes and documents to the 'Documents Found' database.
 
