@@ -75,7 +75,8 @@ How to check it's working:
 * The Task Instance logs in Airflow will show e.g. how many document processed.
 * Check TrackDB to see if it's being updated:
     * Processed log files should gain a `log_analysis_ss='done'` field.
-    * See [this example query]({dag.params['trackdb_url']}/select?indent=true&q=log_analysis_ss%3A[*%20TO%20*]&sort=modified_at_dt%20desc).
+    * See [this query that lists recently processed crawl logs]({dag.params['trackdb_url']}/select?indent=true&q=log_analysis_ss%3A[*%20TO%20*]&sort=modified_at_dt%20desc).
+    * And [this query lists recent crawl logs that have not been processed]({dag.params['trackdb_url']}/select?indent=true&q=-log_analysis_ss%3A%5B*%20TO%20*%5D+kind_s:crawl-logs+stream_s:frequent&sort=modified_at_dt%20desc&rows=100).
 * Check for metrics in Prometheus (updated via Push Gateway):
     * Look for job result metrics in [the push gateway configured for this task](http://{c.push_gateway}), e.g.:
         * `ukwa_task_batch_size{{job="log-analyse-h3-frequent", status="success"}}`
