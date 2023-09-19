@@ -29,7 +29,7 @@ class Config():
     hadoop_job_warc_batch_size = Variable.get('hadoop_job_warc_batch_size')
 
     # Define the common parameters for running Docker tasks:
-    w3act_task_image = 'ukwa/python-w3act:2.1.2'
+    w3act_task_image = 'ukwa/python-w3act:2.1.3'
     ukwa_task_image = 'ukwa/ukwa-manage:2.3.10'
     hadoop_docker_image = 'ukwa/docker-hadoop:2.1.2'
     postgres_image = 'postgres:9.6.2'
