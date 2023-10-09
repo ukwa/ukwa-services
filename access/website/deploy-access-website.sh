@@ -10,7 +10,7 @@ fi
 # Defaults for container versions:
 export UKWA_UI_IMAGE="ukwa/ukwa-ui:v1.4.6"
 export UKWA_NGINX_IMAGE="ukwa/ukwa-site:1.1.2"
-export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.9"
+export PYWB_IMAGE="ukwa/ukwa-pywb:2.6.9.1"
 export API_IMAGE="ukwa/ukwa-access-api:1.0.1"
 
 # Set up environment variables
