@@ -56,8 +56,8 @@ services:
     ulimits:
       nproc: 65535
       nofile:
-        soft: 102400
-        hard: 102400
+        soft: 204800
+        hard: 204800
     depends_on:
       - clamd
       - kafka

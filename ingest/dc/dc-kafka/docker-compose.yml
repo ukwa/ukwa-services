@@ -54,18 +54,6 @@ services:
     deploy:
       replicas: 1
 
-  # Kafka UI
-  ui:
-    #user: ${CURRENT_UID}
-    image: ukwa/docker-trifecta
-    ports:
-      - "9000:9000"
-    environment:
-      - "ZK_HOST=zookeeper:2181"
-    depends_on:
-      - zookeeper
-      - kafka-1
-
 networks:
   # Allow attachment of transient containers, external monitoring:
   default:
