@@ -38,7 +38,7 @@ with DAG(
     'update_storage_listings',
     description='Generate file store lists for reporting purposes.',
     default_args=default_args, 
-    schedule_interval='@daily',
+    schedule_interval='0 4 * * *',
     start_date=days_ago(1),
     catchup=False,
     max_active_runs=1,
@@ -56,6 +56,8 @@ This task:
 - Lists all the current files known to TrackDB.
 - Lists all the web archive files on AWS S3.
 
+It runs at 4am, so the daily TrackDB update should be complete by the time it runs.
+
 Configuration:
 
 * Uses AWS keys defined in an Airflow Connection called `amazon_s3`.
@@ -63,23 +65,24 @@ Configuration:
 How to check it's working:
 
 * Fresh JSONL listings in {c.storage_path}: `trackdb_list.jsonl`, `aws_s3_list.jsonl`
+* The internal website is updated with fresh [reports](https://www.webarchive.org.uk/act/static/reports/), served from {c.w3act_static_web_root}.
 * The [holdings report](https://www.webarchive.org.uk/act/nbapps/voila/render/ukwa-holdings-summary-report.ipynb) is working and presenting that data.
 
 Tool container versions:
 
  * UKWA Manage Task Image: `{c.ukwa_task_image}`
-
+ * UKWA Reports Image: `{c.ukwa_reports_image}`
 
 """
 
-    tdb = DockerOperator(
+    tdb_lister = DockerOperator(
         task_id='export_trackdb_list',
         image=c.ukwa_task_image,
         # Using bash to redirect stdout:
         command="bash -c 'python -m lib.filedb.trackdb_lister > /storage/trackdb_list.jsonl'",
     )
 
-    tdb = DockerOperator(
+    s3_lister = DockerOperator(
         task_id='export_aws_s3_list',
         image=c.ukwa_task_image,
         # Using bash to redirect stdout:
@@ -90,4 +93,18 @@ Tool container versions:
             'HTTPS_PROXY': EXTERNAL_WEB_PROXY,
         },
     )
+
+    reports = DockerOperator(
+        task_id='update_ukwa_reports',
+        image=c.ukwa_reports_image,
+        environment={
+            'TRACKDB_LIST_JSONL': "/storage/trackdb_list.jsonl",
+            'AWS_S3_LIST_JSONL': "/storage/aws_s3_list.jsonl",
+            'OUTPUT_PATH': f'{c.w3act_static_web_root}/reports',
+        },
+    )
+
+    # Run the listers first
+    [ tdb_lister, s3_lister ] >> reports
+
 
