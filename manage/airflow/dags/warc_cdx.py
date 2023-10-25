@@ -112,6 +112,18 @@ def generate_cdx_dag(hadoop_service):
             command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S webrecorder -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }} --years-back {{ params.years_back }}',
         ) 
 
+        cdx_wf = DockerOperator(
+            task_id=f'index_{hadoop_service}_warcit-flash-videos_cdx',
+            image=c.ukwa_task_image,
+        # Add Hadoop settings:
+        entrypoint=entrypoint,
+        environment= {
+            'MRJOB_CONF': mrjob_conf,
+            'PUSH_GATEWAY': c.push_gateway,
+        },
+            command='windex cdx-index -v -t {{ params.trackdb_url }} -H {{ params.hadoop_service }} -S warcit-flash-videos -c {{ params.cdx_service }} -C {{ params.cdx_collection }} -B {{ params.batch_size }} --years-back {{ params.years_back }}',
+        ) 
+
         cdx_fc = DockerOperator(
             task_id=f'index_{hadoop_service}_frequent_cdx',
             image=c.ukwa_task_image,
