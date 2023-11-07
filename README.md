@@ -1,5 +1,7 @@
 # ukwa-services <!-- omit in toc -->
 
+<!-- use the VS Code extension 'Markdown All In One' to keep this table up to date -->
+
 - [Introduction](#introduction)
 - [Structure](#structure)
 - [Deployment Process](#deployment-process)
@@ -8,26 +10,25 @@
 
 Deployment configuration for all UKWA services stacks.
 
-These [Docker Stack](https://docs.docker.com/engine/reference/commandline/stack/) configurations and related scripts are used to launch and manage our main services.  No internal or sensitive data is kept here -- that is stored in internal `ukwa-services-env` repository and pulled in when needed.
+These [Docker Stack](https://docs.docker.com/engine/reference/commandline/stack/) configurations and related scripts are used to launch and manage our main services.  No internal or sensitive data is kept here -- that is stored in internal `ukwa-services-env` repository as environment variable scripts required for deployment, or as part of the CI/CD system.
 
 See the [change log](./CHANGELOG.md) for information on how this setup has changed over time.
 
 ## Structure
 
-Service stacks are grouped by broad service area, e.g. [`access`](./access) contains the stacks that provides the access services, and the [access README](./access/README.md) provides detailed documentation on how the access services are deployed.
+Service stacks are grouped by broad service area, e.g. [`access`](./access) contains the stacks that provides the access services, and the [access README](./access/README.md) provides detailed documentation on how the access services are deployed. The service areas are:
 
-Within each sub-folder, e.g. `access/website`], we should have a single `docker-compose.yml` file which should be used for all deployment contexts (`dev`,`beta` and `prod`). Any necessary variations should be defined via environment variables.
+- [`ingest`](./ingest) covers all services relating to the curation and ingest of web archives
+- [`access`](./access) covers all services relating to how we make the web archives accessible to the public
+- [`manage`](./manage) covers all internal services relating to the management of the web archive, including automation and workflows that orchestrate activities from ingest to storage and then to access
 
-These variables, any other context-specific configuration, should be held in `dev`,`beta` and `prod` subdirectories. For example, if `access/website/docker-compose.yml` is the main stack definition file, any addtional services needed only on `dev` might be declared in `access/website/dev/docker-compose.yml` and would be deployed separately.
+Within each sub-folder, e.g. `access/website`, we should have a single `docker-compose.yml` file which should be used for all deployment contexts (e.g. `dev`,`beta` and `prod`). Any necessary variations should be defined via environment variables.
 
-A top-level guide to all the different automated tasks is provided in [`TASKS.md`](./TASKS.md).
+These variables, any other context-specific configuration, should be held in subdirectories. For example, if `access/website/docker-compose.yml` is the main stack definition file, any addtional services needed only on `dev` might be declared in `access/website/dev/docker-compose.yml` and would be deployed separately.
 
 ## Deployment Process
 
-First, individual components should be developed and tested on developers' own machines/VMs, using the [Docker Compose](https://docs.docker.com/compose/compose-file/) files within each tool's repository. e.g.
-
-- [w3act](https://github.com/ukwa/w3act/blob/master/docker-compose.yml)
-- [crawl-log-viewer](https://github.com/ukwa/crawl-log-viewer#local-development-setup)
+First, individual components should be developed and tested on developers' own machines/VMs, using the [Docker Compose](https://docs.docker.com/compose/compose-file/) files within each tool's repository. e.g. [w3act](https://github.com/ukwa/w3act/blob/master/docker-compose.yml).
 
 These are are intended to be self-contained. i.e. if possible should not depend on external services, but use dummy ones populated with test data.
 
