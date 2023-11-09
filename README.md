@@ -18,7 +18,10 @@ Deployment configuration for almost all UKWA services.
     - [Access](#access)
     - [Monitoring](#monitoring)
   - [Interfaces](#interfaces)
-  - [Networks](#networks)
+  - [Infrastructure](#infrastructure)
+    - [Access \& Updates](#access--updates)
+    - [Container Platforms](#container-platforms)
+    - [Networks](#networks)
 - [Software](#software)
   - [Deployment Process](#deployment-process)
 
@@ -27,7 +30,11 @@ Deployment configuration for almost all UKWA services.
 
 These [Docker Stack](https://docs.docker.com/engine/reference/commandline/stack/) configurations and related scripts are used to launch and manage our main services.  No internal or sensitive data is kept here -- that is stored in internal `ukwa-services-env` repository as environment variable scripts required for deployment, or as part of the CI/CD system.
 
-Note that some services are not deployed via containers, e.g. the Hadoop clusters, and the Solr and OutbackCDX indexes.  Those are documented elsewhere, but the interaction with those other services will be made clear.
+Note that some services are not deployed via containers, e.g. the Hadoop clusters, and the Solr and OutbackCDX indexes.  This includes a dedicated API server that acts as an intermediary for calls to various internal systems, allowing the implementation details of the current deployment to be kept separate from their external identity. 
+
+For example, our OutbackCDX service is accessed internally as `cdx.api.wa.bl.uk`.  Over recent years, this service has been migrated to new hardware on a number of occasions, but using the `cdx.api.wa.bl.uk` proxy alias has allowed us to minimised downtime when migrating or upgrading the service.
+
+These other services are documented elsewhere, but the interaction with those other services will be made clear.
 
 ## Service Stacks
 
@@ -47,25 +54,23 @@ The process for updating and deploying components is described in [the deploymen
 
 ## High-Level Technical Architecture
 
-This is a high-level introduction to the technical components that make up our web archiving services. The primary purpose of this documentation to try and ensure the whole team have an overview of the whole system, and can work out which components are involved when something goes wrong.
+This is a high-level introduction to the technical components that make up our web archiving services. The primary goal is to provide an overview of the whole system, with a particular focusing on knowing where to look if something goes wrong.
 
 Some wider contextual information can be found at:
 
 *   [http://data.webarchive.org.uk/ukwa-documentation/how-ukwa-works/\_index.html](http://data.webarchive.org.uk/ukwa-documentation/how-ukwa-works/_index.html) (source [https://github.com/ukwa/ukwa-documentation/tree/master/content/how-ukwa-works](https://github.com/ukwa/ukwa-documentation/tree/master/content/how-ukwa-works))
 *   ...TBA...
 
-Note that the images on this page can be found at:
+Note that the images on this page can be found in [this Google Slides presentation.](https://docs.google.com/presentation/d/1MnJfldL7MvJYJ28genZqjmDoHhOlo8dRNqmuZGqa5fc/edit?usp=sharing)
 
-*   [This Google Slides presentation.](https://docs.google.com/presentation/d/1MnJfldL7MvJYJ28genZqjmDoHhOlo8dRNqmuZGqa5fc/edit?usp=sharing)
-*   ...TBA...
 
 ### Overview
 
 ![High-level technical overview of the UKWA systems](2023-11-UKWA-Tech-Arch-Overview.png)
 
-The life-cycle of our web archives can be broken down into five main stages, along with management and monitoring processes covering the whole process. Each stage is defined by it's interfaces, with the data standards and protocols that define what goes in to and out of that stage ([see below for more details](#interfaces)). This allows each stage to evolve independently, as long as it's 'contract' with the other stages is maintained.
+The life-cycle of our web archives can be broken down into five main stages, along with management and monitoring processes covering the whole thing, and the underlying infrastructure that supports it all. Each stage is defined by it's interfaces, with the data standards and protocols that define what goes in to and out of that stage ([see below for more details](#interfaces)). This allows each stage to evolve independently, as long as it's 'contract' with the other stages is maintained.
 
-There are multiple ingest streams, covering different aspects of a single overall workflow, starting with the curation tools that we use to drive the web crawlers. Those harvesting processes pull resources off the web and store them in archival form, to be transferred on HDFS. From there, we can ingest the content into other long-term stores, and can then be used to provide access to individual resources both internally and externally, for all the Legal Deposit libraries. As the system complexities and service levels vary significantly across the different access channels, we identify them as distinct services, while only have one (unified) harvesting service.
+There are multiple ingest streams, integrating different capture processes into a single overall workflow, starting with the curation tools that we use to drive the web crawlers. Those harvesting processes pull resources off the web and store them in archival form, to be transferred on HDFS. From there, we can ingest the content into other long-term stores, and can then be used to provide access to individual resources both internally and externally, for all the Legal Deposit libraries. As the system complexities and service levels vary significantly across the different access channels, we identify them as distinct services, while only have one (unified) harvesting service.
 
 In order to be able to find items of interest among the billions of resources we hold, we run a range of data-mining processes on our collections that generate appropriate metadata, which is then combine with manually-generated annotations (supplied by our curators) and used to build our catalogue records and indexes. These records drive the discovery process, allowing users to find content which can then be displayed over the open web or via the reading room access service (as appropriate).
 
@@ -73,9 +78,9 @@ In order to be able to find items of interest among the billions of resources we
 
 #### Manage
 
-The critical management component is Apache Airflow, which orchestrates almost all web archive activity. For staff, it is accessible at [http://airflow.api.wa.bl.uk](http://airflow.api.wa.bl.uk). Each workflow (or DAG in Airflow terminology) is accessible via the management interface, and the description supplied with each one provides documentation on what the task does. Where possible, each individual task in a workflow involves running a command-line application wrapped in versioned Docker container. Developing our tools as individual command-line applications is intended to make them easier to maintain. The Airflow deployment and workflows are defined in the `./manage` folder, in [./manage/airflow](./manage/airflow)
+The critical management component is Apache Airflow, which orchestrates almost all web archive activity. For staff, it is accessible at [http://airflow.api.wa.bl.uk](http://airflow.api.wa.bl.uk). Each workflow (or DAG in Airflow terminology) is accessible via the management interface, and the description supplied with each one provides documentation on what the task does. Where possible, each individual task in a workflow involves running a single command-line application wrapped in versioned Docker container. Developing our tools as individual command-line applications is intended to make them easier to develop, test and maintain. The Airflow deployment and workflows are defined in the `./manage` folder, in [./manage/airflow](./manage/airflow)
 
-Another important component is `TrackDB`, which contains a list of all the files on our storage systems, and it used by Airflow tasks to keep track of what's been indexed, etc.
+Another important component is `TrackDB`, which contains a list of all the files on our storage systems, and is used by Airflow tasks to keep track of what's been indexed, etc.
 
 See [`manage`](./manage/) for more details.
 
@@ -91,7 +96,7 @@ Storage systems are not deployed as containers, so there are no details here.  W
 
 #### Process
 
-There are various Airflow tasks that process the data from W3ACT or from the Hadoop storage. We use the Python MrJob library to run tasks, which are defined in the `ukwa/ukwa-manage` repository. That is quite a complex system, as it supports Hadoop 0.20.x and Hadoop 3.x, and supports tasks written in Java and Python. See [`ukwa/ukwa-manage`](https://github.com/ukwa/ukwa-manage) for more information.
+There are various Airflow tasks that process the data from W3ACT or from the Hadoop storage. We use the [Python MrJob library](https://mrjob.readthedocs.io/) to run tasks, which are defined in the `ukwa/ukwa-manage` repository. That is quite a complex system, as it supports Hadoop 0.20.x and Hadoop 3.x, and supports tasks written in Java and Python. See [`ukwa/ukwa-manage`](https://github.com/ukwa/ukwa-manage) for more information.
 
 #### Access
 
@@ -103,21 +108,36 @@ Our two main access services are:
 See [`access`](./access/) for more details.
 
 #### Monitoring
-
-Runs independently of all other systems, on separate dedicated hardware. Uses the Prometheus stack with alerts defined for major critical processes. See [https://github.com/ukwa/ukwa-monitor](https://github.com/ukwa/ukwa-monitor) for detail.
+ 
+Monitoring runs independently of all other systems, on separate dedicated hardware. Based on [Prometheus](https://prometheus.io/), with alerts defined for major critical processes. See [https://github.com/ukwa/ukwa-monitor](https://github.com/ukwa/ukwa-monitor) for detail.
 
 
 ### Interfaces
+
+There are data standards/protocols that isolate parts of the system so they can evolve independently (see [_How do you cut a monolith in half?_](https://programmingisterrible.com/post/162346490883/how-do-you-cut-a-monolith-in-half) for more on this idea).
 
 | Interface | Protocol | Further Details |
 | --------- | -------- | --------------- |
 | Curate > Crawl | Crawl feeds (seeds, frequencies, etc.), NEVER-CRAWL list. | Generated from W3ACT, see the [w3act\_export workflow](http://airflow.api.wa.bl.uk/dags/w3act_export/grid). |
 | Crawl > Storage | WARC/WACZ files and logs. | These are stored locally then moved to HDFS using Cron jobs (FC) and Airflow (DC, see [copy\_to\_hdfs\_crawler08](http://airflow.api.wa.bl.uk/dags/copy_to_hdfs_crawler08/grid)). | See the [HDFS layout](HDFS-file-system-layout-and-content_154765461.html) page which describes how we expect content to be layed out so it's provenance and nature are clear. |
 | Storage > Process | WARC/WACZ files and logs, Metadata from W3ACT exports. | This covers indexing tasks like CDX generation, full-text indexing etc. |
-| Process > Access |  WARCs/WACZ on HDFS via HTTP API + TrackDB. OutbackCDX API. Solr Full-text and Collections APIs. Data exported by w3act\_export (allows.aclj, blocks.aclj) | As the collection is large, access is powered by APIs rather than file-level standards.| 
+| Process > Access |  WARCs/WACZ on HDFS via HTTP API + TrackDB. OutbackCDX API. Solr Full-text and Collections APIs. Data exported by `w3act\_export` (allows.aclj, blocks.aclj) | As the collection is large, access is powered by APIs rather than file-level standards.| 
+
+### Infrastructure
+
+#### Access & Updates
+
+A central server known as _wash_ is used to log into all system, and runs updates and logging etc. at the system level via Cron jobs.
+
+A pair of servers use IP-failover to host the `*.api.wa.bl.uk` domains, running NGINX to proxy internal services to the appropriate back-end system.
+
+#### Container Platforms
+
+At the time of writing, we use Docker Swarm for production container deployment, and have a set of servers hosting _PROD_, _BETA_ and _DEV_ swarms.
 
 
-### Networks
+
+#### Networks
 
 The systems configured or maintained by the web archiving technical team are located on the following networks.
 
@@ -135,7 +155,7 @@ Almost our entire stack is open source, and the most critical components are co-
 
 Current upgrade work in progress:
 
-*   Reading Room access currently depends on OpenWayback but should be replaced with a modernized PyWB service through the [TP0012 Legal Deposit Access Solution](https://wiki.bl.uk:8443/display/WAG/TP0012+Legal+Deposit+Access+Solution) project.
+*   Reading Room access currently depends on OpenWayback but should be replaced with a modernized PyWB service through the _Legal Deposit Access Solution_ project.
 *   Adoption of Browsertrix Cloud for one-off crawls, with the intent to move all Frequent Crawls into it eventually.
 *   A new approach is needed to manage monitoring and replication of content across H020, H3 BSP and H3 NLS.
 *   Full-scale fulltext indexing remains a challenge and new workflows are needed.

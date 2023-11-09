@@ -51,17 +51,6 @@ services:
     #  mode: global
 
 
-  # Kafka UI
-  ui:
-    image: ukwa/docker-trifecta
-    ports:
-      - "9000:9000"
-    environment:
-      - "ZK_HOST=zookeeper:2181"
-    depends_on:
-      - zookeeper
-      - kafka
-
 networks:
   # Allow attachment of transient containers, external monitoring:
   default:
