@@ -95,7 +95,7 @@ Similarly to Kafka, use the supplied scripts (or varient of them) to launch the 
 
 A few differnet things need to be set up when running a crawler:
 
-- Check scope surts and exclusions. These are on shared files with the host, and may need updating based on data from W3ACT/curators.
+- Check scope surts and exclusions. These are on shared files with the host, and may need updating based on data from W3ACT/curators. FC manages scope and seeds via Kafka, but exclusions are manual. DC needs explicit scope and exclusion configuration.
 - Update the Geo-IP DB for DC: https://github.com/ukwa/ukwa-services/issues/123
 
 Note that setting up seeds, scope and exclusions for the domain crawl is particularly involved, and is documented at _TBA IS ON GITLAB_
