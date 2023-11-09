@@ -4,15 +4,18 @@ The Ingest Stacks <!-- omit in toc -->
 - [Introduction](#introduction)
 - [Operations](#operations)
   - [Crawler Service Operations](#crawler-service-operations)
-    - [Launching the Services](#launching-the-services)
-    - [Waiting for Kafka](#waiting-for-kafka)
-    - [Shutdown](#shutdown)
+    - [Deploying Kafka](#deploying-kafka)
+    - [Configuring Kafka](#configuring-kafka)
+    - [Deploying the crawlers](#deploying-the-crawlers)
+    - [Comparing the crawlers](#comparing-the-crawlers)
+    - [Moving the results](#moving-the-results)
+    - [Shutting down the Docker Services](#shutting-down-the-docker-services)
   - [Crawl Operations](#crawl-operations)
     - [Starting Crawls](#starting-crawls)
     - [Stopping Crawls](#stopping-crawls)
     - [Pause the crawl job(s)](#pause-the-crawl-jobs)
     - [Checkpoint the job(s)](#checkpoint-the-jobs)
-    - [Shutdown](#shutdown-1)
+    - [Shutdown](#shutdown)
 - [Workflows](#workflows)
   - [How the Frequent Crawler works](#how-the-frequent-crawler-works)
   - [How the Document Harvester works](#how-the-document-harvester-works)
@@ -50,45 +53,85 @@ Both services have:
 * A Wayback stack, which is optional, and can be used to look at what has been crawled (as long as the WARCs are still held locally). 
 
 
-#### Launching the Services
+#### Deploying Kafka
 
+Each deployment should have a script for starting Kafka, e.g. `fc/prod/deploy-fc-kafka.sh`. This will require configuration for different servers, e.g. where is the fast disk where the files can be stored.
 
-    docker system prune -f
-
-#### Waiting for Kafka
+Assuming the deployment works, even after the Docker Service is running, it's necessary to wait for Kafka to be ready. In a new setup this should be quick, but for a setup with a lot of existing data it might take a while for Kafka to check all the parition files of all the topcs.  e.g. if you run:
 
     docker service logs --tail 100 -f fc_kafka_kafka
 
-Depending on the 
+You might see a lot of:
 
     ...Loading producer state from snapshot files...
+
+Before it settles down and says it's listening for connections. This can also be checked by starting the associated Kafka UI stack, which should provide a UI on port 9000 that lets you inspect the topics, once Kafka is available. It may sometimes be necessary to force the UI to restart so it properly re-checks:
+
+    docker service update --force fc_kafka_ui_kafka_ui
     
-Check in UI too. Restart if not showing up.
+#### Configuring Kafka
 
-    docker service update --force fc_kafka_ui
+If this is a new Kafka setup, then the relevant topics will need to be created, see e.g. `fc/prod/kafka-create-topics.sh`. 
+
+The Frequent Crawl has separate topics for launching NPLD or By-Permission crawls, and a shared topic for logging what has been crawled.  The Domain Crawler only support NPLD crawls.
+
+One additional factor is configuration for how long Kafka keeps messages. We want to configure Kafka to forget messages after an appropriate time, not necessarily use the default seven days. An example of doing this for the domain crawl 'in scope URL' log is available [here](https://github.com/ukwa/ukwa-services/blob/0a34e74a7c780625247f4e278b0cb2f929baa960/ingest/dc/dc-kafka/kafka-set-topics-retention.sh#L9).
+
+e.g. the `fc.crawled` topic should retain messages for 30 days. e.g. these commands run from inside the Kafka Docker container (`docker exec -it ...`):
+
+```
+bash-4.4#  /opt/kafka/bin/kafka-topics.sh --alter --zookeeper zookeeper:2181 --topic fc.crawled --config retention.ms=2592000000
+Updated config for topic "fc.crawled".
+bash-4.4#  /opt/kafka/bin/kafka-topics.sh --describe --zookeeper zookeeper:2181 --topic fc.crawled
+Topic:fc.crawled        PartitionCount:16       ReplicationFactor:1     Configs:retention.ms=2592000000,compression.type=snappy
+```
+
+The default of seven days is likely fine for the 'fc.tocrawl.*` logs.
     
-    
-Check surts and exclusions. 
-Check GeoIP DB (GeoLite2-City.mmdb) is installed and up to date.
 
-JE cleaner threads
-je.cleaner.threads to 16 (from the default of 1) - note large numbers went very badly causing memory exhaustion
-Bloom filter
-MAX_RETRIES=4
+#### Deploying the crawlers
 
-#### Shutdown
+Similarly to Kafka, use the supplied scripts (or varient of them) to launch the crawler services. This includes things like a set of ClamAV scanners, any web-page rendering services, and an embedded Prometheus for federated monitoring.
 
-At this point, all activity should have stopped, so it should not make much difference how exactly the service is halted.  To attempt to keep things as clean as possible, first terminate and then teardown the job(s) via the Heritrix UI.
+A few differnet things need to be set up when running a crawler:
 
-Then remote the crawl stack:
+- Check scope surts and exclusions. These are on shared files with the host, and may need updating based on data from W3ACT/curators.
+- Update the Geo-IP DB for DC: https://github.com/ukwa/ukwa-services/issues/123
+
+Note that setting up seeds, scope and exclusions for the domain crawl is particularly involved, and is documented at _TBA IS ON GITLAB_
+
+#### Comparing the crawlers
+
+The Domain Crawler is very similar to the Frequent Crawler. Some notable differences are:
+
+- DC runs more ToeThreads so more can be downloaded at once.
+- DC sets `je.cleaner.threads` to 16 (from the default of 1) so the otherwise huge crawl state files can get cleaned up as the crawl goes. (Note large numbers of cleaner threads went very badly, causing memory exhaustion)
+- The DC uses a Bloom filter to track which URLs have already been crawled, rather than a disk database, as that uses much more disk space.
+- The DC uses `MAX_RETRIES=3` rather than the high value of 10 used for FC.
+- The DC uses a GeoIP DB (`GeoLite2-City.mmdb`) to look for UK URLs on non-UK domains. This is built into the Heritrix crawled Docker image, and there is an outstanding issue about keeping this up to date:https://github.com/ukwa/ukwa-services/issues/123
+
+#### Moving the results
+
+Need details on:
+
+- FC uses Gluster and move-to-hdfs scripts
+- DC uses Airflow to run rclone to send data directly to Hadoop
+
+#### Shutting down the Docker Services
+
+Before doing this, a recent crawl checkpoint should have been taken (see below), which means it should not make much difference how exactly the service is halted.  To attempt to keep things as clean as possible, first terminate and then teardown the job(s) via the Heritrix UI.
+
+Then remove the crawl stack:
 
     docker stack rm fc_crawl
     
-If this is not responsive, it may be necessary to restart Docker itself. This means all the services get restarted with the current deployment configuration.
+Note that the crawler containers are configured to wait a few minutes before being forced to shut down, in case they are writing a checkpoint. If the services fail to shut down, it may be necessary to restart Docker itself. This means all the services get restarted with the current deployment configuration.
 
     service docker restart
     
-Even this can be quite slow sometimes, so be patient.
+Even this can be quite slow sometimes, so be patient. There can be a lot of old logs knocking about, so it can help to prune the system:
+
+    docker system prune -f
 
 
 ### Crawl Operations
