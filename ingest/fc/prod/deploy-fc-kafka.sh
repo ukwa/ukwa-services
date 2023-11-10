@@ -1,13 +1,12 @@
 #!/bin/sh
 set -e
+ENVFILE=$1
 DEBUG=1
 
 
 # read environment file
-if [[ "$1" != "" ]]; then
-	ENVFILE="$1"
-else
-	echo "ERROR You must give an argument that specifies the deployment, e.g. crawler06 uses prod-env-crawler06.sh."
+if [[ "${ENVFILE}" == "" ]]; then
+	echo "ERROR: You must give an argument that specifies the deployment, e.g. crawler06 uses prod-env-crawler06.sh."
 	exit 1
 fi
 if ! [[ -f ${ENVFILE} ]]; then
@@ -22,7 +21,7 @@ if !  [[ -d ${STORAGE_PATH} ]]; then
 	echo "ERROR: STORAGE_PATH [${STORAGE_PATH}] defined in [${ENVFILE}] missing"
 	exit 1
 fi
-for _d in ${TMP_STORAGE_PATH} ${CDX_STORAGE_PATH} ${ZK_DATA_PATH} ${ZK_DATALOG_PATH} ${KAFKA_PATH}; do
+for _d in ${TMP_STORAGE_PATH} ${ZK_DATA_PATH} ${ZK_DATALOG_PATH} ${KAFKA_PATH}; do
 	if [[ "${_d}" == "" ]]; then
 		echo "ERROR: No directory defined"
 		exit 1

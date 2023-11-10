@@ -19,9 +19,9 @@ services:
       - "WEBRENDER_WARC_PREFIX=BL-NPLD-WEBRENDER"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
     volumes:
-      - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
-      - "${TMP_STORAGE_PATH}/heritrix/npld/state:/heritrix/state"
-      - "${STORAGE_PATH}/surts/npld:/shared" # Shared configuration - surts file held here.
+      - "${HERITRIX_OUTPUT_PATH}:/heritrix/output"
+      - "${NPLD_STATE_PATH}:/heritrix/state"
+      - "${SURTS_NPLD_PATH}:/shared" # Shared configuration - surts file held here.
     deploy:
       replicas: 1
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
@@ -33,7 +33,7 @@ services:
       - default
       - kafka
 
-  # UKWA Heritrix for NPLD
+  # UKWA Heritrix for BYPM
   bypm-heritrix-worker:
     user: ${H3_UID}
     image: ukwa/heritrix:${HERITRIX_VERSION}
@@ -50,9 +50,9 @@ services:
       - "WEBRENDER_WARC_PREFIX=BL-BYPM-WEBRENDER"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
     volumes:
-      - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
-      - "${TMP_STORAGE_PATH}/heritrix/bypm/state:/heritrix/state"
-      - "${STORAGE_PATH}/surts/bypm:/shared" # Shared configuration - surts file held here.
+      - "${HERITRIX_OUTPUT_PATH}:/heritrix/output"
+      - "${BYPM_STATE_PATH}:/heritrix/state"
+      - "${SURTS_BYPM_PATH}:/shared" # Shared configuration - surts file held here.
     deploy:
       replicas: 1
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
@@ -100,8 +100,8 @@ services:
       - "KAFKA_ACKS=1"
       - "CDXSERVER_ENDPOINT=${CDXSERVER_ENDPOINT}"
     volumes:
-      - "${STORAGE_PATH}/heritrix/wren:/output/warcs"
-      - "/mnt/localraid6/fc/warcprox:/host" # FAST disk for dedup db
+      - "${HERITRIX_WREN_PATH}:/output/warcs"
+      - "${WARCPROX_PATH}:/host" # FAST disk for dedup db
     ulimits:
       nproc: 2000  # See https://github.com/internetarchive/warcprox/blob/2.x/warcprox/warcproxy.py#L413
     deploy:

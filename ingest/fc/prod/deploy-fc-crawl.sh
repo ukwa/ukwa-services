@@ -1,28 +1,41 @@
-#!/bin/bash
-
-# Fail and halt execution on errors
+#!/bin/sh
 set -e
+ENVFILE=$1
+DEBUG=1
 
-if [[ "$1" != "" ]]; then
-    ENV_TAG="$1"
-else
-    echo "You must give an argument that specifies the deployment, e.g. crawler06 uses prod-env-crawler06.sh."
-    exit 1
+
+# read environment file
+if [[ "${ENVFILE}" == "" ]]; then
+	echo "ERROR: You must give an argument that specifies the deployment, e.g. crawler06 uses prod-env-crawler06.sh."
+	exit 1
 fi
+if ! [[ -f ${ENVFILE} ]]; then
+	echo "ERROR: argument [${ENVFILE}] environment file missing"
+	exit 1
+fi
+source ./${ENVFILE}
 
 
-source ./env-${ENV_TAG}.sh
+# check STORAGE_PATH exists, create any missing sub-directories
+if !  [[ -d ${STORAGE_PATH} ]]; then
+	echo "ERROR: STORAGE_PATH [${STORAGE_PATH}] defined in [${ENVFILE}] missing"
+	exit 1
+fi
+for _d in ${HERITRIX_OUTPUT_PATH} ${HERITRIX_WREN_PATH} ${SURTS_NPLD_PATH} ${SURTS_BYPM_PATH} ${NPLD_STATE_PATH} ${BYPM_STATE_PATH} ${CDX_STORAGE_PATH} ${TMP_WEBRENDER_PATH} ${PROMETHEUS_DATA_PATH} ${WARCPROX_PATH}; do
+	[[ ${DEBUG} ]] && echo -e "DEBUG]\t _d:\t [${_d}]"
+	if [[ "${_d}" == "" ]]; then
+		echo "ERROR: No directory defined"
+		exit 1
+	fi
+	if ! [[ -d ${_d} ]]; then
+		[[ ${DEBUG} ]] && echo -e "DEBUG]\t making dir [${_d}]"
+		mkdir -p ${_d} || {
+			echo "ERROR: failed to make directory [${_d}]"
+			exit 1
+		}
+	fi
+done
+exit
 
-echo Using UID $H3_UID for Heritrix
-
-mkdir -p ${STORAGE_PATH}/heritrix/output
-mkdir -p ${STORAGE_PATH}/heritrix/wren
-mkdir -p ${STORAGE_PATH}/surts/npld
-mkdir -p ${STORAGE_PATH}/surts/bypm
-mkdir -p ${TMP_STORAGE_PATH}/heritrix/npld/state
-mkdir -p ${TMP_STORAGE_PATH}/heritrix/bypm/state
-mkdir -p ${CDX_STORAGE_PATH}
-mkdir -p /tmp/webrender
-mkdir -p ${STORAGE_PATH}/prometheus-data
-
+# start FC crawler stack
 docker stack deploy -c ../fc-crawl/docker-compose.yml fc_crawl
