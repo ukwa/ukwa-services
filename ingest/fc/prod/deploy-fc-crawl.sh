@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 ENVFILE=$1
-DEBUG=1
+DEBUG=
 
 
 # read environment file
@@ -35,7 +35,6 @@ for _d in ${HERITRIX_OUTPUT_PATH} ${HERITRIX_WREN_PATH} ${SURTS_NPLD_PATH} ${SUR
 		}
 	fi
 done
-exit
 
 # start FC crawler stack
 docker stack deploy -c ../fc-crawl/docker-compose.yml fc_crawl
