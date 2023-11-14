@@ -11,14 +11,15 @@ services:
       - 8001:8000
     environment:
       - "WARC_PATHS=/heritrix/output,/heritrix/wren"
-      - "TRACKDB_URL=http://solr8.api.wa.bl.uk/solr/tracking"
+        #      - "TRACKDB_URL=http://solr8.api.wa.bl.uk/solr/tracking"
+      - "TRACKDB_URL=''"
     volumes:
-      - "${STORAGE_PATH}/heritrix/output:/heritrix/output"
-      - "${STORAGE_PATH}/heritrix/wren:/heritrix/wren"
-    # To resolve solr8.api.wa.bl.uk
-    dns:
-      - 194.66.236.150
-      - 194.66.236.163
+      - "${HERITRIX_OUTPUT_PATH}:/heritrix/output"
+      - "${HERITRIX_WREN_PATH}:/heritrix/wren"
+#    # To resolve solr8.api.wa.bl.uk
+#    dns:
+#      - 194.66.236.150
+#      - 194.66.236.163
 
   # OpenWayback for QA
   openwayback:

@@ -24,4 +24,7 @@ export CRAWL_HOST_WAN_IP=18.130.205.6
 #export H3_UID=$(id -u)
 export H3_UID=0
 export HERITRIX_VERSION=2.9.3
-export CDXSERVER_ENDPOINT=http://${CRAWL_HOST_LAN_IP}:8081/fc
+export CDXSERVER_ENDPOINT=http://crawler-cdx:8081/fc
+
+# pywb
+export WB_HOST=crawler07.bl.uk
