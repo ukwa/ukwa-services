@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-set -euo pipefail
+set -euxo pipefail
 
 # read script environ argument, check, and read envars
 CONTEXT_ENV_FILE=$1
@@ -13,8 +13,8 @@ set -a # automatically export all variables
 source ${CONTEXT_ENV_FILE}
 set +a
 
-if ! [[ ${DEPLOYMENT_CONTEXT} =~ DEV|BETA|PROD|INGEST ]]; then
-        echo "ERROR: Script $0 DEPLOYMENT_CONTEXT envar not (DEV|BETA|PROD|INGEST)"
+if ! [[ ${DEPLOYMENT_CONTEXT} =~ DEV|BETA|PROD|INGEST|LOCAL ]]; then
+        echo "ERROR: Script $0 DEPLOYMENT_CONTEXT envar not (DEV|BETA|PROD|INGEST|LOCAL)"
         exit
 fi
 
