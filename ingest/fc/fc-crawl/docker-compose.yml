@@ -74,7 +74,7 @@ services:
   # CDX server for deduplication and last-crawled-at:
   crawler-cdx:
     image: nlagovau/outbackcdx:0.11.0
-    command: "java -Xmx8g -jar /outbackcdx.jar -d /crawldb-fc -b 0.0.0.0 -p 8081 -t 5000 -u"
+    command: "java -Xmx2g -jar /outbackcdx.jar -d /crawldb-fc -b 0.0.0.0 -p 8081 -t 1000 -u"
     ports:
       - "8081:8081"
     volumes:
@@ -129,7 +129,7 @@ services:
       - "LC_ALL=en_US.utf8"
       - "PORT=8010"
       - "NODE_ENV=production"
-      - "PUPPETEER_CLUSTER_SIZE=64"
+      - "PUPPETEER_CLUSTER_SIZE=8"
       # The renderer supports substituting the @VERSION@
       - "USER_AGENT_ADDITIONAL=bl.uk_ldfc_renderbot/@VERSION@ (+https://www.bl.uk/legal-deposit/web-archiving)"
     volumes:
