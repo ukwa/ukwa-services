@@ -15,7 +15,7 @@ on:
         required: true
 
 env:
-  TEST_TAG: ${{ inputs.image_name }}:testimage
+  TEST_TAG: ${{ inputs.image_name }}:${{ github.sha }}
 
 jobs:
   push_to_docker_hub:
@@ -63,6 +63,7 @@ jobs:
           output: 'trivy-results.sarif'
           exit-code: 1
           ignore-unfixed: true
+          vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
           timeout: '30m'
           
