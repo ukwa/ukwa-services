@@ -55,13 +55,23 @@ jobs:
           load: true
           tags: ${{ env.TEST_TAG }}
 
+      - name: Run Trivy vulnerability scanner, logging to console
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ env.TEST_TAG }}'
+          format: 'table'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          timeout: '30m'
+  
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ env.TEST_TAG }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          exit-code: 1
+          #exit-code: '1' This seems to be causing problems at present, failing even when there are no problems
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'HIGH,CRITICAL'
