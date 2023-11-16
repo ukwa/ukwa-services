@@ -1,10 +1,10 @@
 name: Deploy UKWA BETA Services
 
-# Switching this off as no runners at present
-#on:
-#  push:
-#    branches:
-#      - master
+on:
+  push:
+    branches:
+      # Switching this off as no runners at present
+      - this-branch-does-not-exist
 
 jobs:
   test-job:
