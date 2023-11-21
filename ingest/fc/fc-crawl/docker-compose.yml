@@ -24,6 +24,11 @@ services:
       - "${SURTS_NPLD_PATH}:/shared" # Shared configuration - surts file held here.
     deploy:
       replicas: 1
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 204800
+        hard: 204800
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     depends_on:
       - clamd
@@ -55,6 +60,11 @@ services:
       - "${SURTS_BYPM_PATH}:/shared" # Shared configuration - surts file held here.
     deploy:
       replicas: 1
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 204800
+        hard: 204800
     stop_grace_period: 5m # Give the H3 instances some time to shut down neatly following SIGTERM
     depends_on:
       - clamd
@@ -104,6 +114,9 @@ services:
       - "${WARCPROX_PATH}:/host" # FAST disk for dedup db
     ulimits:
       nproc: 2000  # See https://github.com/internetarchive/warcprox/blob/2.x/warcprox/warcproxy.py#L413
+      nofile:
+        soft: 204800
+        hard: 204800
     deploy:
       replicas: 1
     depends_on:
@@ -129,7 +142,7 @@ services:
       - "LC_ALL=en_US.utf8"
       - "PORT=8010"
       - "NODE_ENV=production"
-      - "PUPPETEER_CLUSTER_SIZE=8"
+      - "PUPPETEER_CLUSTER_SIZE=4"
       # The renderer supports substituting the @VERSION@
       - "USER_AGENT_ADDITIONAL=bl.uk_ldfc_renderbot/@VERSION@ (+https://www.bl.uk/legal-deposit/web-archiving)"
     volumes:
@@ -141,6 +154,11 @@ services:
       endpoint_mode: dnsrr
       # Note that using dnsrr means we can't use the ingress network for load balancing, and any load balancing has to be done explicitly.
       replicas: 1
+      # Limit resources to avoid swamping the server:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4G
     depends_on:
       - warcprox
     networks:
