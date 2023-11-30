@@ -142,7 +142,7 @@ services:
       - "LC_ALL=en_US.utf8"
       - "PORT=8010"
       - "NODE_ENV=production"
-      - "PUPPETEER_CLUSTER_SIZE=4"
+      - "PUPPETEER_CLUSTER_SIZE=8"
       # The renderer supports substituting the @VERSION@
       - "USER_AGENT_ADDITIONAL=bl.uk_ldfc_renderbot/@VERSION@ (+https://www.bl.uk/legal-deposit/web-archiving)"
     volumes:
@@ -157,8 +157,8 @@ services:
       # Limit resources to avoid swamping the server:
       resources:
         limits:
-          cpus: '4.0'
-          memory: 4G
+          cpus: '8.0'
+          memory: 8G
     depends_on:
       - warcprox
     networks:

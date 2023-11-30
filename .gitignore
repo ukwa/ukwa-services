@@ -3,3 +3,4 @@ __pycache__
 access.log
 error.log
 *~
+ingest/fc/h3b.log
