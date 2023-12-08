@@ -58,6 +58,8 @@ How the Frequent Crawl works
 
 The Kafka `fc.crawled` topic is not intended to be kept long term, but can be used to integrate with other systems to provide some insight into what's going on. In the past, we have used an ELK service to consume events and build a database that can be queried from the Grafana instance that is embedded as part of the W3ACT stack.  We also used a custom activity analysis script as part of the access stack, so the API can report on recent crawler activity. This was how the 'crawl blobs' visualisation worked, as documented at https://blogs.bl.uk/webarchive/2019/10/-ukwa-website-crawl-one-hour-in-one-minute.html and deployed at https://ukwa-vis.glitch.me/.
 
+Note that it is possible to use the crawl-time OutbackCDX collection from PyWB, and that a 'crawler' collection endpoint is configured as part of QA Wayback that works precisely this way. This does mean you can see immediately what has been crawled, but due to a [bug with how de-duplication events are stored by the `warcprox` OutbackCDX plugin](https://github.com/ukwa/docker-warcprox/issues/4) this doesn't always work properly at present.
+
 How the Domain Crawl works
 --------------------------
 
