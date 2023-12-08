@@ -56,6 +56,7 @@ How the Frequent Crawl works
 - The `crawl.log` file is rotated daily as part of the crawl checkpointing cycle. These crawl logs are considered impotant provenance and are transferred to HDFS along with the WARCs.
 - The filesystem layout on HDFS means we need to put the WARCs from the web rendering process in with the corresponding Heritrix job output folders.  There is an Airflow task that attempts to tidy up the WARCs and logs so they can be uploaded in the right place.
 
+The Kafka `fc.crawled` topic is not intended to be kept long term, but can be used to integrate with other systems to provide some insight into what's going on. In the past, we have used an ELK service to consume events and build a database that can be queried from the Grafana instance that is embedded as part of the W3ACT stack.  We also used a custom activity analysis script as part of the access stack, so the API can report on recent crawler activity. This was how the 'crawl blobs' visualisation worked, as documented at https://blogs.bl.uk/webarchive/2019/10/-ukwa-website-crawl-one-hour-in-one-minute.html and deployed at https://ukwa-vis.glitch.me/.
 
 How the Domain Crawl works
 --------------------------
