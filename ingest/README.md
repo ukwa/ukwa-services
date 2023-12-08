@@ -2,6 +2,11 @@ The Ingest Stacks <!-- omit in toc -->
 =================
 
 - [Introduction](#introduction)
+- [How the Frequent Crawl works](#how-the-frequent-crawl-works)
+- [How the Domain Crawl works](#how-the-domain-crawl-works)
+- [How the Document Harvester works](#how-the-document-harvester-works)
+  - [Known Failure Modes](#known-failure-modes)
+  - [Debugging Approach](#debugging-approach)
 - [Operations](#operations)
   - [Crawler Service Operations](#crawler-service-operations)
     - [Deploying Kafka](#deploying-kafka)
@@ -16,11 +21,6 @@ The Ingest Stacks <!-- omit in toc -->
     - [Pause the crawl job(s)](#pause-the-crawl-jobs)
     - [Checkpoint the job(s)](#checkpoint-the-jobs)
     - [Shutdown](#shutdown)
-- [Workflows](#workflows)
-  - [How the Frequent Crawler works](#how-the-frequent-crawler-works)
-  - [How the Document Harvester works](#how-the-document-harvester-works)
-    - [Known Failure Modes](#known-failure-modes)
-    - [Debugging Approach](#debugging-approach)
 
 
 Introduction
@@ -35,6 +35,8 @@ This section covers the service stacks that are used for curation and for crawli
 The [`crawl_log_db`](./crawl_log_db/) service is not in use, but contains a useful example of how a Solr service and it's associated schema can be set up using the Solr API rather than maintaining XML configuration files.
 
 - [ ] TBA move-to-S3?
+
+The Ingest services work together in quite complicated ways, so this page attempts to describe some of the core workflows.  This should help determine what's happened if anything goes wrong.
 
 How the Frequent Crawl works
 ----------------------------
@@ -271,57 +273,3 @@ At this point, all activity should have stopped, so it should not make much diff
 
 You can now shut down the services...
 
-
-Workflows
----------
-
-The Ingest services work together in quite complicated ways, so this section attempts to describe some of the core workflows.  This should help determine what's happened if anything goes wrong.
-
-### How the Frequent Crawler works
-
-
-
-### How the Document Harvester works
-
-1.  Curators mark Targets as being Watched in W3ACT.
-2.  The [`w3act_export` workflow](http://airflow.api.wa.bl.uk/dags/w3act_export/grid) running on Airflow exports the data from W3ACT into files that contain this information.
-3.  The usual move-to-hdfs scripts move WARCs and logs onto the Hadoop store.
-4.  The TrackDB file tracking database gets updated so recent WARCs and crawl logs are known to the system. (See the `update_trackdb_*` tasks on [http://airflow.api.wa.bl.uk](http://airflow.api.wa.bl.uk/home)/).
-5.  The usual web archiving workflow indexes WARCs into the CDX service so items become available.
-6.  The Document Harvester [`ddhapt_log_analyse` workflow](http://airflow.api.wa.bl.uk/dags/ddhapt_log_analyse/grid) runs Hadoop jobs that take the W3ACT export data and use it to find potential documents in the crawl log.
-    1.  This currently means PDF files on Watched Targets.
-    2.  For each, a record is pushed to a dedicate PostgreSQL Document Database (a part of the W3ACT stack), with a status of _NEW_.
-7.  The Document Harvester [ddhapt\_process\_docs workflow](http://airflow.api.wa.bl.uk/dags/ddhapt_process_docs/grid) gets the most recent _NEW_ documents from the Document Database and attempts to enrich the metadata and post them to W3ACT.
-    1.  Currently, the metadata enrichment process talks to the live web rather than the web archive.
-    2.  In general, PDFs are associated with the website they are found from (the landing page), linked to the Target.
-    3.  For GOV.UK, we rely on the PDFs having a rel=up HTTP header that unambigiously links a PDF to it's landing page.
-    4.  The enriched metadata is then used to push a request to W3ACT. This metadata includes an access URL that points to the UKWA website on the public web ([see here for details](https://github.com/ukwa/ukwa-services/blob/aa95df6854382e6b6e84edc697dcb4da2804ef9c/access/website/config/nginx.conf#L154-L155)).
-    5.  W3ACT checks the file in question can be accessed via Wayback and calculates the checksum of the payload, or throws an error if it's not ready yet.
-    6.  If the submission works, the record is updated in the Document Database so it's no longer _NEW_.
-    7.  If it fails, it will be re-run in the future, so once it's available in Wayback it should turn up in W3ACT.
-8.  Curators review the Documents found for the Targets they own, and update the metadata as needed.
-9.  Curators then submit the Documents, which creats a XML SIP file that is passed to a DLS ingest process.
-10.  The DLS ingest process passes the metadata to MER and to Aleph.
-11.  The MER version is not used further.
-12.  The Aleph version then becomes the master metadata record, and is passed to Primo and LDLs via the Metadata Aggregator.
-13.  Links in e.g. Primo point to the access URLs included with the records, meaning users can find and access the documents.
-
-#### Known Failure Modes
-
-The Document Harvester has been fairly reliable in recent years, but some known failure modes may help resolve issues.
-
-*   Under certain circumstances, Heritrix has been known to stop rotating crawl logs properly. If this happens, crawl log files may stop appearing or get lost. Fixing this may require creating an empty crawl.log file in the right place so a checkpoint can rotate the files correctly, or in the worst cases, a full crawler restart. If this happens, crawl logs will stop arriving on HDFS.
-*   If there is a problem with the file tracking database getting updated to slowly, then the Document Harvester Airflow workflows may run but see nothing to process. This can be determined by checking the logs via Airflow, and checking that the expected number of crawl log files for that day were found. Clearing the job so Airflow re-runs it will resolve any gaps.
-*   If there is a problem with W3ACT (either directly, or with how it talks to the curators Wayback instance), then jobs may fail to upload processed Documents to W3ACT. This can be spotted by checking the logs via Airflow, but note that any Documents that have not yet been CDX indexed are expected to be logged as errors at this point, so it can be difficult to tell things apart. It may be necessary to inspect the W3ACT container logs to determine if there's a problem with W3ACT itself.
-
-#### Debugging Approach
-
-Problems will generally be raised by Jennie Grimshaw, who is usually able and happy to supply some example Document URLs that should have been spotted. This is very useful in that it provides some test URLs to run checks with, e.g.
-
-*   Check the URLs actually work and use `curl -v` to see if the `Link: rel=up` header is present (for GOV.UK) which helps find the landing page URL.
-*   Check the crawl-time CDX index (currently at [http://crawler06.bl.uk:8081/fc](http://crawler06.bl.uk:8081/fc)) to check if the URLs have been crawler at all.
-*   Check the access time CDX index (currently at [http://cdx.api.wa.bl.uk/data-heritrix](http://cdx.api.wa.bl.uk/data-heritrix)) to check if the items have been indexed correctly.
-*   Check the Curator Wayback service ([https://www.webarchive.org.uk/act/wayback/archive/](https://www.webarchive.org.uk/act/wayback/archive/)) to see if the URLs are accessible.
-*   Query the PostgreSQL Document Database to see if the URL was found by the crawl log processor and what the status of it is.
-
-Overall, the strategy is to work out where the problem has occurred in the chain of events outlined in the first section, and then modify and/or re-run the workflows as needed.
