@@ -36,6 +36,85 @@ The [`crawl_log_db`](./crawl_log_db/) service is not in use, but contains a usef
 
 - [ ] TBA move-to-S3?
 
+How the Frequent Crawl works
+----------------------------
+
+- Web Archivists define the crawl targets in the W3ACT tool. This covers seed URLs, crawl schedules, and some additional options like scope, size/cap and whether to ignore `robots.txt`.
+- An Apache Airflow task (see the `manage/airflow` folder) exports this data in standard Crawl Feed JSONL format files (one for NPLD crawls, another for By-Permission crawls).
+- Another Airflow task reads these feeds every hour, and if a crawl is due to lauch that hour, sends a URL launch message to the relevant Kafka topic (`fc.tocrawl.npld` or `fc.tocrawl.bypm`).
+- Each of the NPLD and BYPM crawls uses a separate Heritrix3 instance and crawl job.  Those are running continuously, listening to the corresponding `fc.tocrawl.XXX` topic for instructions.
+- When each Heritrix receives the message, it clears any quotas and sets the relevant Heritrix configuration for the seed target URL host using the Heritrix 'sheets' configuration system. It then passed the requested URL through the crawler scope decide rules, and if it is accepted, enqueues the URL for crawling in the Heritrix frontier.
+- The Heritrix 'ToeThreads' pick up the enqueued URLs from the frontier, and will attempt to download them, extract any onward URLs, and pass those through the scope rules and to the frontier.
+- If configured to do so, every URL the crawler discovered and passes the scope rules is logged in a dedicated Kafka topic (`fc.inscope.npld` or `fc.bypm.inscope`). This can potentially be useful for debugging, or in extreme cases, reconstructing the crawl frontier. In practice, it is generally not used and can usually be ignored.
+- For every URL that Heritrix attempts to download, the result is logged to the `crawl.log` file and the the shared `fc.crawled` Kafka topic.
+- For every URL Heritrix downloads successfully, the timestamp and digest/hash are stored in the 'Recently Crawled Database', which is based on an instance of OutbackCDX. This is used to decide whether the time has come to revisit a given URL, and to de-duplicated successfully-downloaded HTTP responses.
+- If requested, either because it is a seed or because the URL is explicitly marked for web rendering, URLs can be passed to the 'WebRender' service rather than downloaded directly by Heritrix.
+    - The WebRender service is an internal HTTP API that accepts a request to render a URL, spins up a browser to render that page, takes screenshots, and then extracts any onward URLs and passes them back to Heritrix when the HTTP API call completes.
+    - This renderer uses a WARC-writing proxy to write the NPLD/BYPM results to separate WARC files, and has additional models to record these events in the Kafka `fc.crawled` topic and in the OutbackCDX instance used to record what the crawl has seen and when it has seen it.
+- Every `request` and `reponse` is written to a WARC file. In the case of Heritrix3, this is immediately followed by a `metadata` record that records what URLs were extracted from that response etc.
+- Before writing each response into a WARC file, Heritrix streams the content into the ClamAV service for malware detection. If anything is detected, the item is stored in separate 'viral' WARC files.
+- The `crawl.log` file is rotated daily as part of the crawl checkpointing cycle. These crawl logs are considered impotant provenance and are transferred to HDFS along with the WARCs.
+- The filesystem layout on HDFS means we need to put the WARCs from the web rendering process in with the corresponding Heritrix job output folders.  There is an Airflow task that attempts to tidy up the WARCs and logs so they can be uploaded in the right place.
+
+
+How the Domain Crawl works
+--------------------------
+
+The domain crawler is very similar to the frequent crawler, but scaled up and bit, and a bit simpler:
+
+- No launch cycle. A large seed list is assembled and then directly fed into the Kafa launch topic and scope configuration files.
+- No web pages are rendered in browsers (because it's computationally very expensive), so those parts are not needed.
+
+
+How the Document Harvester works
+--------------------------------
+
+The Frequent Crawler also provides the basis of the Document Harvester system. This is mostly a crawl post-processing workflow, which proceeds as follows:
+
+1.  Curators mark Targets as being Watched in W3ACT.
+2.  The [`w3act_export` workflow](http://airflow.api.wa.bl.uk/dags/w3act_export/grid) running on Airflow exports the data from W3ACT into files that contain this information.
+3.  The usual move-to-hdfs scripts move WARCs and logs onto the Hadoop store.
+4.  The TrackDB file tracking database gets updated so recent WARCs and crawl logs are known to the system. (See the `update_trackdb_*` tasks on [http://airflow.api.wa.bl.uk](http://airflow.api.wa.bl.uk/home)/).
+5.  The usual web archiving workflow indexes WARCs into the CDX service so items become available.
+6.  The Document Harvester [`ddhapt_log_analyse` workflow](http://airflow.api.wa.bl.uk/dags/ddhapt_log_analyse/grid) runs Hadoop jobs that take the W3ACT export data and use it to find potential documents in the crawl log.
+    1.  This currently means PDF files on Watched Targets.
+    2.  For each, a record is pushed to a dedicate PostgreSQL Document Database (a part of the W3ACT stack), with a status of _NEW_.
+7.  The Document Harvester [ddhapt\_process\_docs workflow](http://airflow.api.wa.bl.uk/dags/ddhapt_process_docs/grid) gets the most recent _NEW_ documents from the Document Database and attempts to enrich the metadata and post them to W3ACT.
+    1.  Currently, the metadata enrichment process talks to the live web rather than the web archive.
+    2.  In general, PDFs are associated with the website they are found from (the landing page), linked to the Target.
+    3.  For GOV.UK, we rely on the PDFs having a rel=up HTTP header that unambigiously links a PDF to it's landing page.
+    4.  The enriched metadata is then used to push a request to W3ACT. This metadata includes an access URL that points to the UKWA website on the public web ([see here for details](https://github.com/ukwa/ukwa-services/blob/aa95df6854382e6b6e84edc697dcb4da2804ef9c/access/website/config/nginx.conf#L154-L155)).
+    5.  W3ACT checks the file in question can be accessed via Wayback and calculates the checksum of the payload, or throws an error if it's not ready yet.
+    6.  If the submission works, the record is updated in the Document Database so it's no longer _NEW_.
+    7.  If it fails, it will be re-run in the future, so once it's available in Wayback it should turn up in W3ACT.
+8.  Curators review the Documents found for the Targets they own, and update the metadata as needed.
+9.  Curators then submit the Documents, which creats a XML SIP file that is passed to a DLS ingest process.
+10.  The DLS ingest process passes the metadata to MER and to Aleph.
+11.  The MER version is not used further.
+12.  The Aleph version then becomes the master metadata record, and is passed to Primo and LDLs via the Metadata Aggregator.
+13.  Links in e.g. Primo point to the access URLs included with the records, meaning users can find and access the documents.
+
+### Known Failure Modes
+
+The Document Harvester has been fairly reliable in recent years, but some known failure modes may help resolve issues.
+
+*   Under certain circumstances, Heritrix has been known to stop rotating crawl logs properly. If this happens, crawl log files may stop appearing or get lost. Fixing this may require creating an empty crawl.log file in the right place so a checkpoint can rotate the files correctly, or in the worst cases, a full crawler restart. If this happens, crawl logs will stop arriving on HDFS.
+*   If there is a problem with the file tracking database getting updated to slowly, then the Document Harvester Airflow workflows may run but see nothing to process. This can be determined by checking the logs via Airflow, and checking that the expected number of crawl log files for that day were found. Clearing the job so Airflow re-runs it will resolve any gaps.
+*   If there is a problem with W3ACT (either directly, or with how it talks to the curators Wayback instance), then jobs may fail to upload processed Documents to W3ACT. This can be spotted by checking the logs via Airflow, but note that any Documents that have not yet been CDX indexed are expected to be logged as errors at this point, so it can be difficult to tell things apart. It may be necessary to inspect the W3ACT container logs to determine if there's a problem with W3ACT itself.
+
+### Debugging Approach
+
+Problems will generally be raised by Jennie Grimshaw, who is usually able and happy to supply some example Document URLs that should have been spotted. This is very useful in that it provides some test URLs to run checks with, e.g.
+
+*   Check the URLs actually work and use `curl -v` to see if the `Link: rel=up` header is present (for GOV.UK) which helps find the landing page URL.
+*   Check the crawl-time CDX index (currently at [http://crawler06.bl.uk:8081/fc](http://crawler06.bl.uk:8081/fc)) to check if the URLs have been crawler at all.
+*   Check the access time CDX index (currently at [http://cdx.api.wa.bl.uk/data-heritrix](http://cdx.api.wa.bl.uk/data-heritrix)) to check if the items have been indexed correctly.
+*   Check the Curator Wayback service ([https://www.webarchive.org.uk/act/wayback/archive/](https://www.webarchive.org.uk/act/wayback/archive/)) to see if the URLs are accessible.
+*   Query the PostgreSQL Document Database to see if the URL was found by the crawl log processor and what the status of it is.
+
+Overall, the strategy is to work out where the problem has occurred in the chain of events outlined in the first section, and then modify and/or re-run the workflows as needed.
+
+
 Operations
 ----------
 
