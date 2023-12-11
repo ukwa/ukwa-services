@@ -9,7 +9,7 @@ The Access Stacks <!-- omit in toc -->
 
 # Introduction
 
-The [access_website stack](./website/docker-compose.yml) runs the services that actually provide the end-user website for https://www.webarchive.org.uk/ or https://beta.webarchive.org.uk/ or https://dev.webarchive.org.uk.
+The [access_website stack](./website/) runs the services that actually provide the end-user website for https://www.webarchive.org.uk/ or https://beta.webarchive.org.uk/ or https://dev.webarchive.org.uk.
 
 # The Website Regression Test Stack
 
