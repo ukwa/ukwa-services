@@ -51,5 +51,8 @@ These can be run each morning, and the metrics posted to Prometheus used to trac
 
 # The Reading Room Wayback Stack
 
-The `rrwb` stack defines the necessary services for running our reading room access services via proxied connections rather than DLS VMs. This new approach is on hold at present.
+There are two Reading Room services, the current (legacy) one and the newer one created by the Legal Deposit Access Solution project.
 
+The new one has detailed documentation in a dedicated repository: https://github.com/ukwa/npld-access-stack#readme
+
+The old one is very old, and is a manually-installed set of services based on OpenWayback. It is not documented further here.
