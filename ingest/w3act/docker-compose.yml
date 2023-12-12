@@ -2,7 +2,10 @@ version: '3.2'
 
 services:
 
+  # -------------------------------------------------------------
   # NGINX to pull all services together:
+  # REQUIRED
+  # -------------------------------------------------------------
   nginx:
     image: nginx:alpine
     volumes:
@@ -11,7 +14,10 @@ services:
     ports:
       - "9000:80"
 
+  # -------------------------------------------------------------
   # PyWB for QA
+  # REQUIRED
+  # -------------------------------------------------------------
   pywb:
     image: ukwa/ukwa-pywb:2.6.7.2
     environment:
@@ -30,7 +36,10 @@ services:
           memory: '2G'
 
 
+  # -------------------------------------------------------------
   # Internal WARC server that can pull from multiple clusters and local disk
+  # REQUIRED
+  # -------------------------------------------------------------
   warc-server:
     image: ukwa/warc-server:1.1.0
     # Modify number of workers:
@@ -51,18 +60,10 @@ services:
       - "/mnt/gluster/fc/heritrix/output:/heritrix/output"
       - "/mnt/gluster/fc/heritrix/wren:/heritrix/wren"
 
-  # PDF to HTML service
-  pdf2htmlex:
-    image: ukwa/pdf2htmlex:1.0.1
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: '2G'
-    depends_on:
-      - pywb
-
+  # -------------------------------------------------------------
   # W3ACT
+  # REQUIRED
+  # -------------------------------------------------------------
   w3act:
     image: ukwa/w3act:2.3.5
     #image: ukwa/w3act:master
@@ -99,7 +100,10 @@ services:
       - pywb
       - pdf2htmlex
 
+  # -------------------------------------------------------------
   # PostgreSQL
+  # REQUIRED
+  # -------------------------------------------------------------
   postgres:
     image: postgres:9.6.2
     environment:
@@ -112,7 +116,22 @@ services:
       - "${W3ACT_DUMPS_DIR}:/tmp"
 
   # -------------------------------------------------------------
-  # Additional database for DDHAPT
+  # PDF to HTML service
+  # REQUIRED for Document Harvester
+  # -------------------------------------------------------------
+  pdf2htmlex:
+    image: ukwa/pdf2htmlex:1.0.1
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: '2G'
+    depends_on:
+      - pywb
+
+  # -------------------------------------------------------------
+  # Additional database for DDHAPT data from Airflow tasks
+  # REQUIRED for Document Harvester
   # -------------------------------------------------------------
   ddhapt-postgres:
     image: postgres:14.1
@@ -125,7 +144,8 @@ services:
       - "${DDHAPT_PSQL_DIR}:/var/lib/postgresql/data"
 
   # -------------------------------------------------------------
-  # Crawl log viewer
+  # Crawl log viewer based on talking to Kafka
+  # OPTIONAL
   # -------------------------------------------------------------
   crawl-log-viewer:
     image: ukwa/crawl-log-viewer
@@ -135,7 +155,8 @@ services:
       - ./config/crawl-log-viewer-topics.json:/usr/src/app/topics.json
 
   # -------------------------------------------------------------
-  # Notebooks and Dashboards
+  # Notebooks intended to be used for complicated dynamic reports
+  # OPTIONAL
   # -------------------------------------------------------------
   nbapps:
     image: ukwa/ukwa-notebook-apps:master
@@ -153,6 +174,10 @@ services:
     volumes:
       - "${STORAGE_PATH}:/storage"
 
+  # -------------------------------------------------------------
+  # Dashboard intended for allowing access to crawl logs in ELK
+  # OPTIONAL
+  # -------------------------------------------------------------
   grafana:
     image: grafana/grafana-oss:8.3.4
     environment:
@@ -177,6 +202,7 @@ services:
 
   # -------------------------------------------------------------
   # SolrWayback service for Staff
+  # OPTIONAL
   # -------------------------------------------------------------
   solrwayback:
     image: ukwa/solrwayback:master
@@ -191,7 +217,8 @@ services:
       - "ALT_PLAYBACK_PREFIX=https://${SERVER_NAME}/act/wayback/archive/"
 
   # -------------------------------------------------------------
-  # Backstage Browser
+  # Backstage Browser, an experimental Solr UI
+  # OPTIONAL
   # -------------------------------------------------------------
   backstage:
     image: ukwa/backstage:master
