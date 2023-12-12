@@ -7,7 +7,8 @@ version: '3.2'
 services:
 
   # -------------------------------------------------------------
-  # Web proxy setup
+  # Web proxy and static site setup
+  # REQUIRED
   # -------------------------------------------------------------
   # All routing to sub-components goes through here.
   # All complex setup relating to the public website is here.
@@ -28,6 +29,7 @@ services:
 
   # -------------------------------------------------------------
   # The main UKWA UI itself
+  # REQUIRED
   # -------------------------------------------------------------
   ukwa-ui:
     # UI container image configured by deployment context (see deployment script):
@@ -61,6 +63,7 @@ services:
 
   # -------------------------------------------------------------
   # OA Wayback configuration:
+  # REQUIRED
   # -------------------------------------------------------------
   pywb:
     image: "${PYWB_IMAGE}"
@@ -83,9 +86,10 @@ services:
           cpus: '4.0'
           memory: '2G'
 
-
-
+  # -------------------------------------------------------------
   # An embedded, bannerless OA Wayback to render screenshots:
+  # OPTIONAL: Used by the API but config. is here so it's easier to compare with the maiun PyWB instance above
+  # -------------------------------------------------------------
   pywb-nobanner:
     image: "${PYWB_IMAGE}"
     environment:
@@ -104,7 +108,10 @@ services:
           cpus: '4.0'
           memory: '2G'
 
+  # -------------------------------------------------------------
   # Internal WARC server that can pull from multiple clusters and local disk
+  # REQUIRED
+  # -------------------------------------------------------------
   warc-server:
     image: ukwa/warc-server:1.1.0
     # Alternative command for debugging:
@@ -121,7 +128,21 @@ services:
       - "/mnt/gluster/fc/heritrix/wren:/heritrix/wren"
 
   # -------------------------------------------------------------
+  # Collections index for Topics & Themes of the UKWA UI
+  # REQUIRED
+  # -------------------------------------------------------------
+  collections_solr:
+    image: ukwa/ukwa-ui-collections-solr:1.2.0
+    user: "${CURRENT_UID}"
+    volumes:
+        - "${STORAGE_PATH_WEBSITE}/collections_solr_cores:/opt/solr/server/solr/mycores"
+        - "${STORAGE_PATH_WEBSITE}/collections_solr_logs:/opt/solr/server/logs"
+    ports:
+        - "9021:8983" # Exposed port so external clients can run checks (TBC)
+
+  # -------------------------------------------------------------
   # Mementos
+  # OPTIONAL
   # -------------------------------------------------------------
   mementos:
     image: ukwa/mementoweb-webclient
@@ -131,6 +152,7 @@ services:
 
   # -------------------------------------------------------------
   # Shine service and database
+  # OPTIONAL
   # -------------------------------------------------------------
   # Shine
   shine:
@@ -150,7 +172,8 @@ services:
       
       
   # -------------------------------------------------------------
-  # The Python service that provides some basic APIs
+  # The set of services that provides a public API:
+  # OPTIONAL
   # -------------------------------------------------------------
   api:
     image: "${API_IMAGE}"
@@ -180,6 +203,7 @@ services:
       - webrender
 
   # Web page rendering post-crawl:
+  # (uses pywb-nobanner)
   webrender:
     image: ukwa/webrender-puppeteer:2.3.3
     environment:
@@ -216,16 +240,6 @@ services:
     #  - 8182:8182
     volumes:
       - ${STORAGE_PATH_WEBSITE}/iiif_cache:/var/cache/cantaloupe
-
-  # Collections index for Topics & Themes of the UKWA UI
-  collections_solr:
-    image: ukwa/ukwa-ui-collections-solr:1.2.0
-    user: "${CURRENT_UID}"
-    volumes:
-        - "${STORAGE_PATH_WEBSITE}/collections_solr_cores:/opt/solr/server/solr/mycores"
-        - "${STORAGE_PATH_WEBSITE}/collections_solr_logs:/opt/solr/server/logs"
-    ports:
-        - "9021:8983" # Exposed port so external clients can run checks (TBC)
 
   # Analyses recent crawl behaviour by processing the crawled data stream:
   analyse:
