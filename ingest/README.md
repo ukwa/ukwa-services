@@ -286,3 +286,7 @@ There's usually three steps to this, working in concert with the Web Archivist r
 3. Check no further activity has been logged.
 
 One important variation is that we sometimes get automated complaints through AWS or JANET rather than via web hosts contacting UKWA.  In this case, we often do not have any way to contact the actual webmaster, so we just have to block the crawl and report back to the network supplier.
+
+In the case of the frequent crawls, this should be done by Nicola updating W3ACT records as `NEVER CRAWL`, and then the relevant `excluded-surts` file being updated based on that. See the FC setup documentation at https://github.com/ukwa/aws-fc-setup/tree/main#configuring-the-crawls ... However, that automated update was not completed, and should really be a new Airflow task!
+
+It's more of a priority for the domain crawl, in which case the equivalent `excluded-surts` file is updated manually. This file uses a syntax called 'Surt Prefix Scope, as defined in http://crawler.archive.org/articles/user_manual/config.html#scopes - this means a specific host/URL-prefix can be blocked by just adding it to that file, or a SURT can be used, prefixed with a `+`.  If you check the Heritrix job/container logs, you should see that Heritrix quickly notices the exclusion file is updated and loads in the changes. It will also grumble if it can't parse the lines.
