@@ -21,6 +21,7 @@ The Ingest Stacks <!-- omit in toc -->
     - [Pause the crawl job(s)](#pause-the-crawl-jobs)
     - [Checkpoint the job(s)](#checkpoint-the-jobs)
     - [Shutdown](#shutdown)
+    - [Handling Crawler Complaints](#handling-crawler-complaints)
 
 
 Introduction
@@ -273,3 +274,15 @@ At this point, all activity should have stopped, so it should not make much diff
 
 You can now shut down the services...
 
+
+#### Handling Crawler Complaints
+
+Occasionally, we need to stop a crawler from crawling a site. Usually this is due an email complaining about the crawler finding 404s on a site that otherwise doesn't get crawled much. Although it's rare we're really doing anything wrong in terms of the legal framework, we usually err on the side of caution and block the crawler from crawling their site. The complaints often don't make this easy, as they often redact most of the host name, leaving us to rely on the timestamp and path of the URL to work out the hostname so we can use that to block the crawler from visiting.
+
+There's usually three steps to this, working in concert with the Web Archivist role(s) who usually coordinate the response to the complaint.
+
+1. Check what's been going on. Use the crawl-time CDX index, or the Kafka UI, or just grep the relevant `crawl.log` to verify what's going on an work out the host name in question.
+2. Update the relevant crawlers' exclusion file to add the URL or SURT to the block list (which the crawler will then automatically read).
+3. Check no further activity has been logged.
+
+One important variation is that we sometimes get automated complaints through AWS or JANET rather than via web hosts contacting UKWA.  In this case, we often do not have any way to contact the actual webmaster, so we just have to block the crawl and report back to the network supplier.
