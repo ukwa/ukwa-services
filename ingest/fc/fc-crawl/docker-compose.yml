@@ -157,8 +157,8 @@ services:
       # Limit resources to avoid swamping the server:
       resources:
         limits:
-          cpus: '8.0'
-          memory: 8G
+          cpus: '2.0'
+          memory: 2G
     depends_on:
       - warcprox
     networks:
