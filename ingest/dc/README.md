@@ -113,13 +113,14 @@ Data will end up in `/data/dc/`
 Launching the full crawl
 ------------------------
 
-TODO We also need to revisit the full-domain seeding protocol
-TODO Add part of setting up the full surts
+The required configuration for Heritrix itself should be through environment variable, so those should be reviewed.
 
-Feed in all known hosts. Pre-filter to avoid lots of empty queues in H3? Run through web render separately?
+The crucial aspects are:
 
-TO ADD
+- The crawl name should reflect the year, e.g. dc2023
+- The number of ToeThreads and BDB cleanup threads should be larger than for FC.
+- The memory requirements are quite high, and the heap settings should match about half the server RAM, up to 128GB server RAM for the large DC frontier.
 
-- update crawl name
-- constraints
+The dc-seeds repository details setting up the seeds and the scope SURT files needed for this crawl, and they need to be installed before starting the crawl. The dc-seeds repo also covers loading the seeds into Kafka.
 
+The crawl should then run in much the same way as the FC.  Checkpoint cleanup is required to keep disk space usage under control.
