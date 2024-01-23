@@ -179,6 +179,7 @@ Whoever is performing the roll-out will then review the tagged `ukwa-services` c
 - check all containers specify a tagged version to deploy
 - check the right API endpoints are in us
 - run any tests supplied for the component
+- run the service-level regression testing suite, https://github.com/ukwa/docker-robot-framework, to check if the public-facing services are behaving as expected.
 
 
 
