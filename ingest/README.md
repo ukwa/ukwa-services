@@ -45,7 +45,8 @@ How the Frequent Crawl works
 
 - Web Archivists define the crawl targets in the W3ACT tool. This covers seed URLs, crawl schedules, and some additional options like scope, size/cap and whether to ignore `robots.txt`.
 - An Apache Airflow task (see the `manage/airflow` folder) exports this data in standard Crawl Feed JSONL format files (one for NPLD crawls, another for By-Permission crawls).
-- Another Airflow task reads these feeds every hour, and if a crawl is due to lauch that hour, sends a URL launch message to the relevant Kafka topic (`fc.tocrawl.npld` or `fc.tocrawl.bypm`).
+- Another Airflow task reads these feeds every hour, and if a crawl is due to launch that hour, sends a URL launch message to the relevant Kafka topic (`fc.tocrawl.npld` or `fc.tocrawl.bypm`).
+  - Crucially, this task takes the crawl spec and [maps](https://github.com/ukwa/crawl-streams/blob/e26fab8d3e4e04133530286810f79f9a3fd3e209/crawlstreams/launcher.py#L174-L189) the details onto the relevant [Heritrix sheets](https://github.com/ukwa/ukwa-heritrix/blob/master/jobs/frequent/sheets.xml#L384-L407).
 - Each of the NPLD and BYPM crawls uses a separate Heritrix3 instance and crawl job.  Those are running continuously, listening to the corresponding `fc.tocrawl.XXX` topic for instructions.
 - When each Heritrix receives the message, it clears any quotas and sets the relevant Heritrix configuration for the seed target URL host using the Heritrix 'sheets' configuration system. It then passed the requested URL through the crawler scope decide rules, and if it is accepted, enqueues the URL for crawling in the Heritrix frontier.
 - The Heritrix 'ToeThreads' pick up the enqueued URLs from the frontier, and will attempt to download them, extract any onward URLs, and pass those through the scope rules and to the frontier.
@@ -298,7 +299,7 @@ It's more of a priority for the domain crawl, in which case the equivalent `excl
 - Crawl CDX
 - Kafka logs
 - daily crawl log files
-- crawl-db, derived from crawl logs, making them queryable
+- crawl-db, derived from crawl logs, making them queryable  - See https://github.com/ukwa/crawl-db#example-of-use
 
 ```
 nohup python -m crawldb.parquet.cli import /mnt/data/fc/heritrix/output/frequent-npld/20231124123728/logs/crawl.log.cp00029-20231213123735 /mnt/data/fc/crawl-db/npld-log-cp00026.parquet &
