@@ -1,5 +1,6 @@
 name: Build, scan and push to Docker Hub
-# intended as shared workflow to be included in other workflows, not called directly
+# intended as shared workflow to be included in other repo workflows, 
+# not triggered by direct pushes to this repo. ie. its an action library function
 
 on:
   workflow_call:
