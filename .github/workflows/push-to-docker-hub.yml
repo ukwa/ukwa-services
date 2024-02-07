@@ -1,4 +1,5 @@
 name: Build, scan and push to Docker Hub
+# intended as shared workflow to be included in other workflows, not called directly
 
 on:
   workflow_call:
