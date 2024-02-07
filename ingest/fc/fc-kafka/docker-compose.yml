@@ -41,7 +41,7 @@ services:
       #KAFKA_CREATE_TOPICS: "fc.tocrawl.npld:16:1,fc.tocrawl.bypm:16:1,fc.crawled:16:1"
       # Integrate with Prometheus - note that this interferes with the create-topics script so may need to be disabled when first creating the topics:
       KAFKA_JMX_OPTS: "-javaagent:/prom-jmx/jmx_prometheus_javaagent-0.10.jar=7071:/prom-jmx/prom-jmx-agent-config-kafka.yml"
-      KAFKA_HEAP_OPTS: "-Xmx2g -Xms2g"
+      KAFKA_HEAP_OPTS: "-Xmx4g -Xms4g"
       # persistent files are in consistent locations, each server supplies a /kafka folder.
       KAFKA_BROKER_ID: 1
       KAFKA_LOG_DIRS: /kafka/kafka-logs/kafka-logs-broker-1

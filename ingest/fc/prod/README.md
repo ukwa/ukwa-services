@@ -39,7 +39,7 @@ Create the topics:
 
 Force a restart of the UI so it's up definately presenting up-to-date information:
 
-    $ docker service update --force fc_kafka_ui
+    $ docker service update --force fc_ui_kafka_kafka-ui
 
 The topics should now show up at e.g. http://crawler04.bl.uk:9000/
 
