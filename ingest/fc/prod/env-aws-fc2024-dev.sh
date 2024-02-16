@@ -13,14 +13,14 @@ export SURTS_NPLD_PATH=${STORAGE_PATH}/surts/npld
 export SURTS_BYPM_PATH=${STORAGE_PATH}/surts/bypm
 export NPLD_STATE_PATH=${TMP_STORAGE_PATH}/heritrix/npld/state
 export BYPM_STATE_PATH=${TMP_STORAGE_PATH}/heritrix/bypm/state
-export CDX_STORAGE_PATH=${STORAGE_PATH}/cdx
+export CDX_STORAGE_PATH=${STORAGE_PATH}/cdx/crawldb-fc
 export TMP_WEBRENDER_PATH=/tmp/webrender
 export PROMETHEUS_DATA_PATH=${STORAGE_PATH}/prometheus-data
 export WARCPROX_PATH=${STORAGE_PATH}/warcprox
 
 # crawler details
 export CRAWL_HOST_LAN_IP=172.31.30.43
-export CRAWL_HOST_WAN_IP=18.130.48.236
+export CRAWL_HOST_WAN_IP=3.8.7.212
 #export H3_UID=$(id -u)
 export H3_UID=0
 export HERITRIX_VERSION=2.9.3
