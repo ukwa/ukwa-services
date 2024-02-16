@@ -84,7 +84,7 @@ services:
   # CDX server for deduplication and last-crawled-at:
   crawler-cdx:
     image: nlagovau/outbackcdx:0.11.0
-    command: "java -Xmx2g -jar /outbackcdx.jar -d /crawldb-fc -b 0.0.0.0 -p 8081 -t 1000 -u"
+    command: "java -Xmx4g -jar /outbackcdx.jar -d /crawldb-fc -b 0.0.0.0 -p 8081 -t 500 -u"
     ports:
       - "8081:8081"
     volumes:
