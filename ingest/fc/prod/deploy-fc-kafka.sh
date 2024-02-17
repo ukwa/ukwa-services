@@ -38,3 +38,7 @@ done
 
 # start FC kafka stack
 docker stack deploy -c ../fc-kafka/docker-compose.yml fc_kafka
+
+wait
+sleep 10
+docker service ls

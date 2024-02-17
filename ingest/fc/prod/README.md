@@ -44,6 +44,8 @@ The topics should now show up at e.g. http://crawler07.bl.uk:9000/
 
 ## Heritrix setup
 
+Before starting the services for the crawler, make sure that if this is a fresh installation, the CDX directory does __NOT__ exist. This is because OutbackCDX (or perhaps the underlying rocksdb) creates this database directory when it is first called by heritrix - if it exists on start, OutbackCDX/rocksdb will conclude the database files (which may be none actually in the directory) are corrupt and the database creation will not happen.
+
 Once this is in place, deploy the services and check they are running:
 
     $ ./deploy-fc-crawl.sh <config.sh>
@@ -54,6 +56,7 @@ The services should now be visible:
 * The NPLD crawl engine: https://crawler07.bl.uk:8443/engine/job/frequent
 * The by-permission crawl engine: https://crawler07.bl.uk:9443/engine/job/frequent 
 * The embedded Prometheus service: http://crawler07.bl.uk:9191/
+* The CDX service: http:/crawler07.bl.uk:8181/
 
 The crawlers to be used - NPLD, BYPM, both - should now be logged into, built, and launched (from the latest checkpoint if appropriate).
 The embedded Prometheus service can be viewed directly but it intended to be hooked into the main monitoring service.

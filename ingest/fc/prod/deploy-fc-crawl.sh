@@ -38,3 +38,7 @@ done
 
 # start FC crawler stack
 docker stack deploy -c ../fc-crawl/docker-compose.yml fc_crawl
+
+wait
+sleep 10
+docker service ls
