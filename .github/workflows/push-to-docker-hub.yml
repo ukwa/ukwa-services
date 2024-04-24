@@ -14,6 +14,11 @@ on:
         description: 'Optional version tag for the Docker image.'
         required: false
         type: string
+      context:
+        description: 'Docker build context if different from the root of the repo.'
+        required: false
+        default: '.'
+        type: string
     secrets:
       DOCKER_HUB_USERNAME:
         required: true
@@ -57,7 +62,7 @@ jobs:
       - name: Build and export to Docker for testing
         uses: docker/build-push-action@v2
         with:
-          context: .
+          context: ${{ inputs.context }}
           load: true
           tags: ${{ env.TEST_TAG }}
 
@@ -91,6 +96,7 @@ jobs:
       - name: Build and push to Docker Hub
         uses: docker/build-push-action@v2
         with:
+          context: ${{ inputs.context }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
