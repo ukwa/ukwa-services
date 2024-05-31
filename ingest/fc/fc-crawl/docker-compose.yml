@@ -4,7 +4,7 @@ services:
   # ---------- CDX server for deduplication and last-crawled-at:
   crawler-cdx:
     image: nlagovau/outbackcdx:0.11.0
-    command: "java -Xmx4g -jar /outbackcdx.jar -d /crawldb-fc -b 0.0.0.0 -p 8081 -t 1000 -u"
+    command: "java -Xmx8g -jar /outbackcdx.jar -d /crawldb-fc -b 0.0.0.0 -p 8081 -t 1000 -u"
     ports:
       - "8081:8081"
     volumes:
@@ -73,8 +73,8 @@ services:
       # Limit resources to avoid swamping the server:
       resources:
         limits:
-          cpus: '2.0'
-          memory: 2G
+          cpus: '4.0'
+          memory: 4G
     depends_on:
       - warcprox
     networks:
